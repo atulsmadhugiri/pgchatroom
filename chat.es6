@@ -1,12 +1,62 @@
-// CREATE A REFERENCE TO FIREBASE
-var FIREBASE = new Firebase("https://research-chat-room.firebaseio.com/");
+// Base Firebase URL
+const BASE_URL = "https://research-chat-room.firebaseio.com";
+
+class WaitingRoom {
+  constructor() {
+    this.firebase = new Firebase(`${BASE_URL}/waiting`);
+    this.firebase.on("value", snapshot => {
+      this.users = snapshot.val();
+    });
+  }
+}
+
+const WAITING_ROOM = new WaitingRoom();
+
+class CurrentUser {
+  constructor(id) {
+    this.id = id;
+    this.firebase = new Firebase(`${BASE_URL}/users/${this.id}`);
+    this.pullInfoAndSetState();
+  }
+
+  // Grab previous info from Firebase or create a new user
+  pullInfoAndSetState() {
+    this.firebase.once("value", snapshot => {
+      this.state = snapshot.val();
+      // If new user, initialize everything properly
+      if (!snapshot.val()) {
+        this.state = "waiting";
+        this.addToWaiting();
+      }
+    });
+  }
+
+  // Adds a new user to waiting room and creates a new chat room if possible
+  addToWaiting() {
+    this.firebase.set("waiting");
+    var waiting = new Firebase(`${BASE_URL}/waiting`);
+    waiting.update({ [this.id]: true });
+  }
+}
+
+class Room {
+  constructor() {
+
+  }
+}
 
 // REGISTER DOM ELEMENTS
-var MESSAGE_INPUT = $("#messageInput");
-var USER_ID = $("#userId");
-var MESSAGE_LIST = $("#messages");
+const MESSAGE_INPUT = $("#messageInput");
+const USER_ID = $("#userId");
+const MESSAGE_LIST = $("#messages");
 
-
+var currentUser;
+USER_ID.keypress(e => {
+  var user_id = USER_ID.val()
+  if (e.keyCode === 13 && user_id) {
+    currentUser = new CurrentUser(user_id);
+  }
+});
 
 // LISTEN FOR KEYPRESS EVENT
 // MESSAGE_INPUT.keypress(function (e) {
