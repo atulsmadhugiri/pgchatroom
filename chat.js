@@ -9,18 +9,66 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 // Base Firebase URL
 var BASE_URL = "https://research-chat-room.firebaseio.com";
 
-var WaitingRoom = function WaitingRoom() {
-  var _this = this;
+var currentUser = { id: "no user" };
 
-  _classCallCheck(this, WaitingRoom);
+var WaitingRoom = (function () {
+  function WaitingRoom() {
+    var _this = this;
 
-  this.firebase = new Firebase("" + BASE_URL + "/waiting");
-  this.firebase.on("value", function (snapshot) {
-    _this.users = snapshot.val();
+    _classCallCheck(this, WaitingRoom);
+
+    this.firebase = new Firebase("" + BASE_URL + "/waiting");
+    // this.users reflects firebase
+    this.firebase.on("value", function (snapshot) {
+      _this.users = snapshot.val() || {};
+    });
+    this.userFirebase = new Firebase("" + BASE_URL + "/users");
+    this.pollUsers();
+  }
+
+  _createClass(WaitingRoom, {
+    numUsers: {
+      get: function () {
+        return Object.keys(this.users).length;
+      }
+    },
+    pollUsers: {
+      value: function pollUsers() {
+        var _this = this;
+
+        var updateFromUsers = function (snapshot) {
+          var id = snapshot.key();
+          var state = snapshot.val();
+
+          console.log("" + id + " is " + state);
+
+          if (state === "waiting") {
+            console.log(_this.numUsers);
+            console.log(currentUser.id);
+            if (_this.numUsers === 2 && id === currentUser.id) console.log("Make a new room");
+            _this.firebase.update(_defineProperty({}, id, true));
+          } else {
+            _this.firebase.child(id).remove();
+          }
+        };
+        var removeFromUsers = function (snapshot) {
+          _this.firebase.child(snapshot.key()).remove();
+        };
+        this.userFirebase.on("child_added", updateFromUsers);
+        this.userFirebase.on("child_changed", updateFromUsers);
+        this.userFirebase.on("child_removed", removeFromUsers);
+      }
+    }
   });
-};
 
+  return WaitingRoom;
+})();
+
+// Global waiting room
 var WAITING_ROOM = new WaitingRoom();
+
+// Just for reference, not used.
+var USER_STATES = ["waiting", "room_id", "done"];
 
 var CurrentUser = (function () {
   function CurrentUser(id) {
@@ -28,35 +76,24 @@ var CurrentUser = (function () {
 
     this.id = id;
     this.firebase = new Firebase("" + BASE_URL + "/users/" + this.id);
-    this.pullInfoAndSetState();
+    this.pollState();
   }
 
   _createClass(CurrentUser, {
-    pullInfoAndSetState: {
+    pollState: {
 
-      // Grab previous info from Firebase or create a new user
+      // Grab previous state from Firebase or set as waiting
 
-      value: function pullInfoAndSetState() {
+      value: function pollState() {
         var _this = this;
 
-        this.firebase.once("value", function (snapshot) {
+        this.firebase.on("value", function (snapshot) {
           _this.state = snapshot.val();
-          // If new user, initialize everything properly
-          if (!snapshot.val()) {
-            _this.state = "waiting";
-            _this.addToWaiting();
+          console.log(_this.state);
+          if (!_this.state) {
+            _this.firebase.set("waiting");
           }
         });
-      }
-    },
-    addToWaiting: {
-
-      // Adds a new user to waiting room and creates a new chat room if possible
-
-      value: function addToWaiting() {
-        this.firebase.set("waiting");
-        var waiting = new Firebase("" + BASE_URL + "/waiting");
-        waiting.update(_defineProperty({}, this.id, true));
       }
     }
   });
@@ -73,7 +110,6 @@ var MESSAGE_INPUT = $("#messageInput");
 var USER_ID = $("#userId");
 var MESSAGE_LIST = $("#messages");
 
-var currentUser;
 USER_ID.keypress(function (e) {
   var user_id = USER_ID.val();
   if (e.keyCode === 13 && user_id) {

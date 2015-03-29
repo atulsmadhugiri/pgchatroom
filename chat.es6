@@ -1,41 +1,60 @@
 // Base Firebase URL
 const BASE_URL = "https://research-chat-room.firebaseio.com";
 
+var currentUser = { id: "no user" };
+
 class WaitingRoom {
   constructor() {
     this.firebase = new Firebase(`${BASE_URL}/waiting`);
-    this.firebase.on("value", snapshot => {
-      this.users = snapshot.val();
-    });
+    // this.users reflects firebase
+    this.firebase.on("value", snapshot => { this.users = snapshot.val() || {}; });
+    this.userFirebase = new Firebase(`${BASE_URL}/users`);
+    this.pollUsers();
+  }
+
+  get numUsers() { return Object.keys(this.users).length; }
+
+  pollUsers() {
+    var updateFromUsers = (snapshot) => {
+      var [id, state] = [snapshot.key(), snapshot.val()];
+      console.log(`${id} is ${state}`);
+
+      if (state === "waiting") {
+        console.log(this.numUsers);
+        console.log(currentUser.id);
+        if (this.numUsers === 2 && id === currentUser.id)
+          console.log("Make a new room");
+        this.firebase.update({ [id]: true });
+      } else {
+        this.firebase.child(id).remove();
+      }
+    }
+    var removeFromUsers = (snapshot) => { this.firebase.child(snapshot.key()).remove(); }
+    this.userFirebase.on("child_added", updateFromUsers);
+    this.userFirebase.on("child_changed", updateFromUsers);
+    this.userFirebase.on("child_removed", removeFromUsers);
   }
 }
 
+// Global waiting room
 const WAITING_ROOM = new WaitingRoom();
 
+// Just for reference, not used.
+const USER_STATES = ["waiting", "room_id", "done"];
 class CurrentUser {
   constructor(id) {
     this.id = id;
     this.firebase = new Firebase(`${BASE_URL}/users/${this.id}`);
-    this.pullInfoAndSetState();
+    this.pollState();
   }
 
-  // Grab previous info from Firebase or create a new user
-  pullInfoAndSetState() {
-    this.firebase.once("value", snapshot => {
+  // Grab previous state from Firebase or set as waiting
+  pollState() {
+    this.firebase.on("value", snapshot => {
       this.state = snapshot.val();
-      // If new user, initialize everything properly
-      if (!snapshot.val()) {
-        this.state = "waiting";
-        this.addToWaiting();
-      }
+      console.log(this.state);
+      if (!this.state) { this.firebase.set("waiting"); }
     });
-  }
-
-  // Adds a new user to waiting room and creates a new chat room if possible
-  addToWaiting() {
-    this.firebase.set("waiting");
-    var waiting = new Firebase(`${BASE_URL}/waiting`);
-    waiting.update({ [this.id]: true });
   }
 }
 
@@ -50,7 +69,6 @@ const MESSAGE_INPUT = $("#messageInput");
 const USER_ID = $("#userId");
 const MESSAGE_LIST = $("#messages");
 
-var currentUser;
 USER_ID.keypress(e => {
   var user_id = USER_ID.val()
   if (e.keyCode === 13 && user_id) {
