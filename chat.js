@@ -33,6 +33,11 @@ var WaitingRoom = (function () {
         return Object.keys(this.users).length;
       }
     },
+    removeUser: {
+      value: function removeUser(user_id) {
+        this.firebase.child(user_id).remove();
+      }
+    },
     pollUsers: {
       value: function pollUsers() {
         var _this = this;
@@ -41,21 +46,20 @@ var WaitingRoom = (function () {
           var id = snapshot.key();
           var state = snapshot.val();
 
-          console.log("" + id + " is " + state);
+          console.log("User " + id + " is " + state);
 
           if (state === "waiting") {
             if (_this.numUsers === 2 && id === currentId) console.log("Make a new room");
             _this.firebase.update(_defineProperty({}, id, true));
           } else {
-            _this.firebase.child(id).remove();
+            _this.removeUser(id);
           }
-        };
-        var removeFromUsers = function (snapshot) {
-          _this.firebase.child(snapshot.key()).remove();
         };
         this.userFirebase.on("child_added", updateFromUsers);
         this.userFirebase.on("child_changed", updateFromUsers);
-        this.userFirebase.on("child_removed", removeFromUsers);
+        this.userFirebase.on("child_removed", function (snapshot) {
+          _this.removeUser(snapshot.key());
+        });
       }
     }
   });
@@ -88,7 +92,7 @@ var CurrentUser = (function () {
 
         this.firebase.on("value", function (snapshot) {
           _this.state = snapshot.val();
-          console.log(_this.state);
+          // console.log(this.state);
           if (!_this.state) {
             _this.firebase.set("waiting");
           }

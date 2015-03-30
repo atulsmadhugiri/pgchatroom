@@ -15,23 +15,24 @@ class WaitingRoom {
 
   get numUsers() { return Object.keys(this.users).length; }
 
+  removeUser(user_id) { this.firebase.child(user_id).remove(); }
+
   pollUsers() {
     var updateFromUsers = (snapshot) => {
       var [id, state] = [snapshot.key(), snapshot.val()];
-      console.log(`${id} is ${state}`);
+      console.log(`User ${id} is ${state}`);
 
       if (state === "waiting") {
         if (this.numUsers === 2 && id === currentId)
           console.log("Make a new room");
         this.firebase.update({ [id]: true });
       } else {
-        this.firebase.child(id).remove();
+        this.removeUser(id);
       }
     }
-    var removeFromUsers = (snapshot) => { this.firebase.child(snapshot.key()).remove(); }
     this.userFirebase.on("child_added", updateFromUsers);
     this.userFirebase.on("child_changed", updateFromUsers);
-    this.userFirebase.on("child_removed", removeFromUsers);
+    this.userFirebase.on("child_removed", (snapshot) => { this.removeUser(snapshot.key()); });
   }
 }
 
@@ -51,7 +52,7 @@ class CurrentUser {
   pollState() {
     this.firebase.on("value", snapshot => {
       this.state = snapshot.val();
-      console.log(this.state);
+      // console.log(this.state);
       if (!this.state) { this.firebase.set("waiting"); }
     });
   }
