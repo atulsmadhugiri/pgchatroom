@@ -12,13 +12,19 @@
 
     <div>
       <label for="userId">User ID:</label>
-      <input type="text" id="userId" placeholder="enter a username...">
+      <input type="text" id="userId" placeholder="Enter your ID...">
     </div>
 
-    <ul id="messages"></ul>
+    <div class="spacer"></div>
+    <div id="messages">
+      <div class="row">
+        <div class="user">System</div>
+        <div class="message">Please wait while we match you to a room.</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
 
-    <input type="text" class="hidden" id="messageInput" placeholder="Type a message...">
-  </div>
+    <input type="text" id="messageInput" placeholder="Type a message..." disabled>
   <script src="chat.js"></script>
 </body>
 </html>
