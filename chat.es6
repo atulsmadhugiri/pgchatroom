@@ -4,35 +4,46 @@ const BASE_URL = "https://research-chat-room.firebaseio.com";
 var currentId;
 var currentUser;
 
-class WaitingRoom {
-  constructor() {
-    this.firebase = new Firebase(`${BASE_URL}/waiting`);
+class AbstractRoom {
+  constructor({room_type: type}) {
+    this.firebase = new Firebase(`${BASE_URL}/${type}`);;
     // this.users reflects firebase
     this.firebase.on("value", snapshot => { this.users = snapshot.val() || {}; });
-    this.userFirebase = new Firebase(`${BASE_URL}/users`);
+    this.userFirebase = new Firebase(`${BASE_URL}/users`);;
     this.pollUsers();
   }
 
   get numUsers() { return Object.keys(this.users).length; }
 
+  updateFromUsers(snapshot) {
+    throw new Error("Can't call abstract method");
+  }
+
   removeUser(user_id) { this.firebase.child(user_id).remove(); }
 
   pollUsers() {
-    var updateFromUsers = (snapshot) => {
-      var [id, state] = [snapshot.key(), snapshot.val()];
-      console.log(`User ${id} is ${state}`);
-
-      if (state === "waiting") {
-        if (this.numUsers === 2 && id === currentId)
-          console.log("Make a new room");
-        this.firebase.update({ [id]: true });
-      } else {
-        this.removeUser(id);
-      }
-    }
-    this.userFirebase.on("child_added", updateFromUsers);
-    this.userFirebase.on("child_changed", updateFromUsers);
+    this.userFirebase.on("child_added", this.updateFromUsers.bind(this));
+    this.userFirebase.on("child_changed", this.updateFromUsers.bind(this));
     this.userFirebase.on("child_removed", (snapshot) => { this.removeUser(snapshot.key()); });
+  }
+}
+
+class WaitingRoom extends AbstractRoom {
+  constructor() {
+    super({ room_type: "waiting" });
+  }
+
+  updateFromUsers(snapshot) {
+    var [id, state] = [snapshot.key(), snapshot.val()];
+    console.log(`User ${id} is ${state}`);
+
+    if (state === "waiting") {
+      if (this.numUsers === 2 && id === currentId)
+        console.log("Make a new room");
+      this.firebase.update({ [id]: true });
+    } else {
+      this.removeUser(id);
+    }
   }
 }
 
@@ -60,6 +71,13 @@ class CurrentUser {
 
 class Room {
   constructor() {
+    this.firebase = new Firebase(`${BASE_URL}/rooms`).push();
+    this.id = this.firebase.key();
+    this.firebase.update({ createdAt: Firebase.ServerValue.TIMESTAMP });
+    this.pollUsers();
+  }
+
+  pollUsers() {
 
   }
 }

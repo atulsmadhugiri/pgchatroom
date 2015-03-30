@@ -2,6 +2,10 @@
 
 var _defineProperty = function (obj, key, value) { return Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); };
 
+var _get = function get(object, property, receiver) { var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { return get(parent, property, receiver); } } else if ("value" in desc && desc.writable) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } };
+
+var _inherits = function (subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) subClass.__proto__ = superClass; };
+
 var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
@@ -12,25 +16,32 @@ var BASE_URL = "https://research-chat-room.firebaseio.com";
 var currentId;
 var currentUser;
 
-var WaitingRoom = (function () {
-  function WaitingRoom() {
+var AbstractRoom = (function () {
+  function AbstractRoom(_ref) {
     var _this = this;
 
-    _classCallCheck(this, WaitingRoom);
+    var type = _ref.room_type;
 
-    this.firebase = new Firebase("" + BASE_URL + "/waiting");
+    _classCallCheck(this, AbstractRoom);
+
+    this.firebase = new Firebase("" + BASE_URL + "/" + type);;
     // this.users reflects firebase
     this.firebase.on("value", function (snapshot) {
       _this.users = snapshot.val() || {};
     });
-    this.userFirebase = new Firebase("" + BASE_URL + "/users");
+    this.userFirebase = new Firebase("" + BASE_URL + "/users");;
     this.pollUsers();
   }
 
-  _createClass(WaitingRoom, {
+  _createClass(AbstractRoom, {
     numUsers: {
       get: function () {
         return Object.keys(this.users).length;
+      }
+    },
+    updateFromUsers: {
+      value: function updateFromUsers(snapshot) {
+        throw new Error("Can't call abstract method");
       }
     },
     removeUser: {
@@ -42,21 +53,8 @@ var WaitingRoom = (function () {
       value: function pollUsers() {
         var _this = this;
 
-        var updateFromUsers = function (snapshot) {
-          var id = snapshot.key();
-          var state = snapshot.val();
-
-          console.log("User " + id + " is " + state);
-
-          if (state === "waiting") {
-            if (_this.numUsers === 2 && id === currentId) console.log("Make a new room");
-            _this.firebase.update(_defineProperty({}, id, true));
-          } else {
-            _this.removeUser(id);
-          }
-        };
-        this.userFirebase.on("child_added", updateFromUsers);
-        this.userFirebase.on("child_changed", updateFromUsers);
+        this.userFirebase.on("child_added", this.updateFromUsers.bind(this));
+        this.userFirebase.on("child_changed", this.updateFromUsers.bind(this));
         this.userFirebase.on("child_removed", function (snapshot) {
           _this.removeUser(snapshot.key());
         });
@@ -64,8 +62,38 @@ var WaitingRoom = (function () {
     }
   });
 
-  return WaitingRoom;
+  return AbstractRoom;
 })();
+
+var WaitingRoom = (function (_AbstractRoom) {
+  function WaitingRoom() {
+    _classCallCheck(this, WaitingRoom);
+
+    _get(Object.getPrototypeOf(WaitingRoom.prototype), "constructor", this).call(this, { room_type: "waiting" });
+  }
+
+  _inherits(WaitingRoom, _AbstractRoom);
+
+  _createClass(WaitingRoom, {
+    updateFromUsers: {
+      value: function updateFromUsers(snapshot) {
+        var id = snapshot.key();
+        var state = snapshot.val();
+
+        console.log("User " + id + " is " + state);
+
+        if (state === "waiting") {
+          if (this.numUsers === 2 && id === currentId) console.log("Make a new room");
+          this.firebase.update(_defineProperty({}, id, true));
+        } else {
+          this.removeUser(id);
+        }
+      }
+    }
+  });
+
+  return WaitingRoom;
+})(AbstractRoom);
 
 // Global waiting room
 var WAITING_ROOM = new WaitingRoom();
@@ -104,9 +132,24 @@ var CurrentUser = (function () {
   return CurrentUser;
 })();
 
-var Room = function Room() {
-  _classCallCheck(this, Room);
-};
+var Room = (function () {
+  function Room() {
+    _classCallCheck(this, Room);
+
+    this.firebase = new Firebase("" + BASE_URL + "/rooms").push();
+    this.id = this.firebase.key();
+    this.firebase.update({ createdAt: Firebase.ServerValue.TIMESTAMP });
+    this.pollUsers();
+  }
+
+  _createClass(Room, {
+    pollUsers: {
+      value: function pollUsers() {}
+    }
+  });
+
+  return Room;
+})();
 
 // REGISTER DOM ELEMENTS
 var MESSAGE_INPUT = $("#messageInput");
