@@ -27,23 +27,24 @@ class AbstractRoom {
   constructor(room_type="abstract") {
     this.firebase = this.firebase || new Firebase(`${BASE_URL}/${room_type}`);;
     // this.users reflects firebase
-    this.firebase.child("users").on("value", snapshot => { this.users = snapshot.val() || {}; });
-    this.userFirebase = new Firebase(`${BASE_URL}/users`);;
+    this.usersFirebase.on("value", snapshot => { this.users = snapshot.val() || {}; });
     this.pollUsers();
   }
 
   get numUsers() { return Object.keys(this.users).length; }
+  get usersFirebase() { return this.firebase.child("users"); }
 
   updateFromUsers(snapshot) {
     throw new Error("Can't call abstract method");
   }
 
-  removeUser(user_id) { this.firebase.child(user_id).remove(); }
+  removeUser(user_id) { this.usersFirebase.child(user_id).remove(); }
 
   pollUsers() {
-    this.userFirebase.on("child_added", this.updateFromUsers.bind(this));
-    this.userFirebase.on("child_changed", this.updateFromUsers.bind(this));
-    this.userFirebase.on("child_removed", (snapshot) => { this.removeUser(snapshot.key()); });
+    const USERS_FIREBASE = new Firebase(`${BASE_URL}/users`);;
+    USERS_FIREBASE.on("child_added", this.updateFromUsers.bind(this));
+    USERS_FIREBASE.on("child_changed", this.updateFromUsers.bind(this));
+    USERS_FIREBASE.on("child_removed", (snapshot) => { this.removeUser(snapshot.key()); });
   }
 }
 
