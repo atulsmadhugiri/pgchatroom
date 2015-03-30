@@ -1,7 +1,8 @@
 // Base Firebase URL
 const BASE_URL = "https://research-chat-room.firebaseio.com";
 
-var currentUser = { id: "no user" };
+var currentId;
+var currentUser;
 
 class WaitingRoom {
   constructor() {
@@ -20,9 +21,7 @@ class WaitingRoom {
       console.log(`${id} is ${state}`);
 
       if (state === "waiting") {
-        console.log(this.numUsers);
-        console.log(currentUser.id);
-        if (this.numUsers === 2 && id === currentUser.id)
+        if (this.numUsers === 2 && id === currentId)
           console.log("Make a new room");
         this.firebase.update({ [id]: true });
       } else {
@@ -70,9 +69,9 @@ const USER_ID = $("#userId");
 const MESSAGE_LIST = $("#messages");
 
 USER_ID.keypress(e => {
-  var user_id = USER_ID.val()
-  if (e.keyCode === 13 && user_id) {
-    currentUser = new CurrentUser(user_id);
+  currentId = USER_ID.val();
+  if (e.keyCode === 13 && currentId) {
+    currentUser = new CurrentUser(currentId);
   }
 });
 

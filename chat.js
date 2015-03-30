@@ -9,7 +9,8 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 // Base Firebase URL
 var BASE_URL = "https://research-chat-room.firebaseio.com";
 
-var currentUser = { id: "no user" };
+var currentId;
+var currentUser;
 
 var WaitingRoom = (function () {
   function WaitingRoom() {
@@ -43,9 +44,7 @@ var WaitingRoom = (function () {
           console.log("" + id + " is " + state);
 
           if (state === "waiting") {
-            console.log(_this.numUsers);
-            console.log(currentUser.id);
-            if (_this.numUsers === 2 && id === currentUser.id) console.log("Make a new room");
+            if (_this.numUsers === 2 && id === currentId) console.log("Make a new room");
             _this.firebase.update(_defineProperty({}, id, true));
           } else {
             _this.firebase.child(id).remove();
@@ -111,9 +110,9 @@ var USER_ID = $("#userId");
 var MESSAGE_LIST = $("#messages");
 
 USER_ID.keypress(function (e) {
-  var user_id = USER_ID.val();
-  if (e.keyCode === 13 && user_id) {
-    currentUser = new CurrentUser(user_id);
+  currentId = USER_ID.val();
+  if (e.keyCode === 13 && currentId) {
+    currentUser = new CurrentUser(currentId);
   }
 });
 
