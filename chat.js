@@ -16,17 +16,51 @@ var BASE_URL = "https://research-chat-room.firebaseio.com";
 var currentId;
 var currentUser;
 
+// Just for reference, not used.
+var USER_STATES = ["waiting", "room_id", "done"];
+
+var CurrentUser = (function () {
+  function CurrentUser(id) {
+    _classCallCheck(this, CurrentUser);
+
+    this.id = id;
+    this.firebase = new Firebase("" + BASE_URL + "/users/" + this.id);
+    this.pollState();
+  }
+
+  _createClass(CurrentUser, {
+    pollState: {
+
+      // Grab previous state from Firebase or set as waiting
+
+      value: function pollState() {
+        var _this = this;
+
+        this.firebase.on("value", function (snapshot) {
+          _this.state = snapshot.val();
+          // console.log(this.state);
+          if (!_this.state) {
+            _this.firebase.set("waiting");
+          }
+        });
+      }
+    }
+  });
+
+  return CurrentUser;
+})();
+
 var AbstractRoom = (function () {
-  function AbstractRoom(_ref) {
+  function AbstractRoom() {
     var _this = this;
 
-    var type = _ref.room_type;
+    var room_type = arguments[0] === undefined ? "abstract" : arguments[0];
 
     _classCallCheck(this, AbstractRoom);
 
-    this.firebase = new Firebase("" + BASE_URL + "/" + type);;
+    this.firebase = this.firebase || new Firebase("" + BASE_URL + "/" + room_type);;
     // this.users reflects firebase
-    this.firebase.on("value", function (snapshot) {
+    this.firebase.child("users").on("value", function (snapshot) {
       _this.users = snapshot.val() || {};
     });
     this.userFirebase = new Firebase("" + BASE_URL + "/users");;
@@ -69,7 +103,7 @@ var WaitingRoom = (function (_AbstractRoom) {
   function WaitingRoom() {
     _classCallCheck(this, WaitingRoom);
 
-    _get(Object.getPrototypeOf(WaitingRoom.prototype), "constructor", this).call(this, { room_type: "waiting" });
+    _get(Object.getPrototypeOf(WaitingRoom.prototype), "constructor", this).call(this, "waiting");
   }
 
   _inherits(WaitingRoom, _AbstractRoom);
@@ -80,11 +114,11 @@ var WaitingRoom = (function (_AbstractRoom) {
         var id = snapshot.key();
         var state = snapshot.val();
 
-        console.log("User " + id + " is " + state);
+        console.log("WaitingRoom: User " + id + " is " + state);
 
         if (state === "waiting") {
           if (this.numUsers === 2 && id === currentId) console.log("Make a new room");
-          this.firebase.update(_defineProperty({}, id, true));
+          this.firebase.child("users").update(_defineProperty({}, id, true));
         } else {
           this.removeUser(id);
         }
@@ -98,58 +132,33 @@ var WaitingRoom = (function (_AbstractRoom) {
 // Global waiting room
 var WAITING_ROOM = new WaitingRoom();
 
-// Just for reference, not used.
-var USER_STATES = ["waiting", "room_id", "done"];
-
-var CurrentUser = (function () {
-  function CurrentUser(id) {
-    _classCallCheck(this, CurrentUser);
-
-    this.id = id;
-    this.firebase = new Firebase("" + BASE_URL + "/users/" + this.id);
-    this.pollState();
-  }
-
-  _createClass(CurrentUser, {
-    pollState: {
-
-      // Grab previous state from Firebase or set as waiting
-
-      value: function pollState() {
-        var _this = this;
-
-        this.firebase.on("value", function (snapshot) {
-          _this.state = snapshot.val();
-          // console.log(this.state);
-          if (!_this.state) {
-            _this.firebase.set("waiting");
-          }
-        });
-      }
-    }
-  });
-
-  return CurrentUser;
-})();
-
-var Room = (function () {
+var Room = (function (_AbstractRoom2) {
   function Room() {
     _classCallCheck(this, Room);
 
     this.firebase = new Firebase("" + BASE_URL + "/rooms").push();
     this.id = this.firebase.key();
     this.firebase.update({ createdAt: Firebase.ServerValue.TIMESTAMP });
-    this.pollUsers();
+    _get(Object.getPrototypeOf(Room.prototype), "constructor", this).call(this);
   }
 
+  _inherits(Room, _AbstractRoom2);
+
   _createClass(Room, {
-    pollUsers: {
-      value: function pollUsers() {}
+    updateFromUsers: {
+      value: function updateFromUsers(snapshot) {
+        var id = snapshot.key();
+        var state = snapshot.val();
+
+        console.log("Room: User " + id + " is " + state);
+
+        if (state === this.id) {}
+      }
     }
   });
 
   return Room;
-})();
+})(AbstractRoom);
 
 // REGISTER DOM ELEMENTS
 var MESSAGE_INPUT = $("#messageInput");

@@ -4,11 +4,30 @@ const BASE_URL = "https://research-chat-room.firebaseio.com";
 var currentId;
 var currentUser;
 
+// Just for reference, not used.
+const USER_STATES = ["waiting", "room_id", "done"];
+class CurrentUser {
+  constructor(id) {
+    this.id = id;
+    this.firebase = new Firebase(`${BASE_URL}/users/${this.id}`);
+    this.pollState();
+  }
+
+  // Grab previous state from Firebase or set as waiting
+  pollState() {
+    this.firebase.on("value", snapshot => {
+      this.state = snapshot.val();
+      // console.log(this.state);
+      if (!this.state) { this.firebase.set("waiting"); }
+    });
+  }
+}
+
 class AbstractRoom {
-  constructor({room_type: type}) {
-    this.firebase = new Firebase(`${BASE_URL}/${type}`);;
+  constructor(room_type="abstract") {
+    this.firebase = this.firebase || new Firebase(`${BASE_URL}/${room_type}`);;
     // this.users reflects firebase
-    this.firebase.on("value", snapshot => { this.users = snapshot.val() || {}; });
+    this.firebase.child("users").on("value", snapshot => { this.users = snapshot.val() || {}; });
     this.userFirebase = new Firebase(`${BASE_URL}/users`);;
     this.pollUsers();
   }
@@ -30,17 +49,17 @@ class AbstractRoom {
 
 class WaitingRoom extends AbstractRoom {
   constructor() {
-    super({ room_type: "waiting" });
+    super("waiting");
   }
 
   updateFromUsers(snapshot) {
     var [id, state] = [snapshot.key(), snapshot.val()];
-    console.log(`User ${id} is ${state}`);
+    console.log(`WaitingRoom: User ${id} is ${state}`);
 
     if (state === "waiting") {
       if (this.numUsers === 2 && id === currentId)
         console.log("Make a new room");
-      this.firebase.update({ [id]: true });
+      this.firebase.child("users").update({ [id]: true });
     } else {
       this.removeUser(id);
     }
@@ -50,35 +69,21 @@ class WaitingRoom extends AbstractRoom {
 // Global waiting room
 const WAITING_ROOM = new WaitingRoom();
 
-// Just for reference, not used.
-const USER_STATES = ["waiting", "room_id", "done"];
-class CurrentUser {
-  constructor(id) {
-    this.id = id;
-    this.firebase = new Firebase(`${BASE_URL}/users/${this.id}`);
-    this.pollState();
-  }
-
-  // Grab previous state from Firebase or set as waiting
-  pollState() {
-    this.firebase.on("value", snapshot => {
-      this.state = snapshot.val();
-      // console.log(this.state);
-      if (!this.state) { this.firebase.set("waiting"); }
-    });
-  }
-}
-
-class Room {
+class Room extends AbstractRoom {
   constructor() {
     this.firebase = new Firebase(`${BASE_URL}/rooms`).push();
     this.id = this.firebase.key();
     this.firebase.update({ createdAt: Firebase.ServerValue.TIMESTAMP });
-    this.pollUsers();
+    super();
   }
 
-  pollUsers() {
+  updateFromUsers(snapshot) {
+    var [id, state] = [snapshot.key(), snapshot.val()];
+    console.log(`Room: User ${id} is ${state}`);
 
+    if (state === this.id) {
+
+    }
   }
 }
 
