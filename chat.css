@@ -3,7 +3,7 @@ body {
   margin-top: 10px;
   margin-left: auto;
   margin-right: auto;
-  width: 500px;
+  width: 526px;
   background-color: #f8f8f8;
   font-size: 24px;
   font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
@@ -44,21 +44,39 @@ em {
   color: black;
 }
 
+.spacer {
+  width: 100%;
+  height: 30px;
+}
 
 /* Chat */
-#messagesDiv {
+#messages {
   background-color: white;
   overflow: auto;
   height: 230px;
-  width: 100%;
+  width: 526px;
   padding: 10px;
-  border: 8px solid #424547;
+  border: 3px solid #424547;
   margin-bottom: 5px;
   text-align: left;
 }
 
-#nameInput {
-  width: 26%;
+#messages .user {
+  position: relative;
+  float: left;
+  width: 120px;
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+#messages .message {
+  position: relative;
+  float: left;
+  width: 370px;
+}
+
+#userId {
+  width: 50%;
 }
 
 #messageInput {
