@@ -38,6 +38,11 @@ var CurrentUser = (function () {
   }
 
   _createClass(CurrentUser, {
+    isInRoom: {
+      value: function isInRoom() {
+        return this.state !== "waiting" && this.state !== "done";
+      }
+    },
     pollState: {
 
       // Grab previous state from Firebase or set as waiting
@@ -51,6 +56,8 @@ var CurrentUser = (function () {
           // console.log(this.state);
           if (!_this.state) {
             _this.firebase.set("waiting");
+          } else if (_this.isInRoom()) {
+            currentRoom = currentRoom || new Room(_this.state);
           }
         });
       }

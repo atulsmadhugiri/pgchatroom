@@ -22,13 +22,19 @@ class CurrentUser {
     this.pollState();
   }
 
+  isInRoom() { return this.state !== "waiting" && this.state !== "done"; }
+
   // Grab previous state from Firebase or set as waiting
   // [Minor bug]: When currentUser is set, this doesn't allow user deletion through Firebase
   pollState() {
     this.firebase.on("value", snapshot => {
       this.state = snapshot.val();
       // console.log(this.state);
-      if (!this.state) { this.firebase.set("waiting"); }
+      if (!this.state) {
+        this.firebase.set("waiting");
+      } else if (this.isInRoom()) {
+        currentRoom = currentRoom || new Room(this.state);
+      }
     });
   }
 }
