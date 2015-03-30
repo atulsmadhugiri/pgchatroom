@@ -185,10 +185,11 @@ var Room = (function (_AbstractRoom2) {
     } else {
       this.firebase = new Firebase("" + BASE_URL + "/rooms").push();
     }
+    _get(Object.getPrototypeOf(Room.prototype), "constructor", this).call(this);
     // this.createdAt is creation time
     this.setCreatedAt();
     this.messagesFirebase = new Firebase("" + BASE_URL + "/messages/" + this.id);
-    _get(Object.getPrototypeOf(Room.prototype), "constructor", this).call(this);
+    this.pollMessages();
   }
 
   _inherits(Room, _AbstractRoom2);
@@ -235,6 +236,27 @@ var Room = (function (_AbstractRoom2) {
       value: function sendMessage(user_id, message) {
         this.messagesFirebase.push({ user_id: user_id, message: message });
       }
+    },
+    pollMessages: {
+      value: function pollMessages() {
+        this.messagesFirebase.limitToLast(10).on("child_added", function (snapshot) {
+          var data = snapshot.val();
+          var user_id = data.user_id;
+          var message = data.message;
+
+          // Create mesage dom element
+          var messageElement = $("<li>");
+          var nameElement = $("<strong class='chatUserid'></strong>");
+          nameElement.text(user_id);
+          messageElement.text(message).prepend(nameElement);
+
+          // Append it to the list of messages
+          MESSAGE_LIST.append(messageElement);
+
+          // Scroll to bottom of messages
+          MESSAGE_LIST[0].scrollTop = MESSAGE_LIST[0].scrollHeight;
+        });
+      }
     }
   });
 
@@ -243,46 +265,24 @@ var Room = (function (_AbstractRoom2) {
 
 // Dom elements
 var MESSAGE_INPUT = $("#messageInput");
-var USER_ID = $("#userId");
+var USER_ID_INPUT = $("#userId");
 var MESSAGE_LIST = $("#messages");
 
 // Id entered should => new User
-USER_ID.keypress(function (e) {
-  currentId = USER_ID.val();
+USER_ID_INPUT.keypress(function (e) {
+  currentId = USER_ID_INPUT.val();
   if (e.keyCode === 13 && currentId) {
     currentUser = new CurrentUser(currentId);
   }
 });
 
-// When message is entered
+// Send message when entered
 MESSAGE_INPUT.keypress(function (e) {
-  if (e.keyCode == 13) {
-    //FIELD VALUES
-    var username = USER_ID.val();
+  if (e.keyCode === 13) {
     var message = MESSAGE_INPUT.val();
+    currentRoom.sendMessage(currentId, message);
 
-    //SAVE DATA TO FIREBASE AND EMPTY FIELD
-    FIREBASE.push({ name: username, text: message });
+    // Blank input
     MESSAGE_INPUT.val("");
   }
 });
-
-// // Add a callback that is triggered for each chat message.
-// FIREBASE.limitToLast(10).on('child_added', function (snapshot) {
-//   //GET DATA
-//   var data = snapshot.val();
-//   var username = data.name || "anonymous";
-//   var message = data.text;
-
-//   //CREATE ELEMENTS MESSAGE & SANITIZE TEXT
-//   var messageElement = $("<li>");
-//   var nameElement = $("<strong class='example-chat-username'></strong>")
-//   nameElement.text(username);
-//   messageElement.text(message).prepend(nameElement);
-
-//   //ADD MESSAGE
-//   MESSAGE_LIST.append(messageElement)
-
-//   //SCROLL TO BOTTOM OF MESSAGE LIST
-//   MESSAGE_LIST[0].scrollTop = MESSAGE_LIST[0].scrollHeight;
-// });

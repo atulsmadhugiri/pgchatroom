@@ -104,10 +104,11 @@ class Room extends AbstractRoom {
     } else {
       this.firebase = new Firebase(`${BASE_URL}/rooms`).push();
     }
+    super();
     // this.createdAt is creation time
     this.setCreatedAt();
     this.messagesFirebase = new Firebase(`${BASE_URL}/messages/${this.id}`)
-    super();
+    this.pollMessages();
   }
 
   get id() { return this.firebase.key(); }
@@ -133,50 +134,47 @@ class Room extends AbstractRoom {
   sendMessage(user_id, message) {
     this.messagesFirebase.push({ user_id, message });
   }
+
+  pollMessages() {
+    this.messagesFirebase.limitToLast(10).on("child_added", snapshot => {
+      var data = snapshot.val();
+      var [user_id, message] = [data.user_id, data.message];
+
+      // Create mesage dom element
+      var messageElement = $("<li>");
+      var nameElement = $("<strong class='chatUserid'></strong>")
+      nameElement.text(user_id);
+      messageElement.text(message).prepend(nameElement);
+
+      // Append it to the list of messages
+      MESSAGE_LIST.append(messageElement)
+
+      // Scroll to bottom of messages
+      MESSAGE_LIST[0].scrollTop = MESSAGE_LIST[0].scrollHeight;
+    });
+  }
 }
 
 // Dom elements
 const MESSAGE_INPUT = $("#messageInput");
-const USER_ID = $("#userId");
+const USER_ID_INPUT = $("#userId");
 const MESSAGE_LIST = $("#messages");
 
 // Id entered should => new User
-USER_ID.keypress(e => {
-  currentId = USER_ID.val();
+USER_ID_INPUT.keypress(e => {
+  currentId = USER_ID_INPUT.val();
   if (e.keyCode === 13 && currentId) {
     currentUser = new CurrentUser(currentId);
   }
 });
 
-// When message is entered
+// Send message when entered
 MESSAGE_INPUT.keypress(function (e) {
-  if (e.keyCode == 13) {
-    //FIELD VALUES
-    var username = USER_ID.val();
+  if (e.keyCode === 13) {
     var message = MESSAGE_INPUT.val();
+    currentRoom.sendMessage(currentId, message);
 
-    //SAVE DATA TO FIREBASE AND EMPTY FIELD
-    FIREBASE.push({name: username, text: message});
-    MESSAGE_INPUT.val('');
+    // Blank input
+    MESSAGE_INPUT.val("");
   }
 });
-
-// // Add a callback that is triggered for each chat message.
-// FIREBASE.limitToLast(10).on('child_added', function (snapshot) {
-//   //GET DATA
-//   var data = snapshot.val();
-//   var username = data.name || "anonymous";
-//   var message = data.text;
-
-//   //CREATE ELEMENTS MESSAGE & SANITIZE TEXT
-//   var messageElement = $("<li>");
-//   var nameElement = $("<strong class='example-chat-username'></strong>")
-//   nameElement.text(username);
-//   messageElement.text(message).prepend(nameElement);
-
-//   //ADD MESSAGE
-//   MESSAGE_LIST.append(messageElement)
-
-//   //SCROLL TO BOTTOM OF MESSAGE LIST
-//   MESSAGE_LIST[0].scrollTop = MESSAGE_LIST[0].scrollHeight;
-// });
