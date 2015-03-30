@@ -108,6 +108,7 @@ class Room extends AbstractRoom {
     // this.createdAt is creation time
     this.setCreatedAt();
     this.messagesFirebase = new Firebase(`${BASE_URL}/messages/${this.id}`)
+    this.enableMessaging()
     this.pollMessages();
   }
 
@@ -135,22 +136,28 @@ class Room extends AbstractRoom {
     this.messagesFirebase.push({ user_id, message });
   }
 
+  addMessageHTML(name, message) {
+    var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
+    $("<div class='user'>").text(name).appendTo(row);
+    $("<div class='message'>").text(message).appendTo(row);
+
+    // Scroll to bottom of messages
+    MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
+  }
+
+  // Enable message input
+  enableMessaging() {
+    MESSAGE_INPUT.prop("disabled", false);
+    this.addMessageHTML("System",
+      "You have been matched to 2 other participants. You have 10 minutes to chat.");
+  }
+
+  // Listen for messages and update HTML accordingly
   pollMessages() {
     this.messagesFirebase.limitToLast(10).on("child_added", snapshot => {
       var data = snapshot.val();
-      var [user_id, message] = [data.user_id, data.message];
-
-      // Create mesage dom element
-      var messageElement = $("<li>");
-      var nameElement = $("<strong class='chatUserid'></strong>")
-      nameElement.text(user_id);
-      messageElement.text(message).prepend(nameElement);
-
-      // Append it to the list of messages
-      MESSAGE_LIST.append(messageElement)
-
-      // Scroll to bottom of messages
-      MESSAGE_LIST[0].scrollTop = MESSAGE_LIST[0].scrollHeight;
+      var [userId, message] = [data.user_id, data.message];
+      this.addMessageHTML(userId, message);
     });
   }
 }
@@ -158,7 +165,7 @@ class Room extends AbstractRoom {
 // Dom elements
 const MESSAGE_INPUT = $("#messageInput");
 const USER_ID_INPUT = $("#userId");
-const MESSAGE_LIST = $("#messages");
+const MESSAGES_ELEMENT = $("#messages");
 
 // Id entered should => new User
 USER_ID_INPUT.keypress(e => {

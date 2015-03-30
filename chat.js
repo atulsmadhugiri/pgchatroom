@@ -189,6 +189,7 @@ var Room = (function (_AbstractRoom2) {
     // this.createdAt is creation time
     this.setCreatedAt();
     this.messagesFirebase = new Firebase("" + BASE_URL + "/messages/" + this.id);
+    this.enableMessaging();
     this.pollMessages();
   }
 
@@ -237,24 +238,38 @@ var Room = (function (_AbstractRoom2) {
         this.messagesFirebase.push({ user_id: user_id, message: message });
       }
     },
+    addMessageHTML: {
+      value: function addMessageHTML(name, message) {
+        var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
+        $("<div class='user'>").text(name).appendTo(row);
+        $("<div class='message'>").text(message).appendTo(row);
+
+        // Scroll to bottom of messages
+        MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
+      }
+    },
+    enableMessaging: {
+
+      // Enable message input
+
+      value: function enableMessaging() {
+        MESSAGE_INPUT.prop("disabled", false);
+        this.addMessageHTML("System", "You have been matched to 2 other participants. You have 10 minutes to chat.");
+      }
+    },
     pollMessages: {
+
+      // Listen for messages and update HTML accordingly
+
       value: function pollMessages() {
+        var _this = this;
+
         this.messagesFirebase.limitToLast(10).on("child_added", function (snapshot) {
           var data = snapshot.val();
-          var user_id = data.user_id;
+          var userId = data.user_id;
           var message = data.message;
 
-          // Create mesage dom element
-          var messageElement = $("<li>");
-          var nameElement = $("<strong class='chatUserid'></strong>");
-          nameElement.text(user_id);
-          messageElement.text(message).prepend(nameElement);
-
-          // Append it to the list of messages
-          MESSAGE_LIST.append(messageElement);
-
-          // Scroll to bottom of messages
-          MESSAGE_LIST[0].scrollTop = MESSAGE_LIST[0].scrollHeight;
+          _this.addMessageHTML(userId, message);
         });
       }
     }
@@ -266,7 +281,7 @@ var Room = (function (_AbstractRoom2) {
 // Dom elements
 var MESSAGE_INPUT = $("#messageInput");
 var USER_ID_INPUT = $("#userId");
-var MESSAGE_LIST = $("#messages");
+var MESSAGES_ELEMENT = $("#messages");
 
 // Id entered should => new User
 USER_ID_INPUT.keypress(function (e) {
