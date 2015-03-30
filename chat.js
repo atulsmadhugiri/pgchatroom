@@ -13,8 +13,17 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 // Base Firebase URL
 var BASE_URL = "https://research-chat-room.firebaseio.com";
 
+var USERS_FIREBASE = new Firebase("" + BASE_URL + "/users");
+
+// Users needed per room
+var USERS_PER_ROOM = 3;
+
+// Time a room is open.
+var ROOM_OPEN_TIME = 600000; // 10 minutes
+
 var currentId;
 var currentUser;
+var currentRoom;
 
 // Just for reference, not used.
 var USER_STATES = ["waiting", "room_id", "done"];
@@ -32,6 +41,7 @@ var CurrentUser = (function () {
     pollState: {
 
       // Grab previous state from Firebase or set as waiting
+      // [Minor bug]: When currentUser is set, this doesn't allow user deletion through Firebase
 
       value: function pollState() {
         var _this = this;
@@ -77,9 +87,14 @@ var AbstractRoom = (function () {
         return this.firebase.child("users");
       }
     },
-    updateFromUsers: {
-      value: function updateFromUsers(snapshot) {
+    updateFromUser: {
+      value: function updateFromUser(snapshot) {
         throw new Error("Can't call abstract method");
+      }
+    },
+    addUser: {
+      value: function addUser(user_id) {
+        this.usersFirebase.update(_defineProperty({}, user_id, true));
       }
     },
     removeUser: {
@@ -91,9 +106,8 @@ var AbstractRoom = (function () {
       value: function pollUsers() {
         var _this = this;
 
-        var USERS_FIREBASE = new Firebase("" + BASE_URL + "/users");;
-        USERS_FIREBASE.on("child_added", this.updateFromUsers.bind(this));
-        USERS_FIREBASE.on("child_changed", this.updateFromUsers.bind(this));
+        USERS_FIREBASE.on("child_added", this.updateFromUser.bind(this));
+        USERS_FIREBASE.on("child_changed", this.updateFromUser.bind(this));
         USERS_FIREBASE.on("child_removed", function (snapshot) {
           _this.removeUser(snapshot.key());
         });
@@ -114,19 +128,42 @@ var WaitingRoom = (function (_AbstractRoom) {
   _inherits(WaitingRoom, _AbstractRoom);
 
   _createClass(WaitingRoom, {
-    updateFromUsers: {
-      value: function updateFromUsers(snapshot) {
+    canCreateNewRoom: {
+      value: function canCreateNewRoom(user_id) {
+        return this.numUsers === USERS_PER_ROOM - 1 && user_id === currentId;
+      }
+    },
+    handleNewUser: {
+      value: function handleNewUser(id) {
+        if (this.canCreateNewRoom(id)) {
+          console.log("Creating a new room");
+          this.createNewRoom(id);
+        } else {
+          this.addUser(id);
+        }
+      }
+    },
+    updateFromUser: {
+      value: function updateFromUser(snapshot) {
         var id = snapshot.key();
         var state = snapshot.val();
 
         console.log("WaitingRoom: User " + id + " is " + state);
 
         if (state === "waiting") {
-          if (this.numUsers === 2 && id === currentId) console.log("Make a new room");
-          this.firebase.child("users").update(_defineProperty({}, id, true));
+          this.handleNewUser(id);
         } else {
           this.removeUser(id);
         }
+      }
+    },
+    createNewRoom: {
+      value: function createNewRoom(newest_user_id) {
+        currentRoom = new Room();
+        var user_ids = Object.keys(this.users).slice(-2).concat([newest_user_id]);
+        user_ids.forEach(function (id) {
+          USERS_FIREBASE.child(id).set(currentRoom.id);
+        });
       }
     }
   });
@@ -139,25 +176,64 @@ var WAITING_ROOM = new WaitingRoom();
 
 var Room = (function (_AbstractRoom2) {
   function Room() {
+    var id = arguments[0] === undefined ? undefined : arguments[0];
+
     _classCallCheck(this, Room);
 
-    this.firebase = new Firebase("" + BASE_URL + "/rooms").push();
-    this.id = this.firebase.key();
-    this.firebase.update({ createdAt: Firebase.ServerValue.TIMESTAMP });
+    if (id) {
+      this.firebase = new Firebase("" + BASE_URL + "/rooms/" + id);
+    } else {
+      this.firebase = new Firebase("" + BASE_URL + "/rooms").push();
+    }
+    // this.createdAt is creation time
+    this.setCreatedAt();
+    this.messagesFirebase = new Firebase("" + BASE_URL + "/messages/" + this.id);
     _get(Object.getPrototypeOf(Room.prototype), "constructor", this).call(this);
   }
 
   _inherits(Room, _AbstractRoom2);
 
   _createClass(Room, {
-    updateFromUsers: {
-      value: function updateFromUsers(snapshot) {
+    id: {
+      get: function () {
+        return this.firebase.key();
+      }
+    },
+    isOpen: {
+      value: function isOpen() {
+        return Firebase.ServerValue.TIMESTAMP - this.createdAt > ROOM_OPEN_TIME;
+      }
+    },
+    setCreatedAt: {
+      value: function setCreatedAt() {
+        var _this = this;
+
+        var createdAtFB = this.firebase.child("createdAt");
+        createdAtFB.on("value", function (snapshot) {
+          _this.createdAt = snapshot.val();
+          if (!_this.createdAt) {
+            createdAtFB.set({ createdAt: Firebase.ServerValue.TIMESTAMP });
+          }
+        });
+      }
+    },
+    updateFromUser: {
+      value: function updateFromUser(snapshot) {
         var id = snapshot.key();
         var state = snapshot.val();
 
         console.log("Room: User " + id + " is " + state);
 
-        if (state === this.id) {}
+        if (state === this.id) {
+          this.addUser(id);
+        } else {
+          this.removeUser(id);
+        }
+      }
+    },
+    sendMessage: {
+      value: function sendMessage(user_id, message) {
+        this.messagesFirebase.push({ user_id: user_id, message: message });
       }
     }
   });
@@ -165,11 +241,12 @@ var Room = (function (_AbstractRoom2) {
   return Room;
 })(AbstractRoom);
 
-// REGISTER DOM ELEMENTS
+// Dom elements
 var MESSAGE_INPUT = $("#messageInput");
 var USER_ID = $("#userId");
 var MESSAGE_LIST = $("#messages");
 
+// Id entered should => new User
 USER_ID.keypress(function (e) {
   currentId = USER_ID.val();
   if (e.keyCode === 13 && currentId) {
@@ -177,18 +254,18 @@ USER_ID.keypress(function (e) {
   }
 });
 
-// LISTEN FOR KEYPRESS EVENT
-// MESSAGE_INPUT.keypress(function (e) {
-//   if (e.keyCode == 13) {
-//     //FIELD VALUES
-//     var username = USER_ID.val();
-//     var message = MESSAGE_INPUT.val();
+// When message is entered
+MESSAGE_INPUT.keypress(function (e) {
+  if (e.keyCode == 13) {
+    //FIELD VALUES
+    var username = USER_ID.val();
+    var message = MESSAGE_INPUT.val();
 
-//     //SAVE DATA TO FIREBASE AND EMPTY FIELD
-//     FIREBASE.push({name: username, text: message});
-//     MESSAGE_INPUT.val('');
-//   }
-// });
+    //SAVE DATA TO FIREBASE AND EMPTY FIELD
+    FIREBASE.push({ name: username, text: message });
+    MESSAGE_INPUT.val("");
+  }
+});
 
 // // Add a callback that is triggered for each chat message.
 // FIREBASE.limitToLast(10).on('child_added', function (snapshot) {
