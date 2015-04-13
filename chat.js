@@ -20,6 +20,8 @@ var USERS_PER_ROOM = 3;
 
 // Time a room is open.
 var ROOM_OPEN_TIME = 600000; // 10 minutes
+var FIVE_MIN_WARNING = 300000; // 5 minute warning
+var ONE_MIN_WARNING = 540000; // 1 minute warning
 
 var currentId;
 var currentUser;
@@ -27,6 +29,13 @@ var currentRoom;
 
 // Just for reference, not used.
 var USER_STATES = ["waiting", "room_id", "done"];
+
+/**
+ * CurrentUser is the current user.
+ * this.id - user id from Qualtrics
+ * this.firebase - connection to Firebase for this user
+ * this.isInRoom() - returns true if user is in a chat room
+ */
 
 var CurrentUser = (function () {
   function CurrentUser(id) {
@@ -66,6 +75,16 @@ var CurrentUser = (function () {
 
   return CurrentUser;
 })();
+
+/**
+ * AbstractRoom implements polling for user info
+ * this.firebase - reference to firebase
+ * this.usersFirebase - reference to subfirebase for users
+ * this.users - object with user info
+ * this.numUsers - number of users
+ *
+ * this.updateFromUser - abstract method to handle user update
+ */
 
 var AbstractRoom = (function () {
   function AbstractRoom() {
@@ -125,6 +144,12 @@ var AbstractRoom = (function () {
   return AbstractRoom;
 })();
 
+/**
+ * WaitingRoom is where users get placed on creation.
+ * this.canCreateNewRoom(user_id) - returns true if a new room can be made with the newest user_id
+ * this.createNewRoom(newest_user_id) - makes a new Room with 3 users
+ */
+
 var WaitingRoom = (function (_AbstractRoom) {
   function WaitingRoom() {
     _classCallCheck(this, WaitingRoom);
@@ -181,6 +206,11 @@ var WaitingRoom = (function (_AbstractRoom) {
 // Global waiting room
 var WAITING_ROOM = new WaitingRoom();
 
+/**
+ * Room allows 3 people to chat for ROOM_OPEN_TIME seconds
+ * Polls messages and adds html when a new message is sent
+ */
+
 var Room = (function (_AbstractRoom2) {
   function Room() {
     var id = arguments[0] === undefined ? undefined : arguments[0];
@@ -195,6 +225,8 @@ var Room = (function (_AbstractRoom2) {
     _get(Object.getPrototypeOf(Room.prototype), "constructor", this).call(this);
     // this.createdAt is creation time
     this.setCreatedAt();
+    this.startTimers();
+
     this.messagesFirebase = new Firebase("" + BASE_URL + "/messages/" + this.id);
     this.enableMessaging();
     this.pollMessages();
@@ -221,9 +253,22 @@ var Room = (function (_AbstractRoom2) {
         createdAtFB.on("value", function (snapshot) {
           _this.createdAt = snapshot.val();
           if (!_this.createdAt) {
-            createdAtFB.set({ createdAt: Firebase.ServerValue.TIMESTAMP });
+            createdAtFB.set(Firebase.ServerValue.TIMESTAMP);
           }
         });
+      }
+    },
+    startTimers: {
+      value: function startTimers() {
+        var _this = this;
+
+        setTimeout(function () {
+          return _this.sendSystemMessage("You have 5 minutes remaining.");
+        }, FIVE_MIN_WARNING);
+        setTimeout(function () {
+          return _this.sendSystemMessage("You have 1 minute remaining.");
+        }, ONE_MIN_WARNING);
+        setTimeout(this.disableMessaging.bind(this), ROOM_OPEN_TIME);
       }
     },
     updateFromUser: {
@@ -245,6 +290,11 @@ var Room = (function (_AbstractRoom2) {
         this.messagesFirebase.push({ user_id: user_id, message: message });
       }
     },
+    sendSystemMessage: {
+      value: function sendSystemMessage(message) {
+        this.addMessageHTML("System", message);
+      }
+    },
     addMessageHTML: {
       value: function addMessageHTML(name, message) {
         var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
@@ -261,7 +311,16 @@ var Room = (function (_AbstractRoom2) {
 
       value: function enableMessaging() {
         MESSAGE_INPUT.prop("disabled", false);
-        this.addMessageHTML("System", "You have been matched to 2 other participants. You have 10 minutes to chat.");
+        this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
+      }
+    },
+    disableMessaging: {
+
+      // Disables message input
+
+      value: function disableMessaging() {
+        MESSAGE_INPUT.prop("disabled", true);
+        this.sendSystemMessage("Your chat time is over. Please proceed to the next section of the survey.");
       }
     },
     pollMessages: {

@@ -8,6 +8,8 @@ const USERS_PER_ROOM = 3;
 
 // Time a room is open.
 const ROOM_OPEN_TIME = 600000 // 10 minutes
+const FIVE_MIN_WARNING = 300000 // 5 minute warning
+const ONE_MIN_WARNING = 540000 // 1 minute warning
 
 var currentId;
 var currentUser;
@@ -15,6 +17,13 @@ var currentRoom;
 
 // Just for reference, not used.
 const USER_STATES = ["waiting", "room_id", "done"];
+
+/**
+ * CurrentUser is the current user.
+ * this.id - user id from Qualtrics
+ * this.firebase - connection to Firebase for this user
+ * this.isInRoom() - returns true if user is in a chat room
+ */
 class CurrentUser {
   constructor(id) {
     this.id = id;
@@ -39,6 +48,15 @@ class CurrentUser {
   }
 }
 
+/**
+ * AbstractRoom implements polling for user info
+ * this.firebase - reference to firebase
+ * this.usersFirebase - reference to subfirebase for users
+ * this.users - object with user info
+ * this.numUsers - number of users
+ *
+ * this.updateFromUser - abstract method to handle user update
+ */
 class AbstractRoom {
   constructor(room_type = "abstract") {
     this.firebase = this.firebase || new Firebase(`${BASE_URL}/${room_type}`);;
@@ -64,6 +82,11 @@ class AbstractRoom {
   }
 }
 
+/**
+ * WaitingRoom is where users get placed on creation.
+ * this.canCreateNewRoom(user_id) - returns true if a new room can be made with the newest user_id
+ * this.createNewRoom(newest_user_id) - makes a new Room with 3 users
+ */
 class WaitingRoom extends AbstractRoom {
   constructor() {
     super("waiting");
@@ -103,6 +126,10 @@ class WaitingRoom extends AbstractRoom {
 // Global waiting room
 const WAITING_ROOM = new WaitingRoom();
 
+/**
+ * Room allows 3 people to chat for ROOM_OPEN_TIME seconds
+ * Polls messages and adds html when a new message is sent
+ */
 class Room extends AbstractRoom {
   constructor(id = undefined) {
     if (id) {
@@ -113,6 +140,8 @@ class Room extends AbstractRoom {
     super();
     // this.createdAt is creation time
     this.setCreatedAt();
+    this.startTimers();
+
     this.messagesFirebase = new Firebase(`${BASE_URL}/messages/${this.id}`)
     this.enableMessaging()
     this.pollMessages();
@@ -126,8 +155,14 @@ class Room extends AbstractRoom {
     var createdAtFB = this.firebase.child("createdAt");
     createdAtFB.on("value", snapshot => {
       this.createdAt = snapshot.val();
-      if (!this.createdAt) { createdAtFB.set({ createdAt: Firebase.ServerValue.TIMESTAMP }); }
+      if (!this.createdAt) { createdAtFB.set(Firebase.ServerValue.TIMESTAMP); }
     });
+  }
+
+  startTimers() {
+    setTimeout(() => this.sendSystemMessage("You have 5 minutes remaining."), FIVE_MIN_WARNING);
+    setTimeout(() => this.sendSystemMessage("You have 1 minute remaining."), ONE_MIN_WARNING);
+    setTimeout(this.disableMessaging.bind(this), ROOM_OPEN_TIME);
   }
 
   updateFromUser(snapshot) {
@@ -142,6 +177,10 @@ class Room extends AbstractRoom {
     this.messagesFirebase.push({ user_id, message });
   }
 
+  sendSystemMessage(message) {
+    this.addMessageHTML("System", message);
+  }
+
   addMessageHTML(name, message) {
     var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
     $("<div class='user'>").text(name).appendTo(row);
@@ -154,8 +193,13 @@ class Room extends AbstractRoom {
   // Enable message input
   enableMessaging() {
     MESSAGE_INPUT.prop("disabled", false);
-    this.addMessageHTML("System",
-      "You have been matched to 2 other participants. You have 10 minutes to chat.");
+    this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
+  }
+
+  // Disables message input
+  disableMessaging() {
+    MESSAGE_INPUT.prop("disabled", true);
+    this.sendSystemMessage("Your chat time is over. Please proceed to the next section of the survey.");
   }
 
   // Listen for messages and update HTML accordingly
