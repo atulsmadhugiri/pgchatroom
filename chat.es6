@@ -200,7 +200,8 @@
     // Disables message input
     disableMessaging() {
       MESSAGE_INPUT.prop("disabled", true);
-      this.sendSystemMessage("Your chat time is over. Please proceed to the next section of the survey.");
+      this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " +
+                             "the survey using the password complete123.");
     }
 
     // Listen for messages and update HTML accordingly

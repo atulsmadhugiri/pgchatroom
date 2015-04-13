@@ -321,7 +321,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
         value: function disableMessaging() {
           MESSAGE_INPUT.prop("disabled", true);
-          this.sendSystemMessage("Your chat time is over. Please proceed to the next section of the survey.");
+          this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123.");
         }
       },
       pollMessages: {
