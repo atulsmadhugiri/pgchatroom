@@ -265,8 +265,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
       }
       _get(Object.getPrototypeOf(Room.prototype), "constructor", this).call(this);
       // this.createdAt is creation time
-      this.setCreatedAt();
-      this.startTimers();
+      this.setCreatedAtAndStartTimers();
 
       this.messagesFirebase = new Firebase("" + BASE_URL + "/messages/" + this.id);
       Messaging.enableMessaging();
@@ -281,13 +280,23 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
           return this.firebase.key();
         }
       },
-      isOpen: {
-        value: function isOpen() {
-          return Firebase.ServerValue.TIMESTAMP - this.createdAt > ROOM_OPEN_TIME;
+      timeOpen: {
+        get: function () {
+          return Date.now() - this.createdAt;
         }
       },
-      setCreatedAt: {
-        value: function setCreatedAt() {
+      willBeWarned: {
+        get: function () {
+          return this.timeOpen < ONE_MIN_WARNING;
+        }
+      },
+      willBeClosed: {
+        get: function () {
+          return this.timeOpen < ROOM_OPEN_TIME;
+        }
+      },
+      setCreatedAtAndStartTimers: {
+        value: function setCreatedAtAndStartTimers() {
           var _this = this;
 
           var createdAtFB = this.firebase.child("createdAt");
@@ -295,18 +304,26 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
             _this.createdAt = snapshot.val();
             if (!_this.createdAt) {
               createdAtFB.set(Firebase.ServerValue.TIMESTAMP);
+            } else {
+              _this.startTimers();
             }
           });
         }
       },
       startTimers: {
         value: function startTimers() {
-          var _this = this;
-
-          setTimeout(function () {
-            return _this.sendSystemMessage("You have 1 minute remaining.");
-          }, ONE_MIN_WARNING);
-          setTimeout(Messaging.disableMessaging.bind(Messaging), ROOM_OPEN_TIME);
+          var timeToWarning = ONE_MIN_WARNING - this.timeOpen;
+          var timeToClose = ROOM_OPEN_TIME - this.timeOpen;
+          if (this.willBeWarned) {
+            setTimeout(function () {
+              return Messaging.sendSystemMessage("You have 1 minute remaining.");
+            }, timeToWarning);
+            setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+          } else if (this.willBeClosed) {
+            setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+          } else {
+            Messaging.disableMessaging();
+          }
         }
       },
       updateFromUser: {
@@ -328,34 +345,17 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
           this.messagesFirebase.push({ user_id: user_id, message: message });
         }
       },
-      sendSystemMessage: {
-        value: function sendSystemMessage(message) {
-          Messaging.addMessageHTML("System", message);
-        }
-      },
-      addMessageHTML: {
-        value: function addMessageHTML(name, message) {
-          var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
-          $("<div class='user'>").text(name).appendTo(row);
-          $("<div class='message'>").text(message).appendTo(row);
-
-          // Scroll to bottom of messages
-          MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
-        }
-      },
       pollMessages: {
 
         // Listen for messages and update HTML accordingly
 
         value: function pollMessages() {
-          var _this = this;
-
           this.messagesFirebase.limitToLast(10).on("child_added", function (snapshot) {
             var data = snapshot.val();
             var userId = data.user_id;
             var message = data.message;
 
-            _this.addMessageHTML(userId, message);
+            Messaging.addMessageHTML(userId, message);
           });
         }
       }

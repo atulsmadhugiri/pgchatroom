@@ -168,29 +168,39 @@
       }
       super();
       // this.createdAt is creation time
-      this.setCreatedAt();
-      this.startTimers();
+      this.setCreatedAtAndStartTimers();
 
       this.messagesFirebase = new Firebase(`${BASE_URL}/messages/${this.id}`)
-      Messaging.enableMessaging()
+      Messaging.enableMessaging();
       this.pollMessages();
     }
 
     get id() { return this.firebase.key(); }
 
-    isOpen() { return Firebase.ServerValue.TIMESTAMP - this.createdAt > ROOM_OPEN_TIME }
+    get timeOpen() { return Date.now() - this.createdAt; }
+    get willBeWarned() { return this.timeOpen < ONE_MIN_WARNING; }
+    get willBeClosed() { return this.timeOpen < ROOM_OPEN_TIME; }
 
-    setCreatedAt() {
+    setCreatedAtAndStartTimers() {
       var createdAtFB = this.firebase.child("createdAt");
-      createdAtFB.on("value", snapshot => {
+      createdAtFB.on("value", (snapshot) => {
         this.createdAt = snapshot.val();
         if (!this.createdAt) { createdAtFB.set(Firebase.ServerValue.TIMESTAMP); }
+        else                 { this.startTimers() }
       });
     }
 
     startTimers() {
-      setTimeout(() => this.sendSystemMessage("You have 1 minute remaining."), ONE_MIN_WARNING);
-      setTimeout(Messaging.disableMessaging.bind(Messaging), ROOM_OPEN_TIME);
+      const timeToWarning = ONE_MIN_WARNING - this.timeOpen;
+      const timeToClose = ROOM_OPEN_TIME - this.timeOpen;
+      if (this.willBeWarned) {
+        setTimeout(() => Messaging.sendSystemMessage("You have 1 minute remaining."), timeToWarning);
+        setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+      } else if (this.willBeClosed) {
+        setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+      } else {
+        Messaging.disableMessaging();
+      }
     }
 
     updateFromUser(snapshot) {
@@ -205,25 +215,12 @@
       this.messagesFirebase.push({ user_id, message });
     }
 
-    sendSystemMessage(message) {
-      Messaging.addMessageHTML("System", message);
-    }
-
-    addMessageHTML(name, message) {
-      var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
-      $("<div class='user'>").text(name).appendTo(row);
-      $("<div class='message'>").text(message).appendTo(row);
-
-      // Scroll to bottom of messages
-      MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
-    }
-
     // Listen for messages and update HTML accordingly
     pollMessages() {
       this.messagesFirebase.limitToLast(10).on("child_added", snapshot => {
         var data = snapshot.val();
         var [userId, message] = [data.user_id, data.message];
-        this.addMessageHTML(userId, message);
+        Messaging.addMessageHTML(userId, message);
       });
     }
   }
