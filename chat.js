@@ -13,7 +13,15 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 (function () {
   // Grab room from URL
   var URL_REGEX = /room=(\w+)/;
-  var ROOM = URL_REGEX.exec(location.search)[1];
+  var PARAMS = URL_REGEX.exec(location.search);
+  if (!PARAMS) {
+    throw "Missing room in URL!";
+  }
+  var ROOM = PARAMS[1];
+  if ($.inArray(ROOM, ["worker", "manager"]) < 0) {
+    throw "Bad room in URL!";
+  }
+
   // Base Firebase URL
   var BASE_URL = "https://research-chat-room.firebaseio.com/" + ROOM;
 

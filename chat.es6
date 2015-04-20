@@ -1,7 +1,11 @@
 (() => {
   // Grab room from URL
   const URL_REGEX = /room=(\w+)/;
-  const ROOM = URL_REGEX.exec(location.search)[1];
+  const PARAMS = URL_REGEX.exec(location.search)
+  if (!PARAMS) { throw "Missing room in URL!"; }
+  const ROOM = PARAMS[1];
+  if ($.inArray(ROOM, ["worker", "manager"]) < 0) { throw "Bad room in URL!"; }
+
   // Base Firebase URL
   const BASE_URL = `https://research-chat-room.firebaseio.com/${ROOM}`;
 
