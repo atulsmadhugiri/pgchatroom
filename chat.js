@@ -11,8 +11,11 @@ var _createClass = (function () { function defineProperties(target, props) { for
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
 
 (function () {
+  // Grab room from URL
+  var URL_REGEX = /room=(\w+)/;
+  var ROOM = URL_REGEX.exec(location.search)[1];
   // Base Firebase URL
-  var BASE_URL = "https://research-chat-room.firebaseio.com";
+  var BASE_URL = "https://research-chat-room.firebaseio.com/" + ROOM;
 
   var USERS_FIREBASE = new Firebase("" + BASE_URL + "/users");
 
@@ -20,9 +23,8 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
   var USERS_PER_ROOM = 3;
 
   // Time a room is open.
-  var ROOM_OPEN_TIME = 600000; // 10 minutes
-  var FIVE_MIN_WARNING = 300000; // 5 minute warning
-  var ONE_MIN_WARNING = 540000; // 1 minute warning
+  var ROOM_OPEN_TIME = 300000; // 5 minutes
+  var ONE_MIN_WARNING = 240000; // 1 minute warning
 
   var currentId;
   var currentUser;
@@ -207,6 +209,44 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
   // Global waiting room
   var WAITING_ROOM = new WaitingRoom();
 
+  var Messaging = (function () {
+    function Messaging() {
+      _classCallCheck(this, Messaging);
+    }
+
+    _createClass(Messaging, null, {
+      addMessageHTML: {
+        value: function addMessageHTML(name, message) {
+          var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
+          $("<div class='user'>").text(name).appendTo(row);
+          $("<div class='message'>").text(message).appendTo(row);
+
+          // Scroll to bottom of messages
+          MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
+        }
+      },
+      sendSystemMessage: {
+        value: function sendSystemMessage(message) {
+          this.addMessageHTML("System", message);
+        }
+      },
+      enableMessaging: {
+        value: function enableMessaging() {
+          MESSAGE_INPUT.prop("disabled", false);
+          this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
+        }
+      },
+      disableMessaging: {
+        value: function disableMessaging() {
+          MESSAGE_INPUT.prop("disabled", true);
+          this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123.");
+        }
+      }
+    });
+
+    return Messaging;
+  })();
+
   /**
    * Room allows 3 people to chat for ROOM_OPEN_TIME seconds
    * Polls messages and adds html when a new message is sent
@@ -229,7 +269,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
       this.startTimers();
 
       this.messagesFirebase = new Firebase("" + BASE_URL + "/messages/" + this.id);
-      this.enableMessaging();
+      Messaging.enableMessaging();
       this.pollMessages();
     }
 
@@ -264,12 +304,9 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
           var _this = this;
 
           setTimeout(function () {
-            return _this.sendSystemMessage("You have 5 minutes remaining.");
-          }, FIVE_MIN_WARNING);
-          setTimeout(function () {
             return _this.sendSystemMessage("You have 1 minute remaining.");
           }, ONE_MIN_WARNING);
-          setTimeout(this.disableMessaging.bind(this), ROOM_OPEN_TIME);
+          setTimeout(Messaging.disableMessaging.bind(Messaging), ROOM_OPEN_TIME);
         }
       },
       updateFromUser: {
@@ -293,7 +330,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
       },
       sendSystemMessage: {
         value: function sendSystemMessage(message) {
-          this.addMessageHTML("System", message);
+          Messaging.addMessageHTML("System", message);
         }
       },
       addMessageHTML: {
@@ -304,24 +341,6 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
 
           // Scroll to bottom of messages
           MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
-        }
-      },
-      enableMessaging: {
-
-        // Enable message input
-
-        value: function enableMessaging() {
-          MESSAGE_INPUT.prop("disabled", false);
-          this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
-        }
-      },
-      disableMessaging: {
-
-        // Disables message input
-
-        value: function disableMessaging() {
-          MESSAGE_INPUT.prop("disabled", true);
-          this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123.");
         }
       },
       pollMessages: {

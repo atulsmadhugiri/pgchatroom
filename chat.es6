@@ -1,6 +1,9 @@
 (() => {
+  // Grab room from URL
+  const URL_REGEX = /room=(\w+)/;
+  const ROOM = URL_REGEX.exec(location.search)[1];
   // Base Firebase URL
-  const BASE_URL = "https://research-chat-room.firebaseio.com";
+  const BASE_URL = `https://research-chat-room.firebaseio.com/${ROOM}`;
 
   const USERS_FIREBASE = new Firebase(`${BASE_URL}/users`);
 
@@ -8,9 +11,8 @@
   const USERS_PER_ROOM = 3;
 
   // Time a room is open.
-  const ROOM_OPEN_TIME = 600000 // 10 minutes
-  const FIVE_MIN_WARNING = 300000 // 5 minute warning
-  const ONE_MIN_WARNING = 540000 // 1 minute warning
+  const ROOM_OPEN_TIME = 300000 // 5 minutes
+  const ONE_MIN_WARNING = 240000 // 1 minute warning
 
   var currentId;
   var currentUser;
@@ -127,6 +129,32 @@
   // Global waiting room
   const WAITING_ROOM = new WaitingRoom();
 
+  class Messaging {
+    static addMessageHTML(name, message) {
+      var row = $("<div class='row'>").appendTo(MESSAGES_ELEMENT);
+      $("<div class='user'>").text(name).appendTo(row);
+      $("<div class='message'>").text(message).appendTo(row);
+
+      // Scroll to bottom of messages
+      MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
+    }
+
+    static sendSystemMessage(message) {
+      this.addMessageHTML("System", message);
+    }
+
+    static enableMessaging() {
+      MESSAGE_INPUT.prop("disabled", false);
+      this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
+    }
+
+    static disableMessaging() {
+      MESSAGE_INPUT.prop("disabled", true);
+      this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " +
+                             "the survey using the password complete123.");
+    }
+  }
+
   /**
    * Room allows 3 people to chat for ROOM_OPEN_TIME seconds
    * Polls messages and adds html when a new message is sent
@@ -144,7 +172,7 @@
       this.startTimers();
 
       this.messagesFirebase = new Firebase(`${BASE_URL}/messages/${this.id}`)
-      this.enableMessaging()
+      Messaging.enableMessaging()
       this.pollMessages();
     }
 
@@ -161,9 +189,8 @@
     }
 
     startTimers() {
-      setTimeout(() => this.sendSystemMessage("You have 5 minutes remaining."), FIVE_MIN_WARNING);
       setTimeout(() => this.sendSystemMessage("You have 1 minute remaining."), ONE_MIN_WARNING);
-      setTimeout(this.disableMessaging.bind(this), ROOM_OPEN_TIME);
+      setTimeout(Messaging.disableMessaging.bind(Messaging), ROOM_OPEN_TIME);
     }
 
     updateFromUser(snapshot) {
@@ -179,7 +206,7 @@
     }
 
     sendSystemMessage(message) {
-      this.addMessageHTML("System", message);
+      Messaging.addMessageHTML("System", message);
     }
 
     addMessageHTML(name, message) {
@@ -189,19 +216,6 @@
 
       // Scroll to bottom of messages
       MESSAGES_ELEMENT[0].scrollTop = MESSAGES_ELEMENT[0].scrollHeight;
-    }
-
-    // Enable message input
-    enableMessaging() {
-      MESSAGE_INPUT.prop("disabled", false);
-      this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
-    }
-
-    // Disables message input
-    disableMessaging() {
-      MESSAGE_INPUT.prop("disabled", true);
-      this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " +
-                             "the survey using the password complete123.");
     }
 
     // Listen for messages and update HTML accordingly
