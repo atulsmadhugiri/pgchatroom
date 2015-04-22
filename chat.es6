@@ -169,7 +169,7 @@
 
     static enableMessaging() {
       MESSAGE_INPUT.prop("disabled", false);
-      this.sendSystemMessage("You have been matched to 2 other participants. You have 10 minutes to chat.");
+      this.sendSystemMessage("You have been matched to 2 other participants. You have 5 minutes to chat.");
     }
 
     static disableMessaging() {
