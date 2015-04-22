@@ -175,13 +175,13 @@
     static disableMessaging() {
       MESSAGE_INPUT.prop("disabled", true);
       this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " +
-                             "the survey using the password complete123.");
+                             "the survey using the password complete123");
     }
 
     static earlyFinish() {
       MESSAGE_INPUT.prop("disabled", true);
       this.sendSystemMessage("We were not able to match you with other participants in time. " +
-        "Please proceed to the next section of the survey using the password alternate123.");
+        "Please proceed to the next section of the survey using the password alternate123");
     }
   }
 

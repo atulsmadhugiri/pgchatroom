@@ -277,13 +277,13 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
       disableMessaging: {
         value: function disableMessaging() {
           MESSAGE_INPUT.prop("disabled", true);
-          this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123.");
+          this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123");
         }
       },
       earlyFinish: {
         value: function earlyFinish() {
           MESSAGE_INPUT.prop("disabled", true);
-          this.sendSystemMessage("We were not able to match you with other participants in time. " + "Please proceed to the next section of the survey using the password alternate123.");
+          this.sendSystemMessage("We were not able to match you with other participants in time. " + "Please proceed to the next section of the survey using the password alternate123");
         }
       }
     });
