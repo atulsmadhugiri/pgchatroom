@@ -30,6 +30,9 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
   // Users needed per room
   var USERS_PER_ROOM = 3;
 
+  // Max time in waiting room
+  var MAX_WAITING_TIME = 180000; // 3 minutes
+
   // Time a room is open.
   var ROOM_OPEN_TIME = 300000; // 5 minutes
   var ONE_MIN_WARNING = 240000; // 1 minute warning
@@ -55,12 +58,23 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
       this.id = id;
       this.firebase = new Firebase("" + BASE_URL + "/users/" + this.id);
       this.pollState();
+      this.setWaitingTime();
     }
 
     _createClass(CurrentUser, {
+      isWaiting: {
+        value: function isWaiting() {
+          return this.state === "waiting";
+        }
+      },
       isInRoom: {
         value: function isInRoom() {
           return this.state !== "waiting" && this.state !== "done";
+        }
+      },
+      isDone: {
+        value: function isDone() {
+          return this.state === "done";
         }
       },
       pollState: {
@@ -76,10 +90,26 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
             // console.log(this.state);
             if (!_this.state) {
               _this.firebase.set("waiting");
+            } else if (_this.isWaiting()) {
+              Messaging.sendSystemMessage("Please wait while we match you to a room. If we are not able to " + "match you in 3 minutes you will be able to move on to the next part of the survey.");
             } else if (_this.isInRoom()) {
               currentRoom = currentRoom || new Room(_this.state);
+            } else if (_this.isDone()) {
+              Messaging.disableMessaging();
             }
           });
+        }
+      },
+      setWaitingTime: {
+        value: function setWaitingTime() {
+          var _this = this;
+
+          setTimeout(function () {
+            if (_this.state === "waiting") {
+              _this.firebase.set("done");
+              Messaging.earlyFinish();
+            }
+          }, MAX_WAITING_TIME);
         }
       }
     });
@@ -248,6 +278,12 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
         value: function disableMessaging() {
           MESSAGE_INPUT.prop("disabled", true);
           this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123.");
+        }
+      },
+      earlyFinish: {
+        value: function earlyFinish() {
+          MESSAGE_INPUT.prop("disabled", true);
+          this.sendSystemMessage("We were not able to match you with other participants in time. " + "Please proceed to the next section of the survey using the password alternate123.");
         }
       }
     });

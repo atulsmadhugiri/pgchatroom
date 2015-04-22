@@ -14,6 +14,9 @@
   // Users needed per room
   const USERS_PER_ROOM = 3;
 
+  // Max time in waiting room
+  const MAX_WAITING_TIME = 180000 // 3 minutes
+
   // Time a room is open.
   const ROOM_OPEN_TIME = 300000 // 5 minutes
   const ONE_MIN_WARNING = 240000 // 1 minute warning
@@ -36,9 +39,12 @@
       this.id = id;
       this.firebase = new Firebase(`${BASE_URL}/users/${this.id}`);
       this.pollState();
+      this.setWaitingTime();
     }
 
+    isWaiting() { return this.state === "waiting"; }
     isInRoom() { return this.state !== "waiting" && this.state !== "done"; }
+    isDone() { return this.state === "done"; }
 
     // Grab previous state from Firebase or set as waiting
     // [Minor bug]: When currentUser is set, this doesn't allow user deletion through Firebase
@@ -48,10 +54,24 @@
         // console.log(this.state);
         if (!this.state) {
           this.firebase.set("waiting");
+        } else if (this.isWaiting()) {
+          Messaging.sendSystemMessage("Please wait while we match you to a room. If we are not able to " +
+            "match you in 3 minutes you will be able to move on to the next part of the survey.");
         } else if (this.isInRoom()) {
           currentRoom = currentRoom || new Room(this.state);
+        } else if (this.isDone()) {
+          Messaging.disableMessaging();
         }
       });
+    }
+
+    setWaitingTime() {
+      setTimeout(() => {
+        if (this.state === "waiting") {
+          this.firebase.set("done");
+          Messaging.earlyFinish();
+        }
+      }, MAX_WAITING_TIME);
     }
   }
 
@@ -156,6 +176,12 @@
       MESSAGE_INPUT.prop("disabled", true);
       this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " +
                              "the survey using the password complete123.");
+    }
+
+    static earlyFinish() {
+      MESSAGE_INPUT.prop("disabled", true);
+      this.sendSystemMessage("We were not able to match you with other participants in time. " +
+        "Please proceed to the next section of the survey using the password alternate123.");
     }
   }
 
