@@ -265,6 +265,7 @@
     currentId = USER_ID_INPUT.val();
     if (e.keyCode === 13 && currentId) {
       currentUser = new CurrentUser(currentId);
+      USER_ID_INPUT.prop("disabled", true);
     }
   });
 
