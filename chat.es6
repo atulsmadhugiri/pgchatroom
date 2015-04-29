@@ -242,7 +242,7 @@
     }
 
     sendMessage(user_id, message) {
-      this.messagesFirebase.push({ user_id, message });
+      this.messagesFirebase.push({ user_id, message, created_at: Firebase.ServerValue.TIMESTAMP });
     }
 
     // Listen for messages and update HTML accordingly

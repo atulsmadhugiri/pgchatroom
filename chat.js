@@ -386,7 +386,7 @@ var _classCallCheck = function (instance, Constructor) { if (!(instance instance
       },
       sendMessage: {
         value: function sendMessage(user_id, message) {
-          this.messagesFirebase.push({ user_id: user_id, message: message });
+          this.messagesFirebase.push({ user_id: user_id, message: message, created_at: Firebase.ServerValue.TIMESTAMP });
         }
       },
       pollMessages: {
