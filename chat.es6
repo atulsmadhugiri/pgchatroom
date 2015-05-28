@@ -1,10 +1,15 @@
 (() => {
   // Grab room from URL
   const URL_REGEX = /room=(\w+)/;
-  const PARAMS = URL_REGEX.exec(location.search)
-  if (!PARAMS) { throw "Missing room in URL!"; }
-  const ROOM = PARAMS[1];
-  if ($.inArray(ROOM, ["worker", "manager"]) < 0) { throw "Bad room in URL!"; }
+  const ROOM_PARAMS = URL_REGEX.exec(location.search)
+  if (!ROOM_PARAMS) { throw "Missing room in URL!"; }
+  const ROOM = ROOM_PARAMS[1];
+
+  // Grab user_id from URL
+  const USER_ID_REGEX = /user_id=(\w+)/;
+  const USER_ID_PARAMS = USER_ID_REGEX.exec(location.search);
+  if (!USER_ID_PARAMS) { throw "Missing user_id in URL!"; }
+  const USER_ID = USER_ID_PARAMS[1];
 
   // Base Firebase URL
   const BASE_URL = `https://research-chat-room.firebaseio.com/${ROOM}`;
@@ -18,10 +23,10 @@
   const MAX_WAITING_TIME = 180000 // 3 minutes
 
   // Time a room is open.
-  const ROOM_OPEN_TIME = 300000 // 5 minutes
-  const ONE_MIN_WARNING = 240000 // 1 minute warning
+  const ROOM_OPEN_TIME = 180000 // 3 minutes
+  const ONE_MIN_WARNING = ROOM_OPEN_TIME - 60000 // 1 minute warning
 
-  var currentId;
+  var currentId = USER_ID;
   var currentUser;
   var currentRoom;
 
@@ -169,7 +174,7 @@
 
     static enableMessaging() {
       MESSAGE_INPUT.prop("disabled", false);
-      this.sendSystemMessage("You have been matched to 2 other participants. You have 5 minutes to chat.");
+      this.sendSystemMessage("You have been matched to 2 other participants. You have 3 minutes to chat.");
     }
 
     static disableMessaging() {
@@ -191,12 +196,13 @@
    */
   class Room extends AbstractRoom {
     constructor(id = undefined) {
+      super();
       if (id) {
         this.firebase = new Firebase(`${BASE_URL}/rooms/${id}`);
       } else {
         this.firebase = new Firebase(`${BASE_URL}/rooms`).push();
       }
-      super();
+
       // this.createdAt is creation time
       this.setCreatedAtAndStartTimers();
 
@@ -261,13 +267,9 @@
   const MESSAGES_ELEMENT = $("#messages");
 
   // Id entered should => new User
-  USER_ID_INPUT.keypress(e => {
-    currentId = USER_ID_INPUT.val();
-    if (e.keyCode === 13 && currentId) {
-      currentUser = new CurrentUser(currentId);
-      USER_ID_INPUT.prop("disabled", true);
-    }
-  });
+  currentUser = new CurrentUser(currentId);
+  USER_ID_INPUT.val(currentId);
+  USER_ID_INPUT.prop("disabled", true);
 
   // Send message when entered
   MESSAGE_INPUT.keypress(function (e) {
