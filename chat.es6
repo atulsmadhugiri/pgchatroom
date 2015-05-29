@@ -179,12 +179,16 @@
 
     static disableMessaging() {
       MESSAGE_INPUT.prop("disabled", true);
+    }
+
+    static finishChat() {
+      this.disableMessaging();
       this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " +
                              "the survey using the password complete123");
     }
 
     static earlyFinish() {
-      MESSAGE_INPUT.prop("disabled", true);
+      this.disableMessaging();
       this.sendSystemMessage("We were not able to match you with other participants in time. " +
         "Please proceed to the next section of the survey using the password alternate123");
     }
@@ -218,11 +222,13 @@
     get willBeClosed() { return this.timeOpen < ROOM_OPEN_TIME; }
 
     setCreatedAtAndStartTimers() {
-      var createdAtFB = this.firebase.child("createdAt");
+      let timersStarted = false;
+
+      let createdAtFB = this.firebase.child("createdAt");
       createdAtFB.on("value", (snapshot) => {
         this.createdAt = snapshot.val();
-        if (!this.createdAt) { createdAtFB.set(Firebase.ServerValue.TIMESTAMP); }
-        else                 { this.startTimers() }
+        if (!this.createdAt)     { createdAtFB.set(Firebase.ServerValue.TIMESTAMP); }
+        else if (!timersStarted) { timersStarted = true; this.startTimers(); }
       });
     }
 
@@ -231,11 +237,11 @@
       const timeToClose = ROOM_OPEN_TIME - this.timeOpen;
       if (this.willBeWarned) {
         setTimeout(() => Messaging.sendSystemMessage("You have 1 minute remaining."), timeToWarning);
-        setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+        setTimeout(Messaging.finishChat.bind(Messaging), timeToClose);
       } else if (this.willBeClosed) {
-        setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+        setTimeout(Messaging.finishChat.bind(Messaging), timeToClose);
       } else {
-        Messaging.disableMessaging();
+        Messaging.finishChat();
       }
     }
 

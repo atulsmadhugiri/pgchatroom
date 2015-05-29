@@ -19,6 +19,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
   }
   var ROOM = ROOM_PARAMS[1];
 
+  // Grab user_id from URL
   var USER_ID_REGEX = /user_id=(\w+)/;
   var USER_ID_PARAMS = USER_ID_REGEX.exec(location.search);
   if (!USER_ID_PARAMS) {
@@ -277,12 +278,17 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: "disableMessaging",
       value: function disableMessaging() {
         MESSAGE_INPUT.prop("disabled", true);
+      }
+    }, {
+      key: "finishChat",
+      value: function finishChat() {
+        this.disableMessaging();
         this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123");
       }
     }, {
       key: "earlyFinish",
       value: function earlyFinish() {
-        MESSAGE_INPUT.prop("disabled", true);
+        this.disableMessaging();
         this.sendSystemMessage("We were not able to match you with other participants in time. " + "Please proceed to the next section of the survey using the password alternate123");
       }
     }]);
@@ -343,13 +349,15 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       value: function setCreatedAtAndStartTimers() {
         var _this5 = this;
 
+        var timersStarted = false;
+
         var createdAtFB = this.firebase.child("createdAt");
         createdAtFB.on("value", function (snapshot) {
           _this5.createdAt = snapshot.val();
           if (!_this5.createdAt) {
             createdAtFB.set(Firebase.ServerValue.TIMESTAMP);
-          } else {
-            _this5.startTimers();
+          } else if (!timersStarted) {
+            timersStarted = true;_this5.startTimers();
           }
         });
       }
@@ -362,11 +370,11 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
           setTimeout(function () {
             return Messaging.sendSystemMessage("You have 1 minute remaining.");
           }, timeToWarning);
-          setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+          setTimeout(Messaging.finishChat.bind(Messaging), timeToClose);
         } else if (this.willBeClosed) {
-          setTimeout(Messaging.disableMessaging.bind(Messaging), timeToClose);
+          setTimeout(Messaging.finishChat.bind(Messaging), timeToClose);
         } else {
-          Messaging.disableMessaging();
+          Messaging.finishChat();
         }
       }
     }, {
