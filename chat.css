@@ -86,3 +86,13 @@ em {
 #messageInput {
   width: 68%;
 }
+
+/* JSON to CSV */
+#dataInput {
+  width: 400px;
+  height: 600px;
+}
+
+.csvResults {
+  margin-top: 20px;
+}
