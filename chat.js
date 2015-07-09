@@ -283,13 +283,13 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
       key: "finishChat",
       value: function finishChat() {
         this.disableMessaging();
-        this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password complete123");
+        this.sendSystemMessage("Your chat time is over. Please proceed to the next section of " + "the survey using the password \"complete123\" (without quotes)");
       }
     }, {
       key: "earlyFinish",
       value: function earlyFinish() {
         this.disableMessaging();
-        this.sendSystemMessage("We were not able to match you with other participants in time. " + "Please proceed to the next section of the survey using the password alternate123");
+        this.sendSystemMessage("We were not able to match you with other participants in time. " + "Please proceed to the next section of the survey using the password \"alternate123\" (without quotes)");
       }
     }]);
 
