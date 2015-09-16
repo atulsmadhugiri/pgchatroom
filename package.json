@@ -1,0 +1,35 @@
+{
+  "name": "pg-chat-room",
+  "version": "1.0.0",
+  "description": "Chat room for Leadership in Unusual Contexts research studies",
+  "main": "chat.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SamLau95/pg-chat-room.git"
+  },
+  "author": "samlau95",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SamLau95/pg-chat-room/issues"
+  },
+  "homepage": "https://github.com/SamLau95/pg-chat-room#readme",
+  "dependencies": {
+    "babel-core": "^5.8.24",
+    "babel-eslint": "^4.1.2",
+    "babel-loader": "^5.3.2",
+    "css-loader": "^0.18.0",
+    "eslint": "^1.4.3",
+    "eslint-loader": "^1.0.0",
+    "eslint-plugin-react": "^3.3.2",
+    "node-sass": "^3.3.2",
+    "sass-loader": "^2.0.1",
+    "style-loader": "^0.12.3",
+    "webpack": "^1.12.1"
+  },
+  "devDependencies": {
+    "eslint-config-airbnb": "0.0.8"
+  }
+}
