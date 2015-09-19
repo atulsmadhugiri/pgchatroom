@@ -1,8 +1,8 @@
-const urlRegex = /room=(\w+)/;
-const userIdRegex = /user_id=(\w+)/;
+const ROOM_REGEX = /room=(\w+)/;
+const USER_ID_REGEX = /user_id=(\w+)/;
 
-const getRoom = () => {
-  const roomParams = urlRegex.exec(location.search);
-  if (!roomParams) { throw new Error('Missing room in URL!'); }
-  return roomParams[1];
+const getAttributeFromUrlParams = (regex, attr) => {
+  const params = regex.exec(location.search);
+  if (!params) { throw new Error(`Missing ${attr} in URL!`); }
+  return params[1];
 };
