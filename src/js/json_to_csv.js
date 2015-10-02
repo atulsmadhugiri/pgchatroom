@@ -1,4 +1,6 @@
-import '../styles/chat.css';
+import _ from 'underscore';
+import $ from 'jquery';
+import BabyParse from 'babyparse';
 
 const $dataInput = $('#dataInput');
 const $submitButton = $('button[name="submit"]');
@@ -9,27 +11,20 @@ const convertToCSV = (text) => {
   const FIELDS = ['Room', 'Room ID', 'User ID'];
   const data = [];
 
-  const roomTypes = Object.keys(json);
-  for (let i = 0; i < roomTypes.length; i++) {
-    roomType = roomTypes[i];
-    console.log(roomType);
-    if (!json[roomType].hasOwnProperty('rooms')) { continue; }
-    const rooms = Object.keys(json[roomType].rooms);
-    // debugger;
-    for (let j = 0; j < rooms.length; j++) {
-      const room = rooms[j];
-      const users = Object.keys(json[roomType].rooms[room].users);
-      for (let k = 0; k < users.length; k++) {
-        user = users[k];
+  _.mapObject(json, (roomTypeData, roomType) => {
+    _.mapObject(roomTypeData.rooms, (roomData, room) => {
+      _.mapObject(roomData.users, (userVal, user) => {
         data.push([roomType, room, user]);
-      }
-    }
-  }
+      });
+    });
+  });
 
-  return Papa.unparse({fields: FIELDS, data: data});
+  return BabyParse.unparse({fields: FIELDS, data: data});
 };
 
 $submitButton.click(() => {
   const csvData = convertToCSV($dataInput.val());
   $csvResults.html(csvData);
 });
+
+export default convertToCSV;
