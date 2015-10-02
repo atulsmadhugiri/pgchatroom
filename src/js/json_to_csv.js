@@ -27,9 +27,11 @@ const dataToCsv = (data) => {
   return BabyParse.unparse({ fields: CSV_FIELDS, data: data });
 };
 
-$submitButton.click(() => {
-  const csvData = parseData($dataInput.val());
-  $csvResults.html(dataToCsv(csvData));
+$(() => {
+  $submitButton.click(() => {
+    const csvData = parseData($dataInput.val());
+    $csvResults.html(dataToCsv(csvData));
+  });
 });
 
 export default { parseData, dataToCsv };

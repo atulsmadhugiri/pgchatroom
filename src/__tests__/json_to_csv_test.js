@@ -3,25 +3,25 @@ import { expect } from 'chai';
 import { parseData, dataToCsv } from '../js/json_to_csv';
 
 const testJSON = {
-  'test': {
-    'messages' : {},
-    'rooms' : {
-      '-JzhkKXRyEp00PrGPnIQ' : {
-        'createdAt' : 1442802915663,
-        'users' : {
-          '15132' : true,
-          '66291' : true,
-          '77721' : true
+  "test": {
+    "messages" : {},
+    "rooms" : {
+      "-JzhkKXRyEp00PrGPnIQ" : {
+        "createdAt" : 1442802915663,
+        "users" : {
+          "15132" : true,
+          "66291" : true,
+          "77721" : true
         }
       }
     },
-    'users' : {
-      '15132' : '-JzhkKXRyEp00PrGPnIQ',
-      '66291' : '-JzhkKXRyEp00PrGPnIQ',
-      '77721' : '-JzhkKXRyEp00PrGPnIQ'
+    "users" : {
+      "15132" : "-JzhkKXRyEp00PrGPnIQ",
+      "66291" : "-JzhkKXRyEp00PrGPnIQ",
+      "77721" : "-JzhkKXRyEp00PrGPnIQ"
     }
   }
-}
+};
 
 const testText = JSON.stringify(testJSON);
 
