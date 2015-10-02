@@ -1,3 +1,6 @@
+// This file is not implemented yet and isn't used anywhere.
+// TODO(sam): Implement this file
+
 const ROOM_REGEX = /room=(\w+)/;
 const USER_ID_REGEX = /user_id=(\w+)/;
 

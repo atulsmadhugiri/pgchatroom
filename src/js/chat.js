@@ -1,5 +1,5 @@
 /*eslint-disable */
-import './chat.css';
+import '../styles/chat.css';
 
 // Grab room from URL
 const URL_REGEX = /room=(\w+)/;

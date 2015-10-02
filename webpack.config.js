@@ -2,12 +2,14 @@ var webpack = require("webpack");
 
 module.exports = {
     entry: {
-        app: ["./src/chat.js"]
+        chat: ["./src/js/chat.js"],
+        json_to_csv: ["./src/js/json_to_csv.js"],
+        admin: ["./src/js/admin.js"]
     },
     output: {
         path: __dirname + "/build",
         publicPath: "/build/",
-        filename: "bundle.js"
+        filename: "[name].bundle.js"
     },
     module: {
         preLoaders: [

@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="stylesheet" href="chat.css">
   <script src="papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
   <meta charset="UTF-8">
@@ -17,39 +16,5 @@
   </pre>
 </body>
 
-<script>
-  var $dataInput = $('#dataInput');
-  var $submitButton = $('button[name="submit"]');
-  var $csvResults = $('.csvResults');
-
-  var convertToCSV = function(text) {
-    var json = JSON.parse(text);
-    var FIELDS = ["Room", "Room ID", "User ID"];
-    var data = [];
-
-    var roomTypes = Object.keys(json);
-    for (var i = 0; i < roomTypes.length; i++) {
-      roomType = roomTypes[i];
-      console.log(roomType);
-      if (!json[roomType].hasOwnProperty("rooms")) { continue; }
-      var rooms = Object.keys(json[roomType]["rooms"]);
-      // debugger;
-      for (var j = 0; j < rooms.length; j++) {
-        var room = rooms[j];
-        var users = Object.keys(json[roomType]["rooms"][room]["users"]);
-        for (var k = 0; k < users.length; k++) {
-          user = users[k];
-          data.push([roomType, room, user]);
-        }
-      }
-    }
-
-    return Papa.unparse({fields: FIELDS, data: data});
-  };
-
-  $submitButton.click(function() {
-    var csvData = convertToCSV($dataInput.val());
-    $csvResults.html(csvData);
-  });
-</script>
+<script src="build/json_to_csv.bundle.js"></script>
 </html>
