@@ -2,14 +2,15 @@ var webpack = require('webpack');
 
 module.exports = function (config) {
   config.set({
-    browsers: [ 'Chrome' ], //run in Chrome
-    singleRun: true, //just run once by default
+    browsers: [ 'PhantomJS' ], //run in Chrome
+    singleRun: false,
     frameworks: [ 'mocha' ], //use the mocha test framework
     files: [
       'tests.webpack.js' //just load this file
     ],
     preprocessors: {
-      'tests.webpack.js': [ 'webpack', 'sourcemap' ] //preprocess with webpack and our sourcemap loader
+      'tests.webpack.js': [ 'webpack', 'sourcemap' ], //preprocess with webpack and our sourcemap loader
+      'src/*.js': 'coverage'
     },
     reporters: [ 'dots' ], //report results in this format
     webpack: { //kind of a copy of your webpack config
