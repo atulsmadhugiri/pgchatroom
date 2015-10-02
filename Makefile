@@ -1,7 +1,8 @@
-.PHONY: build serve
+.PHONY: build serve test
 
 WEBPACK=node_modules/webpack/bin/webpack.js
 WEBPACK_DEV_SERVER=node_modules/webpack-dev-server/bin/webpack-dev-server.js
+KARMA=node_modules/karma-cli/bin/karma
 
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
@@ -22,3 +23,6 @@ serve:
 	@echo "${BLUE}Navigate to localhost:${PORT}/webpack-dev-server/ to use hot reloader.${NOCOLOR}"
 	@echo "${BLUE}========${NOCOLOR}"
 	${WEBPACK_DEV_SERVER} --port ${PORT} -d --hot --inline
+
+test:
+	${KARMA} start
