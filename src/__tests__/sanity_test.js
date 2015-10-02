@@ -1,7 +1,7 @@
-import assert from 'assert';
+import { expect } from 'chai';
 
 describe('Sanity:', () => {
   it('one should equal one', () => {
-    assert.equal(1, 1);
+    expect(1).to.eql(1);
   });
 });

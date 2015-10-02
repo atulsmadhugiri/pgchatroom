@@ -34,8 +34,8 @@
     "webpack": "^1.12.1"
   },
   "devDependencies": {
+    "chai": "^3.3.0",
     "eslint-config-airbnb": "0.0.8",
-    "expect": "^1.11.1",
     "karma": "^0.13.10",
     "karma-chrome-launcher": "^0.2.0",
     "karma-cli": "^0.1.1",

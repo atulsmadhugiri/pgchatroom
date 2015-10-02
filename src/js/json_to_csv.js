@@ -6,9 +6,10 @@ const $dataInput = $('#dataInput');
 const $submitButton = $('button[name="submit"]');
 const $csvResults = $('.csvResults');
 
-const convertToCSV = (text) => {
+const CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
+
+const parseData = (text) => {
   const json = JSON.parse(text);
-  const FIELDS = ['Room', 'Room ID', 'User ID'];
   const data = [];
 
   _.mapObject(json, (roomTypeData, roomType) => {
@@ -19,12 +20,16 @@ const convertToCSV = (text) => {
     });
   });
 
-  return BabyParse.unparse({fields: FIELDS, data: data});
+  return data;
+};
+
+const dataToCsv = (data) => {
+  return BabyParse.unparse({ fields: CSV_FIELDS, data: data });
 };
 
 $submitButton.click(() => {
-  const csvData = convertToCSV($dataInput.val());
-  $csvResults.html(csvData);
+  const csvData = parseData($dataInput.val());
+  $csvResults.html(dataToCsv(csvData));
 });
 
-export default convertToCSV;
+export default { parseData, dataToCsv };
