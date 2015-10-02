@@ -4,7 +4,7 @@
   "description": "Chat room for Leadership in Unusual Contexts research studies",
   "main": "chat.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "make test_once"
   },
   "repository": {
     "type": "git",

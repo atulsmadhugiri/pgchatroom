@@ -10,8 +10,10 @@ NOCOLOR=\033[0m
 PORT=8080
 
 help:
-	@echo "make serve # runs the server (port 8080 by default)"
-	@echo "make build # bundles javascript"
+	@echo "make serve     # runs the server (port 8080 by default)"
+	@echo "make build     # bundles javascript"
+	@echo "make test      # starts test runner"
+	@echo "make test_once # runs tests once"
 
 build:
 	@echo "${BLUE}Bundling Javascript, results are in build/${NOCOLOR}"
@@ -26,3 +28,6 @@ serve:
 
 test:
 	${KARMA} start
+
+test_once:
+	${KARMA} start --single-run
