@@ -1,6 +1,7 @@
 /*eslint-disable */
 import Firebase from 'firebase';
 import $ from 'jquery';
+import CHAT_CONSTANTS from 'constants'
 
 // Grab room from URL
 const URL_REGEX = /room=(\w+)/;
