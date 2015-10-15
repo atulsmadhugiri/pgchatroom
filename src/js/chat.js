@@ -3,34 +3,6 @@ import Firebase from 'firebase';
 import $ from 'jquery';
 import { CHAT_CONSTANTS } from './constants'
 
-console.log(CHAT_CONSTANTS);
-// // Grab room from URL
-// const URL_REGEX = /room=(\w+)/;
-// const ROOM_PARAMS = URL_REGEX.exec(location.search);
-// if (!ROOM_PARAMS) { throw new Error('Missing room in URL!'); }
-// const ROOM = ROOM_PARAMS[1];
-
-// // Grab user_id from URL
-// const USER_ID_REGEX = /user_id=(\w+)/;
-// const USER_ID_PARAMS = USER_ID_REGEX.exec(location.search);
-// if (!USER_ID_PARAMS) { throw new Error('Missing user_id in URL!'); }
-// const USER_ID = USER_ID_PARAMS[1];
-
-// // Base Firebase URL
-// const BASE_URL = `https://research-chat-room.firebaseio.com/${ROOM}`;
-
-// const USERS_FIREBASE = new Firebase(`${BASE_URL}/users`);
-
-// // Users needed per room
-// const USERS_PER_ROOM = 3;
-
-// // Max time in waiting room
-// const MAX_WAITING_TIME = 180000; // 3 minutes
-
-// // Time a room is open.
-// const ROOM_OPEN_TIME = 180000; // 3 minutes
-// const ONE_MIN_WARNING = ROOM_OPEN_TIME - 60000; // 1 minute warning
-
 var currentId = CHAT_CONSTANTS.USER_ID;
 var currentUser;
 var currentRoom;
