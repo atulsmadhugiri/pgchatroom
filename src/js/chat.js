@@ -1,35 +1,9 @@
 /*eslint-disable */
 import Firebase from 'firebase';
 import $ from 'jquery';
+import { CHAT_CONSTANTS } from './constants'
 
-// Grab room from URL
-const URL_REGEX = /room=(\w+)/;
-const ROOM_PARAMS = URL_REGEX.exec(location.search);
-if (!ROOM_PARAMS) { throw new Error('Missing room in URL!'); }
-const ROOM = ROOM_PARAMS[1];
-
-// Grab user_id from URL
-const USER_ID_REGEX = /user_id=(\w+)/;
-const USER_ID_PARAMS = USER_ID_REGEX.exec(location.search);
-if (!USER_ID_PARAMS) { throw new Error('Missing user_id in URL!'); }
-const USER_ID = USER_ID_PARAMS[1];
-
-// Base Firebase URL
-const BASE_URL = `https://research-chat-room.firebaseio.com/${ROOM}`;
-
-const USERS_FIREBASE = new Firebase(`${BASE_URL}/users`);
-
-// Users needed per room
-const USERS_PER_ROOM = 3;
-
-// Max time in waiting room
-const MAX_WAITING_TIME = 180000; // 3 minutes
-
-// Time a room is open.
-const ROOM_OPEN_TIME = 180000; // 3 minutes
-const ONE_MIN_WARNING = ROOM_OPEN_TIME - 60000; // 1 minute warning
-
-var currentId = USER_ID;
+var currentId = CHAT_CONSTANTS.USER_ID;
 var currentUser;
 var currentRoom;
 
@@ -45,7 +19,7 @@ var currentRoom;
 class CurrentUser {
   constructor(id) {
     this.id = id;
-    this.firebase = new Firebase(`${BASE_URL}/users/${this.id}`);
+    this.firebase = new Firebase(`${CHAT_CONSTANTS.BASE_URL}/users/${this.id}`);
     this.pollState();
     this.setWaitingTime();
   }
@@ -79,7 +53,7 @@ class CurrentUser {
         this.firebase.set('done');
         Messaging.earlyFinish();
       }
-    }, MAX_WAITING_TIME);
+    }, CHAT_CONSTANTS.MAX_WAITING_TIME);
   }
 }
 
@@ -94,7 +68,7 @@ class CurrentUser {
  */
 class AbstractRoom {
   constructor(roomType = 'abstract') {
-    this.firebase = this.firebase || new Firebase(`${BASE_URL}/${roomType}`);
+    this.firebase = this.firebase || new Firebase(`${CHAT_CONSTANTS.BASE_URL}/${roomType}`);
     // this.users reflects firebase
     this.usersFirebase.on('value', snapshot => { this.users = snapshot.val() || {}; });
     this.pollUsers();
@@ -111,9 +85,9 @@ class AbstractRoom {
   removeUser(userId) { this.usersFirebase.child(userId).remove(); }
 
   pollUsers() {
-    USERS_FIREBASE.on('child_added', this.updateFromUser.bind(this));
-    USERS_FIREBASE.on('child_changed', this.updateFromUser.bind(this));
-    USERS_FIREBASE.on('child_removed', snapshot => { this.removeUser(snapshot.key()); });
+    CHAT_CONSTANTS.USERS_FIREBASE.on('child_added', this.updateFromUser.bind(this));
+    CHAT_CONSTANTS.USERS_FIREBASE.on('child_changed', this.updateFromUser.bind(this));
+    CHAT_CONSTANTS.USERS_FIREBASE.on('child_removed', snapshot => { this.removeUser(snapshot.key()); });
   }
 }
 
@@ -128,7 +102,7 @@ class WaitingRoom extends AbstractRoom {
   }
 
   canCreateNewRoom(userId) {
-    return this.numUsers === USERS_PER_ROOM - 1 && userId === currentId;
+    return this.numUsers === CHAT_CONSTANTS.USERS_PER_ROOM - 1 && userId === currentId;
   }
 
   handleNewUser(id) {
@@ -155,7 +129,7 @@ class WaitingRoom extends AbstractRoom {
     currentRoom = new Room();
     const userIds = Object.keys(this.users).slice(-2).concat([newestUserId]);
     userIds.forEach(id => {
-      USERS_FIREBASE.child(id).set(currentRoom.id);
+      CHAT_CONSTANTS.USERS_FIREBASE.child(id).set(currentRoom.id);
     });
   }
 }
@@ -207,15 +181,15 @@ class Room extends AbstractRoom {
   constructor(id = undefined) {
     super();
     if (id) {
-      this.firebase = new Firebase(`${BASE_URL}/rooms/${id}`);
+      this.firebase = new Firebase(`${CHAT_CONSTANTS.BASE_URL}/rooms/${id}`);
     } else {
-      this.firebase = new Firebase(`${BASE_URL}/rooms`).push();
+      this.firebase = new Firebase(`${CHAT_CONSTANTS.BASE_URL}/rooms`).push();
     }
 
     // this.createdAt is creation time
     this.setCreatedAtAndStartTimers();
 
-    this.messagesFirebase = new Firebase(`${BASE_URL}/messages/${this.id}`);
+    this.messagesFirebase = new Firebase(`${CHAT_CONSTANTS.BASE_URL}/messages/${this.id}`);
     Messaging.enableMessaging();
     this.pollMessages();
   }
@@ -223,8 +197,8 @@ class Room extends AbstractRoom {
   get id() { return this.firebase.key(); }
 
   get timeOpen() { return Date.now() - this.createdAt; }
-  get willBeWarned() { return this.timeOpen < ONE_MIN_WARNING; }
-  get willBeClosed() { return this.timeOpen < ROOM_OPEN_TIME; }
+  get willBeWarned() { return this.timeOpen < CHAT_CONSTANTS.ROOM_OPEN_TIME - CHAT_CONSTANTS.WARNING; }
+  get willBeClosed() { return this.timeOpen < CHAT_CONSTANTS.ROOM_OPEN_TIME; }
 
   setCreatedAtAndStartTimers() {
     let timersStarted = false;
@@ -238,8 +212,8 @@ class Room extends AbstractRoom {
   }
 
   startTimers() {
-    const timeToWarning = ONE_MIN_WARNING - this.timeOpen;
-    const timeToClose = ROOM_OPEN_TIME - this.timeOpen;
+    const timeToWarning = CHAT_CONSTANTS.ROOM_OPEN_TIME - CHAT_CONSTANTS.WARNING - this.timeOpen;
+    const timeToClose = CHAT_CONSTANTS.ROOM_OPEN_TIME - this.timeOpen;
     if (this.willBeWarned) {
       setTimeout(() => Messaging.sendSystemMessage('You have 1 minute remaining.'), timeToWarning);
       setTimeout(Messaging.finishChat.bind(Messaging), timeToClose);
