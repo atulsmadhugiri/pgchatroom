@@ -7,6 +7,11 @@ var currentId = CHAT_CONSTANTS.USER_ID;
 var currentUser;
 var currentRoom;
 
+let ROOM_OPEN_TIME;
+let WARNING;
+let USERS_PER_ROOM;
+let MAX_WAITING_TIME;
+
 // Just for reference, not used.
 // const USER_STATES = ['waiting', 'room_id', 'done'];
 
@@ -53,7 +58,7 @@ class CurrentUser {
         this.firebase.set('done');
         Messaging.earlyFinish();
       }
-    }, CHAT_CONSTANTS.MAX_WAITING_TIME);
+    }, MAX_WAITING_TIME);
   }
 }
 
@@ -102,7 +107,7 @@ class WaitingRoom extends AbstractRoom {
   }
 
   canCreateNewRoom(userId) {
-    return this.numUsers === CHAT_CONSTANTS.USERS_PER_ROOM - 1 && userId === currentId;
+    return this.numUsers === USERS_PER_ROOM - 1 && userId === currentId;
   }
 
   handleNewUser(id) {
@@ -197,8 +202,8 @@ class Room extends AbstractRoom {
   get id() { return this.firebase.key(); }
 
   get timeOpen() { return Date.now() - this.createdAt; }
-  get willBeWarned() { return this.timeOpen < CHAT_CONSTANTS.ROOM_OPEN_TIME - CHAT_CONSTANTS.WARNING; }
-  get willBeClosed() { return this.timeOpen < CHAT_CONSTANTS.ROOM_OPEN_TIME; }
+  get willBeWarned() { return this.timeOpen < ROOM_OPEN_TIME - WARNING; }
+  get willBeClosed() { return this.timeOpen < ROOM_OPEN_TIME; }
 
   setCreatedAtAndStartTimers() {
     let timersStarted = false;
@@ -212,8 +217,8 @@ class Room extends AbstractRoom {
   }
 
   startTimers() {
-    const timeToWarning = CHAT_CONSTANTS.ROOM_OPEN_TIME - CHAT_CONSTANTS.WARNING - this.timeOpen;
-    const timeToClose = CHAT_CONSTANTS.ROOM_OPEN_TIME - this.timeOpen;
+    const timeToWarning = ROOM_OPEN_TIME - WARNING - this.timeOpen;
+    const timeToClose = ROOM_OPEN_TIME - this.timeOpen;
     if (this.willBeWarned) {
       setTimeout(() => Messaging.sendSystemMessage('You have 1 minute remaining.'), timeToWarning);
       setTimeout(Messaging.finishChat.bind(Messaging), timeToClose);
@@ -246,25 +251,36 @@ class Room extends AbstractRoom {
   }
 }
 
+const CONST_FIREBASE = new Firebase(`https://research-chat-room.firebaseio.com/constants`);
+
 // Dom elements
 const MESSAGE_INPUT = $('#messageInput');
 const USER_ID_INPUT = $('#userId');
 const MESSAGES_ELEMENT = $('#messages');
 
-// Id entered should => new User
-currentUser = new CurrentUser(currentId);
-USER_ID_INPUT.val(currentId);
-USER_ID_INPUT.prop('disabled', true);
+CONST_FIREBASE.on('value', snapshot => {
+  const values = snapshot.val();
 
-// Send message when entered
-MESSAGE_INPUT.keypress((e) => {
-  if (e.keyCode === 13) {
-    const message = MESSAGE_INPUT.val();
-    currentRoom.sendMessage(currentId, message);
+  ROOM_OPEN_TIME = values.roomOpenTime;
+  WARNING = values.warning;
+  USERS_PER_ROOM = values.usersPerRoom;
+  MAX_WAITING_TIME = values.maxWaitingTime;
 
-    // Blank input
-    MESSAGE_INPUT.val('');
-  }
+  // Id entered should => new User
+  currentUser = new CurrentUser(currentId);
+  USER_ID_INPUT.val(currentId);
+  USER_ID_INPUT.prop('disabled', true);
+
+  // Send message when entered
+  MESSAGE_INPUT.keypress((e) => {
+    if (e.keyCode === 13) {
+      const message = MESSAGE_INPUT.val();
+      currentRoom.sendMessage(currentId, message);
+
+      // Blank input
+      MESSAGE_INPUT.val('');
+    }
+  });
 });
 
 /*eslint-enable */
