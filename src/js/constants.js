@@ -35,4 +35,4 @@ const CHAT_CONSTANTS = {
   MAX_WAITING_TIME: 180000, // 3 minutes
 };
 
-export { CHAT_CONSTANTS };
+export default CHAT_CONSTANTS;

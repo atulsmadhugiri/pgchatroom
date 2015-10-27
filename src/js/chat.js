@@ -1,7 +1,7 @@
 /*eslint-disable */
 import Firebase from 'firebase';
 import $ from 'jquery';
-import { CHAT_CONSTANTS } from './constants'
+import CHAT_CONSTANTS from './constants'
 
 var currentId = CHAT_CONSTANTS.USER_ID;
 var currentUser;

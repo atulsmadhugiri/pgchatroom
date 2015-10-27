@@ -9291,38 +9291,11 @@
 
 	var _jquery2 = _interopRequireDefault(_jquery);
 
-	// Grab room from URL
-	var URL_REGEX = /room=(\w+)/;
-	var ROOM_PARAMS = URL_REGEX.exec(location.search);
-	if (!ROOM_PARAMS) {
-	  throw new Error('Missing room in URL!');
-	}
-	var ROOM = ROOM_PARAMS[1];
+	var _constants = __webpack_require__(5);
 
-	// Grab user_id from URL
-	var USER_ID_REGEX = /user_id=(\w+)/;
-	var USER_ID_PARAMS = USER_ID_REGEX.exec(location.search);
-	if (!USER_ID_PARAMS) {
-	  throw new Error('Missing user_id in URL!');
-	}
-	var USER_ID = USER_ID_PARAMS[1];
+	var _constants2 = _interopRequireDefault(_constants);
 
-	// Base Firebase URL
-	var BASE_URL = 'https://research-chat-room.firebaseio.com/' + ROOM;
-
-	var USERS_FIREBASE = new _firebase2['default'](BASE_URL + '/users');
-
-	// Users needed per room
-	var USERS_PER_ROOM = 3;
-
-	// Max time in waiting room
-	var MAX_WAITING_TIME = 180000; // 3 minutes
-
-	// Time a room is open.
-	var ROOM_OPEN_TIME = 180000; // 3 minutes
-	var ONE_MIN_WARNING = ROOM_OPEN_TIME - 60000; // 1 minute warning
-
-	var currentId = USER_ID;
+	var currentId = _constants2['default'].USER_ID;
 	var currentUser;
 	var currentRoom;
 
@@ -9341,7 +9314,7 @@
 	    _classCallCheck(this, CurrentUser);
 
 	    this.id = id;
-	    this.firebase = new _firebase2['default'](BASE_URL + '/users/' + this.id);
+	    this.firebase = new _firebase2['default'](_constants2['default'].BASE_URL + '/users/' + this.id);
 	    this.pollState();
 	    this.setWaitingTime();
 	  }
@@ -9403,7 +9376,7 @@
 	          _this2.firebase.set('done');
 	          Messaging.earlyFinish();
 	        }
-	      }, MAX_WAITING_TIME);
+	      }, _constants2['default'].MAX_WAITING_TIME);
 	    }
 	  }]);
 
@@ -9418,7 +9391,7 @@
 
 	    _classCallCheck(this, AbstractRoom);
 
-	    this.firebase = this.firebase || new _firebase2['default'](BASE_URL + '/' + roomType);
+	    this.firebase = this.firebase || new _firebase2['default'](_constants2['default'].BASE_URL + '/' + roomType);
 	    // this.users reflects firebase
 	    this.usersFirebase.on('value', function (snapshot) {
 	      _this3.users = snapshot.val() || {};
@@ -9452,9 +9425,9 @@
 	    value: function pollUsers() {
 	      var _this4 = this;
 
-	      USERS_FIREBASE.on('child_added', this.updateFromUser.bind(this));
-	      USERS_FIREBASE.on('child_changed', this.updateFromUser.bind(this));
-	      USERS_FIREBASE.on('child_removed', function (snapshot) {
+	      _constants2['default'].USERS_FIREBASE.on('child_added', this.updateFromUser.bind(this));
+	      _constants2['default'].USERS_FIREBASE.on('child_changed', this.updateFromUser.bind(this));
+	      _constants2['default'].USERS_FIREBASE.on('child_removed', function (snapshot) {
 	        _this4.removeUser(snapshot.key());
 	      });
 	    }
@@ -9487,7 +9460,7 @@
 	  _createClass(WaitingRoom, [{
 	    key: 'canCreateNewRoom',
 	    value: function canCreateNewRoom(userId) {
-	      return this.numUsers === USERS_PER_ROOM - 1 && userId === currentId;
+	      return this.numUsers === _constants2['default'].USERS_PER_ROOM - 1 && userId === currentId;
 	    }
 	  }, {
 	    key: 'handleNewUser',
@@ -9519,7 +9492,7 @@
 	      currentRoom = new Room();
 	      var userIds = Object.keys(this.users).slice(-2).concat([newestUserId]);
 	      userIds.forEach(function (id) {
-	        USERS_FIREBASE.child(id).set(currentRoom.id);
+	        _constants2['default'].USERS_FIREBASE.child(id).set(currentRoom.id);
 	      });
 	    }
 	  }]);
@@ -9592,15 +9565,15 @@
 
 	    _get(Object.getPrototypeOf(Room.prototype), 'constructor', this).call(this);
 	    if (id) {
-	      this.firebase = new _firebase2['default'](BASE_URL + '/rooms/' + id);
+	      this.firebase = new _firebase2['default'](_constants2['default'].BASE_URL + '/rooms/' + id);
 	    } else {
-	      this.firebase = new _firebase2['default'](BASE_URL + '/rooms').push();
+	      this.firebase = new _firebase2['default'](_constants2['default'].BASE_URL + '/rooms').push();
 	    }
 
 	    // this.createdAt is creation time
 	    this.setCreatedAtAndStartTimers();
 
-	    this.messagesFirebase = new _firebase2['default'](BASE_URL + '/messages/' + this.id);
+	    this.messagesFirebase = new _firebase2['default'](_constants2['default'].BASE_URL + '/messages/' + this.id);
 	    Messaging.enableMessaging();
 	    this.pollMessages();
 	  }
@@ -9627,8 +9600,8 @@
 	  }, {
 	    key: 'startTimers',
 	    value: function startTimers() {
-	      var timeToWarning = ONE_MIN_WARNING - this.timeOpen;
-	      var timeToClose = ROOM_OPEN_TIME - this.timeOpen;
+	      var timeToWarning = _constants2['default'].ROOM_OPEN_TIME - _constants2['default'].WARNING - this.timeOpen;
+	      var timeToClose = _constants2['default'].ROOM_OPEN_TIME - this.timeOpen;
 	      if (this.willBeWarned) {
 	        setTimeout(function () {
 	          return Messaging.sendSystemMessage('You have 1 minute remaining.');
@@ -9685,12 +9658,12 @@
 	  }, {
 	    key: 'willBeWarned',
 	    get: function get() {
-	      return this.timeOpen < ONE_MIN_WARNING;
+	      return this.timeOpen < _constants2['default'].ROOM_OPEN_TIME - _constants2['default'].WARNING;
 	    }
 	  }, {
 	    key: 'willBeClosed',
 	    get: function get() {
-	      return this.timeOpen < ROOM_OPEN_TIME;
+	      return this.timeOpen < _constants2['default'].ROOM_OPEN_TIME;
 	    }
 	  }]);
 
@@ -9993,6 +9966,60 @@
 
 	module.exports = Firebase;
 
+
+/***/ },
+/* 5 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+	var ROOM_REGEX = /room=(\w+)/;
+	var USER_ID_REGEX = /user_id=(\w+)/;
+
+	var getAttributeFromUrlParams = function getAttributeFromUrlParams(regex, attr) {
+	  var params = regex.exec(location.search);
+	  if (!params) {
+	    throw new Error('Missing ' + attr + ' in URL!');
+	  }
+	  return params[1];
+	};
+
+	// Grab room from URL
+	var ROOM_PARAMS = ROOM_REGEX.exec(location.search);
+	if (!ROOM_PARAMS) {
+	  throw new Error('Missing room in URL!');
+	}
+
+	// Grab user_id from URL
+	var USER_ID_PARAMS = USER_ID_REGEX.exec(location.search);
+	if (!USER_ID_PARAMS) {
+	  throw new Error('Missing user_id in URL!');
+	}
+
+	var BASE_URL = 'https://research-chat-room.firebaseio.com/' + getAttributeFromUrlParams(ROOM_REGEX);
+
+	var CHAT_CONSTANTS = {
+	  ROOM: getAttributeFromUrlParams(ROOM_REGEX),
+	  USER_ID: getAttributeFromUrlParams(USER_ID_REGEX),
+	  BASE_URL: BASE_URL,
+	  USERS_FIREBASE: new Firebase(BASE_URL + '/users'),
+
+	  // Time a room is open.
+	  ROOM_OPEN_TIME: 180000, // 3 minutes
+	  WARNING: 60000, // 1 minute warning
+
+	  // Users needed per room
+	  USERS_PER_ROOM: 3,
+
+	  // Max time in waiting room
+	  MAX_WAITING_TIME: 180000 };
+
+	// 3 minutes
+	exports['default'] = CHAT_CONSTANTS;
+	module.exports = exports['default'];
 
 /***/ }
 /******/ ]);
