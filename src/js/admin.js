@@ -1,18 +1,24 @@
 import $ from 'jquery';
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-const $roomName = $('#url-generator #room-name');
-const $urlResult = $('#url-generator #url-result');
-const $submitButton = $('#url-generator button[name="submit"]');
+import UrlGenerator from './components/url-generator';
 
-const generateUrl = (roomName) => {
-  return `https://samlau95.github.io/pg-chat-room?` +
-    `room=${roomName}&user_id=\${e://Field/CHATROOM%20ID}`;
-};
+export default class AdminApp extends React.Component {
+  render() {
+    return (
+      <div>
+        <h1>Chat Room Admin Panel</h1>
 
-const outputResult = (url) => {
-  $urlResult.html(url);
-};
+        <UrlGenerator />
+      </div>
+    );
+  }
+}
 
 $(() => {
-  $submitButton.click(() => outputResult(generateUrl($roomName.val())));
+  ReactDOM.render(
+    <AdminApp />,
+    document.getElementById('admin-app')
+  );
 });
