@@ -6,6 +6,9 @@ module.exports = {
         json_to_csv: ["./src/js/json_to_csv.js"],
         admin: ["./src/js/admin.js"]
     },
+    resolve: {
+        extensions: ['', '.js', '.jsx']
+    },
     output: {
         path: __dirname + "/build",
         publicPath: "/build/",
