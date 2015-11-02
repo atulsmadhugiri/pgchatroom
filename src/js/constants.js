@@ -1,3 +1,5 @@
+import Firebase from 'firebase';
+
 const ROOM_REGEX = /room=(\w+)/;
 const USER_ID_REGEX = /user_id=(\w+)/;
 
@@ -6,6 +8,12 @@ const getAttributeFromUrlParams = (regex, attr) => {
   if (!params) { throw new Error(`Missing ${attr} in URL!`); }
   return params[1];
 };
+
+/*
+
+ROOM SETUP
+
+*/
 
 // Grab room from URL
 const ROOM_PARAMS = ROOM_REGEX.exec(location.search);
@@ -23,16 +31,6 @@ const CHAT_CONSTANTS = {
   USER_ID: getAttributeFromUrlParams(USER_ID_REGEX),
   BASE_URL: BASE_URL,
   USERS_FIREBASE: new Firebase(`${BASE_URL}/users`),
-
-  // Time a room is open.
-  ROOM_OPEN_TIME: 180000, // 3 minutes
-  WARNING: 60000, // 1 minute warning
-
-  // Users needed per room
-  USERS_PER_ROOM: 3,
-
-  // Max time in waiting room
-  MAX_WAITING_TIME: 180000, // 3 minutes
 };
 
 export default CHAT_CONSTANTS;
