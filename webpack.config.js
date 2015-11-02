@@ -7,7 +7,7 @@ module.exports = {
         admin: ["./src/js/admin.js"]
     },
     resolve: {
-        extensions: ['', '.js', '.jsx']
+        extensions: ["", ".webpack.js", ".web.js", ".js", ".jsx"]
     },
     output: {
         path: __dirname + "/build",

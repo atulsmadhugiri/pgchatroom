@@ -28,6 +28,10 @@ p {
  font-size: 16px;
 }
 
+label {
+  display: block;
+}
+
 input {
   font-size: 24px;
 }

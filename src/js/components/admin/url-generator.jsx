@@ -20,7 +20,6 @@ export default class UrlGenerator extends React.Component {
   _handleSubmit(e) {
     e.preventDefault();
     this.setState({ url: nameToUrl(this.state.name) });
-    console.log(this.state.url);
   }
 
   render() {
