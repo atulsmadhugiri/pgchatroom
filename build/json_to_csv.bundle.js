@@ -45,7 +45,7 @@
 /***/ 0:
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(165);
+	module.exports = __webpack_require__(167);
 
 
 /***/ },
@@ -9267,67 +9267,7 @@
 
 /***/ },
 
-/***/ 165:
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	Object.defineProperty(exports, '__esModule', {
-	  value: true
-	});
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
-
-	var _underscore = __webpack_require__(166);
-
-	var _underscore2 = _interopRequireDefault(_underscore);
-
-	var _jquery = __webpack_require__(2);
-
-	var _jquery2 = _interopRequireDefault(_jquery);
-
-	var _babyparse = __webpack_require__(167);
-
-	var _babyparse2 = _interopRequireDefault(_babyparse);
-
-	var $dataInput = (0, _jquery2['default'])('#dataInput');
-	var $submitButton = (0, _jquery2['default'])('button[name="submit"]');
-	var $csvResults = (0, _jquery2['default'])('.csvResults');
-
-	var CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
-
-	var parseData = function parseData(text) {
-	  var json = JSON.parse(text);
-	  var data = [];
-
-	  _underscore2['default'].mapObject(json, function (roomTypeData, roomType) {
-	    _underscore2['default'].mapObject(roomTypeData.rooms, function (roomData, room) {
-	      _underscore2['default'].mapObject(roomData.users, function (userVal, user) {
-	        data.push([roomType, room, user]);
-	      });
-	    });
-	  });
-
-	  return data;
-	};
-
-	var dataToCsv = function dataToCsv(data) {
-	  return _babyparse2['default'].unparse({ fields: CSV_FIELDS, data: data });
-	};
-
-	(0, _jquery2['default'])(function () {
-	  $submitButton.click(function () {
-	    var csvData = parseData($dataInput.val());
-	    $csvResults.html(dataToCsv(csvData));
-	  });
-	});
-
-	exports['default'] = { parseData: parseData, dataToCsv: dataToCsv };
-	module.exports = exports['default'];
-
-/***/ },
-
-/***/ 166:
+/***/ 164:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;//     Underscore.js 1.8.3
@@ -10883,6 +10823,66 @@
 /***/ },
 
 /***/ 167:
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	Object.defineProperty(exports, '__esModule', {
+	  value: true
+	});
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+	var _underscore = __webpack_require__(164);
+
+	var _underscore2 = _interopRequireDefault(_underscore);
+
+	var _jquery = __webpack_require__(2);
+
+	var _jquery2 = _interopRequireDefault(_jquery);
+
+	var _babyparse = __webpack_require__(168);
+
+	var _babyparse2 = _interopRequireDefault(_babyparse);
+
+	var $dataInput = (0, _jquery2['default'])('#dataInput');
+	var $submitButton = (0, _jquery2['default'])('button[name="submit"]');
+	var $csvResults = (0, _jquery2['default'])('.csvResults');
+
+	var CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
+
+	var parseData = function parseData(text) {
+	  var json = JSON.parse(text);
+	  var data = [];
+
+	  _underscore2['default'].mapObject(json, function (roomTypeData, roomType) {
+	    _underscore2['default'].mapObject(roomTypeData.rooms, function (roomData, room) {
+	      _underscore2['default'].mapObject(roomData.users, function (userVal, user) {
+	        data.push([roomType, room, user]);
+	      });
+	    });
+	  });
+
+	  return data;
+	};
+
+	var dataToCsv = function dataToCsv(data) {
+	  return _babyparse2['default'].unparse({ fields: CSV_FIELDS, data: data });
+	};
+
+	(0, _jquery2['default'])(function () {
+	  $submitButton.click(function () {
+	    var csvData = parseData($dataInput.val());
+	    $csvResults.html(dataToCsv(csvData));
+	  });
+	});
+
+	exports['default'] = { parseData: parseData, dataToCsv: dataToCsv };
+	module.exports = exports['default'];
+
+/***/ },
+
+/***/ 168:
 /***/ function(module, exports, __webpack_require__) {
 
 	var __WEBPACK_AMD_DEFINE_RESULT__;/*
