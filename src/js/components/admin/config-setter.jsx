@@ -9,11 +9,13 @@ function convertToMins(ms) {
   return ms / 1000 / 60;
 }
 
-export default class ConfigSetter extends React.Component {
-  constructor(props) {
-    super(props);
+const ConfigSetter = React.createClass({
+  propTypes: {
+    firebase: React.PropTypes.object.isRequired,
+  },
 
-    this.state = {
+  getInitialState() {
+    return {
       loaded: false, // loaded data from Firebase yet?
       saved: false, // saved back to Firebase yet?
 
@@ -25,7 +27,7 @@ export default class ConfigSetter extends React.Component {
         warning: false,
       },
     };
-  }
+  },
 
   componentWillMount() {
     // Only read in initial data
@@ -35,14 +37,15 @@ export default class ConfigSetter extends React.Component {
         config: snapshot.val(),
       });
     });
-  }
+  },
 
   _handleSubmit(e) {
     e.preventDefault();
     this.props.firebase.set(this.state.config, (err) => {
       this.setState({ saved: !err });
+      console.log(this.state);
     });
-  }
+  },
 
   // transform arg is used to change from mins to ms
   _handleChange(attr, transform = _.identity, e) {
@@ -54,7 +57,7 @@ export default class ConfigSetter extends React.Component {
       saved: false,
       config: config,
     });
-  }
+  },
 
   _formInputFor(attr, label, convertData = _.identity,
       convertInput = _.identity) {
@@ -64,11 +67,11 @@ export default class ConfigSetter extends React.Component {
         <input type="text"
           id={attr}
           defaultValue={convertData(this.state.config[attr])}
-          onChange={this._handleChange.bind(this, attr, convertInput)} />
+          onChange={_.partial(this._handleChange, attr, convertInput)} />
         <div className="spacer"></div>
       </div>
     );
-  }
+  },
 
   render() {
     return (
@@ -76,7 +79,7 @@ export default class ConfigSetter extends React.Component {
         <h3>Change the settings for all chat rooms.</h3>
 
         {!this.state.loaded ? 'Loading...' :
-          <form onSubmit={this._handleSubmit.bind(this)}>
+          <form onSubmit={this._handleSubmit}>
 
             {this._formInputFor('usersPerRoom',
               'Users per chat room')}
@@ -96,7 +99,7 @@ export default class ConfigSetter extends React.Component {
         }
       </div>
     );
-  }
-}
+  },
+});
 
-ConfigSetter.propTypes = { firebase: React.PropTypes.object.isRequired };
+export default ConfigSetter;

@@ -7,30 +7,29 @@ const nameToUrl = (roomName) => {
     `room=${roomName}&${USER_ID_FIELD}`;
 };
 
-export default class UrlGenerator extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { name: '', url: '' };
-  }
+const UrlGenerator = React.createClass({
+  getInitialState() {
+    return { name: '', url: '' };
+  },
 
   _handleChange(e) {
     this.setState({ name: e.target.value });
-  }
+  },
 
   _handleSubmit(e) {
     e.preventDefault();
     this.setState({ url: nameToUrl(this.state.name) });
-  }
+  },
 
   render() {
     return (
       <div>
-        <form onSubmit={this._handleSubmit.bind(this)}>
+        <form onSubmit={this._handleSubmit}>
           <h3>Generate a chatroom URL for a given room.</h3>
 
           <input type="text"
             value={this.state.name}
-            onChange={this._handleChange.bind(this)}
+            onChange={this._handleChange}
             placeholder="Room name" />
 
           <button name="submit">Generate</button>
@@ -39,5 +38,7 @@ export default class UrlGenerator extends React.Component {
         <div>{this.state.url}</div>
       </div>
     );
-  }
-}
+  },
+});
+
+export default UrlGenerator;
