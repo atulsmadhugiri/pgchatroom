@@ -3,13 +3,13 @@ import Firebase from 'firebase';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import ConfigSetter from './components/admin/config-setter';
-import UrlGenerator from './components/admin/url-generator';
+import ConfigSetter from './admin/components/config-setter';
+import UrlGenerator from './admin/components/url-generator';
 
 // TODO(sam): Move this into the constants file
 const CONFIG_FB = new Firebase('https://research-chat-room.firebaseio.com/constants');
 
-export default class AdminApp extends React.Component {
+const AdminApp = React.createClass({
   render() {
     return (
       <div>
@@ -20,8 +20,8 @@ export default class AdminApp extends React.Component {
         <ConfigSetter firebase={CONFIG_FB}/>
       </div>
     );
-  }
-}
+  },
+});
 
 $(() => {
   ReactDOM.render(
@@ -29,3 +29,5 @@ $(() => {
     document.getElementById('admin-app')
   );
 });
+
+export default AdminApp;
