@@ -58,7 +58,7 @@ em {
 }
 
 /* Chat */
-#messages {
+.messages {
   background-color: white;
   overflow: auto;
   height: 230px;
@@ -69,7 +69,7 @@ em {
   text-align: left;
 }
 
-#messages .user {
+.messages .user {
   position: relative;
   float: left;
   width: 120px;
@@ -77,18 +77,10 @@ em {
   font-weight: bold;
 }
 
-#messages .message {
+.messages .message {
   position: relative;
   float: left;
   width: 370px;
-}
-
-#userId {
-  width: 50%;
-}
-
-#messageInput {
-  width: 68%;
 }
 
 /* JSON to CSV */

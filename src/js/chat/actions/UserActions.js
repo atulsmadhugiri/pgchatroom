@@ -1,6 +1,7 @@
 import alt from '../alt';
 
 import { getAttributeFromUrlParams } from '../util';
+import MessagesActions from './MessagesActions';
 
 const USER_ID_REGEX = /user_id=(\w+)/;
 
@@ -13,14 +14,15 @@ class UserActions {
     const userId = getAttributeFromUrlParams(USER_ID_REGEX);
     if (!userId) { throw new Error('Missing user_id in url!'); }
 
-    console.log(userId);
     this.dispatch(userId);
   }
 
-  loadAndListen(usersFb, userId) {
+  loadAndListen(opts = {}) {
     this.dispatch();
 
+    const { usersFb, userId, config } = opts;
     const userFb = usersFb.child(userId);
+
     userFb.on('value', snapshot => {
       const userState = snapshot.val();
       this.actions.updateUser(userState);
@@ -30,14 +32,16 @@ class UserActions {
         this.actions.createUser(userFb, userId);
         break;
       case 'waiting':
-        // TODO(sam): Send waiting system message
-        this.actions.startWaitingTime(userFb);
+        MessagesActions.startMessage(config.maxWaitingTime);
+        this.actions.startWaitingTime(userFb, config.maxWaitingTime);
         break;
       case 'early-done':
-        // TODO(sam): End chat
+        // TODO(sam): Move this into constants
+        MessagesActions.earlyFinishMessage('alternate123');
         break;
       case 'done':
-        // TODO(sam): End chat
+        // TODO(sam): Move this into constants
+        MessagesActions.finishMessage('complete123');
         break;
       default: // User in room
         // TODO(sam): Start chat
@@ -50,7 +54,7 @@ class UserActions {
     this.dispatch();
   }
 
-  startWaitingTime(userFb) {
+  startWaitingTime(userFb, waitingTime) {
     setTimeout(() => {
       userFb.once('value', snapshot => {
         const userState = snapshot.val();
@@ -58,7 +62,7 @@ class UserActions {
           userFb.set('early-done');
         }
       });
-    }, 10000);
+    }, waitingTime);
   }
 }
 

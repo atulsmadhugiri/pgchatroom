@@ -1,5 +1,8 @@
 import React from 'react';
 
+import Message from './Message';
+
+import MessagesStore from '../stores/MessagesStore';
 import StudyActions from '../actions/StudyActions';
 import StudyStore from '../stores/StudyStore';
 import UserActions from '../actions/UserActions';
@@ -11,6 +14,7 @@ function getStateFromStores() {
     config: StudyStore.getConfig(),
     userId: UserStore.getUserId(),
     userState: UserStore.getUserState(),
+    messages: MessagesStore.getMessages(),
   };
 }
 
@@ -22,6 +26,7 @@ const ChatApp = React.createClass({
   componentDidMount() {
     UserStore.listen(this._onChange);
     StudyStore.listen(this._onChange);
+    MessagesStore.listen(this._onChange);
 
     this._init();
   },
@@ -34,8 +39,18 @@ const ChatApp = React.createClass({
     StudyActions.initStudy();
     StudyActions.loadConfig(StudyStore.getConfigFb());
 
+    // HACKHACKHACK: while I figure out how to call this method only after
+    // config is loaded
+    setTimeout(this._loadUser, 2500);
+  },
+
+  _loadUser() {
     UserActions.getInitialUserId();
-    UserActions.loadAndListen(StudyStore.getUsersFb(), UserStore.getUserId());
+    UserActions.loadAndListen({
+      usersFb: StudyStore.getUsersFb(),
+      userId: UserStore.getUserId(),
+      config: StudyStore.getConfig(),
+    });
   },
 
   render() {
@@ -44,6 +59,10 @@ const ChatApp = React.createClass({
     if (!this.state.userId || !this.state.study || !this.state.config) {
       return <div>Loading...</div>;
     }
+
+    const messages = this.state.messages.map((message, i) => {
+      return <Message user={message.user} message={message.message} key={i} />;
+    });
 
     return (
       <div>
@@ -54,7 +73,9 @@ const ChatApp = React.createClass({
         </div>
 
         <div className="spacer"></div>
-        <div id="messages"></div>
+
+        <div className="messages">{messages}</div>
+
         <div className="spacer"></div>
 
         <input type="text"

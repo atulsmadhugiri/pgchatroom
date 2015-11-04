@@ -1,13 +1,7 @@
 import React from 'react';
 import _ from 'underscore';
 
-function convertToMs(mins) {
-  return mins * 60 * 1000;
-}
-
-function convertToMins(ms) {
-  return ms / 1000 / 60;
-}
+import { convertToMs, convertToMins } from '../../chat/util';
 
 const ConfigSetter = React.createClass({
   propTypes: {
