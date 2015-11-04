@@ -4,7 +4,7 @@ module.exports = {
     entry: {
         chat: ["./src/js/chat.js"],
         json_to_csv: ["./src/js/json_to_csv.js"],
-        admin: ["./src/js/admin.js"]
+        admin: ["./src/js/admin.js"],
     },
     resolve: {
         extensions: ["", ".webpack.js", ".web.js", ".js", ".jsx"]
@@ -20,11 +20,11 @@ module.exports = {
         ],
         loaders: [
             { test: /\.s?css$/, loader: "style!css!sass" },
-            { test: /\.jsx?$/, loader: "babel", exclude: /node_modules/ }
+            { test: /\.jsx?$/, loaders: ["react-hot", "babel"], exclude: /node_modules/ }
         ]
     },
     plugins: [
-      new webpack.NoErrorsPlugin()
+      new webpack.NoErrorsPlugin(),
     ],
     eslint: {
         configFile: ".eslintrc"
