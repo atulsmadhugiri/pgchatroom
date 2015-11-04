@@ -21,6 +21,7 @@ class UserActions {
     this.dispatch();
 
     const { usersFb, userId, config } = opts;
+    const { maxWaitingTime, password, altPassword } = config;
     const userFb = usersFb.child(userId);
 
     userFb.on('value', snapshot => {
@@ -32,16 +33,14 @@ class UserActions {
         this.actions.createUser(userFb, userId);
         break;
       case 'waiting':
-        MessagesActions.startMessage(config.maxWaitingTime);
-        this.actions.startWaitingTime(userFb, config.maxWaitingTime);
+        MessagesActions.startMessage(maxWaitingTime);
+        this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
-        // TODO(sam): Move this into constants
-        MessagesActions.earlyFinishMessage('alternate123');
+        MessagesActions.earlyFinishMessage(altPassword);
         break;
       case 'done':
-        // TODO(sam): Move this into constants
-        MessagesActions.finishMessage('complete123');
+        MessagesActions.finishMessage(password);
         break;
       default: // User in room
         // TODO(sam): Start chat
@@ -55,6 +54,7 @@ class UserActions {
   }
 
   startWaitingTime(userFb, waitingTime) {
+    console.log('Starting wait timer...');
     setTimeout(() => {
       userFb.once('value', snapshot => {
         const userState = snapshot.val();
