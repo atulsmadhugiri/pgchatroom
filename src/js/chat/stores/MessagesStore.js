@@ -8,6 +8,7 @@ class MessagesStore {
   constructor() {
     this.bindActions(MessagesActions);
 
+    this.messagingEnabled = false;
     this.messages = [];
   }
 
@@ -15,8 +16,20 @@ class MessagesStore {
     this.messages.push({ user: SYSTEM, message: message });
   }
 
-  message(message) {
+  onMessage(message) {
     this.messages.push(message);
+  }
+
+  onEnableMessaging() {
+    this.messagingEnabled = true;
+  }
+
+  onDisableMessaging() {
+    this.messagingEnabled = false;
+  }
+
+  static getMessagingEnabled() {
+    return this.getState().messagingEnabled;
   }
 
   static getMessages() {
