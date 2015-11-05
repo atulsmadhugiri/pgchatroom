@@ -4,6 +4,7 @@ import Firebase from 'firebase';
 import StudyActions from '../actions/StudyActions';
 
 const BASE_URL = `https://research-chat-room.firebaseio.com`;
+// const BASE_URL = `ws://127.0.1:5000`;
 
 class StudyStore {
   constructor() {
