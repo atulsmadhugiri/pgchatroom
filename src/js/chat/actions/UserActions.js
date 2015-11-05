@@ -1,8 +1,10 @@
 import alt from '../alt';
+import _ from 'underscore';
 
 import { getAttributeFromUrlParams } from '../util';
 import MessagesActions from './MessagesActions';
 import WaitingRoomActions from './WaitingRoomActions';
+import RoomActions from './RoomActions';
 
 const USER_ID_REGEX = /user_id=(\w+)/;
 
@@ -21,7 +23,7 @@ class UserActions {
   loadAndListen({ baseFb, userId, config }) {
     this.dispatch();
 
-    const { maxWaitingTime, password, altPassword } = config;
+    const { maxWaitingTime } = config;
     const usersFb = baseFb.child('users');
     const userFb = usersFb.child(userId);
 
@@ -34,29 +36,37 @@ class UserActions {
         this.actions.createUser(userFb, userId);
         break;
       case 'waiting':
-        MessagesActions.startMessage(maxWaitingTime);
+        MessagesActions.waitingMessage(config);
         WaitingRoomActions.listenForMoreUsers({
           baseFb,
           usersFb,
+          config,
           currentUserId: userId,
         });
         this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
-        MessagesActions.earlyFinishMessage(altPassword);
+        MessagesActions.earlyFinishMessage(config);
         break;
       case 'done':
-        MessagesActions.finishMessage(password);
+        MessagesActions.finishMessage(config);
         break;
       default: // User in room
-        // TODO(sam): Start chat
+        const roomId = userState;
+        RoomActions.addUser({ baseFb, userId, roomId });
+        MessagesActions.startMessage(config);
       }
     });
   }
 
   createUser(userFb) {
     userFb.set('waiting');
-    this.dispatch();
+  }
+
+  setUsersToRoom({ usersFb, users, roomId }) {
+    usersFb.update(
+      _.object(users, users.map(() => roomId))
+    );
   }
 
   startWaitingTime(userFb, waitingTime) {

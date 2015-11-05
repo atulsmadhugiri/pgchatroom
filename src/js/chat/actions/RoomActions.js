@@ -2,12 +2,20 @@ import alt from '../alt';
 
 class RoomActions {
   constructor() {
-    // this.generateActions('');
+    // this.generateActions('addUser');
   }
 
-  createRoom({ baseFb, matchedUsers }) {
-    console.log(baseFb.toString(), matchedUsers);
-    debugger;
+  createRoom(baseFb) {
+    const roomFb = baseFb.child('rooms').push();
+    this.dispatch(roomFb);
+
+    return roomFb.key();
+  }
+
+  addUser({ baseFb, userId, roomId }) {
+    const roomFb = baseFb.child(`rooms/${roomId}`);
+    roomFb.child('users').update({ [userId]: true });
+    this.dispatch(userId);
   }
 }
 
