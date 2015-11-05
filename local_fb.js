@@ -6,5 +6,7 @@ new FirebaseServer(5000, 'test.firebaseio.com', {
     maxWaitingTime: 180000,
     roomOpenTime: 180000,
     warning: 60000,
+    altPassword: 'alternate123',
+    password: 'complete123',
   }
 });
