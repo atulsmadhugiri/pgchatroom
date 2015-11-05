@@ -17,8 +17,13 @@ class StudyActions {
   }
 
   loadConfig(configFb) {
-    configFb.once('value', snapshot => {
-      this.actions.updateConfig(snapshot.val());
+    this.dispatch();
+    return new Promise(resolve => {
+      configFb.once('value', snapshot => {
+        const config = snapshot.val();
+        this.actions.updateConfig(config);
+        resolve(config);
+      });
     });
   }
 }

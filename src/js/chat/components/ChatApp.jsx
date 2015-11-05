@@ -1,6 +1,5 @@
 import React from 'react';
 
-import { deferIfUpdated } from '../util';
 import Message from './Message';
 import MessagesStore from '../stores/MessagesStore';
 import StudyActions from '../actions/StudyActions';
@@ -38,28 +37,13 @@ const ChatApp = React.createClass({
     this._init();
   },
 
-  componentDidUpdate(prevProps, prevState) {
-    const runIfLoaded = (key, fn) => {
-      return deferIfUpdated(prevState, this.state, key, fn);
-    };
-
-    runIfLoaded('config', this._setupUser);
-  },
-
   _onChange() {
     this.setState(getStateFromStores());
   },
 
-  _init() {
+  async _init() {
     StudyActions.initStudy();
-    StudyActions.loadConfig(StudyStore.getConfigFb());
-  },
-
-  _setupUser() {
-    // TODO(sam): Remove once life is better
-    if (!StudyStore.getConfig()) {
-      throw new Error("Config didn't load in time!");
-    }
+    await StudyActions.loadConfig(StudyStore.getConfigFb());
 
     UserActions.getInitialUserId();
     UserActions.loadAndListen({
