@@ -2,6 +2,7 @@ import alt from '../alt';
 
 import { getAttributeFromUrlParams } from '../util';
 import MessagesActions from './MessagesActions';
+import WaitingRoomActions from './WaitingRoomActions';
 
 const USER_ID_REGEX = /user_id=(\w+)/;
 
@@ -17,11 +18,11 @@ class UserActions {
     this.dispatch(userId);
   }
 
-  loadAndListen(opts = {}) {
+  loadAndListen({ baseFb, userId, config }) {
     this.dispatch();
 
-    const { usersFb, userId, config } = opts;
     const { maxWaitingTime, password, altPassword } = config;
+    const usersFb = baseFb.child('users');
     const userFb = usersFb.child(userId);
 
     userFb.on('value', snapshot => {
@@ -34,6 +35,11 @@ class UserActions {
         break;
       case 'waiting':
         MessagesActions.startMessage(maxWaitingTime);
+        WaitingRoomActions.listenForMoreUsers({
+          baseFb,
+          usersFb,
+          currentUserId: userId,
+        });
         this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
