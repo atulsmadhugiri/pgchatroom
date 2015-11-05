@@ -1,20 +1,23 @@
 import React from 'react';
 
+import { deferIfUpdated } from '../util';
 import Message from './Message';
-
 import MessagesStore from '../stores/MessagesStore';
 import StudyActions from '../actions/StudyActions';
 import StudyStore from '../stores/StudyStore';
 import UserActions from '../actions/UserActions';
 import UserStore from '../stores/UserStore';
+import WaitingRoomStore from '../stores/WaitingRoomStore';
 
 function getStateFromStores() {
   return {
-    study: StudyStore.getStudy(),
     config: StudyStore.getConfig(),
     userId: UserStore.getUserId(),
-    userState: UserStore.getUserState(),
     messages: MessagesStore.getMessages(),
+    // These aren't necessary but are useful for debugging
+    study: StudyStore.getStudy(),
+    userState: UserStore.getUserState(),
+    waitingUsers: WaitingRoomStore.getWaitingUsers(),
   };
 }
 
@@ -24,11 +27,23 @@ const ChatApp = React.createClass({
   },
 
   componentDidMount() {
-    UserStore.listen(this._onChange);
-    StudyStore.listen(this._onChange);
-    MessagesStore.listen(this._onChange);
+    const stores = [
+      StudyStore,
+      UserStore,
+      MessagesStore,
+      WaitingRoomStore,
+    ];
+    stores.forEach(store => store.listen(this._onChange));
 
     this._init();
+  },
+
+  componentDidUpdate(prevProps, prevState) {
+    const runIfLoaded = (key, fn) => {
+      return deferIfUpdated(prevState, this.state, key, fn);
+    };
+
+    runIfLoaded('config', this._setupUser);
   },
 
   _onChange() {
@@ -38,16 +53,17 @@ const ChatApp = React.createClass({
   _init() {
     StudyActions.initStudy();
     StudyActions.loadConfig(StudyStore.getConfigFb());
-
-    // HACKHACKHACK: while I figure out how to call this method only after
-    // config is loaded
-    setTimeout(this._loadUser, 2500);
   },
 
-  _loadUser() {
+  _setupUser() {
+    // TODO(sam): Remove once life is better
+    if (!StudyStore.getConfig()) {
+      throw new Error("Config didn't load in time!");
+    }
+
     UserActions.getInitialUserId();
     UserActions.loadAndListen({
-      usersFb: StudyStore.getUsersFb(),
+      baseFb: StudyStore.getBaseFb(),
       userId: UserStore.getUserId(),
       config: StudyStore.getConfig(),
     });
