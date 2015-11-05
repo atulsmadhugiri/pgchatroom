@@ -2,6 +2,7 @@ import React from 'react';
 
 import Message from './Message';
 import MessagesStore from '../stores/MessagesStore';
+import RoomStore from '../stores/RoomStore';
 import StudyActions from '../actions/StudyActions';
 import StudyStore from '../stores/StudyStore';
 import UserActions from '../actions/UserActions';
@@ -13,10 +14,13 @@ function getStateFromStores() {
     config: StudyStore.getConfig(),
     userId: UserStore.getUserId(),
     messages: MessagesStore.getMessages(),
+    roomFb: RoomStore.getRoomFb(),
+    messagingEnabled: MessagesStore.getMessagingEnabled(),
     // These aren't necessary but are useful for debugging
     study: StudyStore.getStudy(),
     userState: UserStore.getUserState(),
     waitingUsers: WaitingRoomStore.getWaitingUsers(),
+    roomId: RoomStore.getRoomId(),
   };
 }
 
@@ -31,6 +35,7 @@ const ChatApp = React.createClass({
       UserStore,
       MessagesStore,
       WaitingRoomStore,
+      RoomStore,
     ];
     stores.forEach(store => store.listen(this._onChange));
 
@@ -51,6 +56,11 @@ const ChatApp = React.createClass({
       userId: UserStore.getUserId(),
       config: StudyStore.getConfig(),
     });
+  },
+
+  _sendMessage(e) {
+    console.log(`Message sent: ${this.state.userId}`);
+    console.log(e.target.val());
   },
 
   render() {
@@ -78,9 +88,11 @@ const ChatApp = React.createClass({
 
         <div className="spacer"></div>
 
-        <input type="text"
-          placeholder="Type a message"
-          disabled />
+        <form onSubmit={this._sendMessage}>
+          <input type="text"
+            placeholder="Type a message"
+            disabled={!this.state.messagingEnabled} />
+        </form>
       </div>
     );
   },
