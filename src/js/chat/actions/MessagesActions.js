@@ -2,10 +2,15 @@ import alt from '../alt';
 
 import { convertToMins } from '../util';
 
-function startMessage(maxWaitingTime) {
+function waitingMessage(maxWaitingTime) {
   return `Please wait while we match you to a room. If we are ` +
     `not able to match you in ${convertToMins(maxWaitingTime)} minutes you ` +
     `will be able to move on to the next part of the survey.`;
+}
+
+function startMessage(usersPerRoom, roomOpenTime) {
+  return `You have been matched to ${usersPerRoom - 1} other participants. ` +
+    `You have ${convertToMins(roomOpenTime)} minutes to chat.`;
 }
 
 function finishMessage(password) {
@@ -21,19 +26,27 @@ function earlyFinishMessage(altPassword) {
 
 class MessagesActions {
   constructor() {
-    this.generateActions('systemMessage', 'message');
+    this.generateActions('enableMessaging', 'disableMessaging',
+      'systemMessage', 'message');
   }
 
-  startMessage(maxWaitingTime) {
-    this.actions.systemMessage(startMessage(maxWaitingTime));
+  waitingMessage({ maxWaitingTime }) {
+    this.actions.systemMessage(waitingMessage(maxWaitingTime));
   }
 
-  finishMessage(password) {
+  startMessage({ usersPerRoom, roomOpenTime }) {
+    this.actions.enableMessaging();
+    this.actions.systemMessage(startMessage(usersPerRoom, roomOpenTime));
+  }
+
+  finishMessage({ password }) {
     this.actions.systemMessage(finishMessage(password));
+    this.actions.disableMessaging();
   }
 
-  earlyFinishMessage(altPassword) {
+  earlyFinishMessage({ altPassword }) {
     this.actions.systemMessage(earlyFinishMessage(altPassword));
+    this.actions.disableMessaging();
   }
 }
 
