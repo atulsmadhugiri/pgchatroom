@@ -21,7 +21,7 @@ module.exports = {
         loaders: [
             { test: /\.s?css$/, loader: "style!css!sass" },
             // { test: /\.jsx?$/, loaders: ["react-hot", "babel"], exclude: /node_modules/ }
-            { test: /\.jsx?$/, loaders: ["babel"], exclude: /node_modules/ }
+            { test: /\.jsx?$/, loaders: ["babel?optional=runtime"], exclude: /node_modules/ }
         ]
     },
     plugins: [
