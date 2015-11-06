@@ -1,5 +1,11 @@
 import _ from 'underscore';
 
+function assert(condition, message = 'Assertion failed.') {
+  if (!condition) {
+    throw new Error(`[AssertionError]: ${message}`);
+  }
+}
+
 function getAttributeFromUrlParams(regex) {
   const params = regex.exec(location.search);
   return params && params[1];
@@ -33,6 +39,7 @@ function deferIfUpdated(prevState, state, key, fn) {
 }
 
 export default {
+  assert,
   getAttributeFromUrlParams,
   convertToMs,
   convertToMins,
