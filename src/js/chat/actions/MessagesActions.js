@@ -54,8 +54,7 @@ class MessagesActions {
   }
 
   startMessage({ StudyStore, MessagesStore }) {
-    const { usersPerRoom, roomOpenTime } =
-      StudyStore.get('config').usersPerRoom;
+    const { usersPerRoom, roomOpenTime } = StudyStore.get('config');
 
     this.actions.systemMessage(startMessage(usersPerRoom, roomOpenTime));
     this.actions.enableMessaging(MessagesStore);
