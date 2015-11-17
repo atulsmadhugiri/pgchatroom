@@ -21,9 +21,6 @@ class WaitingRoomActions {
         userState => userState === 'waiting');
       this.actions.updateWaitingUsers(waitingUsers);
 
-      // This might cause 3 rooms to be created (one for each user
-      // that gets matched).
-      // TODO(sam): Ensure that only one room gets created
       if (_.size(waitingUsers) >= usersPerRoom &&
           _.has(waitingUsers, currentUserId)) {
         this.actions.sendUsersToRoom(
@@ -46,15 +43,19 @@ class WaitingRoomActions {
       .first(usersPerRoom - 1)
       .value()
       .concat([currentUserId]);
-    const roomId = RoomActions.createRoom(StudyStore);
 
-    debugger;
 
-    UserActions.setUsersToRoom({
-      StudyStore,
-      roomId,
-      matchedUsers,
-    });
+    // Make sure only one room is created when all users hit this code
+    const shouldCreateRoom = _.min(matchedUsers) === currentUserId;
+    if (shouldCreateRoom) {
+      const roomId = RoomActions.createRoom(StudyStore);
+
+      UserActions.setUsersToRoom({
+        StudyStore,
+        roomId,
+        matchedUsers,
+      });
+    }
   }
 }
 
