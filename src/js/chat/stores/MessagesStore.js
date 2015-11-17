@@ -42,7 +42,7 @@ class MessagesStore {
 
   disableMessaging() {
     if (this.messagingFb) {
-      messagingFb.off();
+      this.messagingFb.off();
     }
 
     this.messagingEnabled = false;
