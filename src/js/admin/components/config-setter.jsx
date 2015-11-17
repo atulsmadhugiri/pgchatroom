@@ -19,6 +19,8 @@ const ConfigSetter = React.createClass({
         maxWaitingTime: false,
         roomOpenTime: false,
         warning: false,
+        password: false,
+        altPassword: false,
       },
     };
   },
@@ -86,6 +88,10 @@ const ConfigSetter = React.createClass({
             {this._formInputFor('warning',
               'Minutes remaining before chat end warning',
               convertToMins, convertToMs)}
+            {this._formInputFor('password',
+              'Password to continue with study after chat')}
+            {this._formInputFor('altPassword',
+              'Password to continue if not placed in chat room')}
 
             <div>{this.state.saved && 'Saved!'}</div>
             <button name="submit">Save</button>
