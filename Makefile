@@ -26,6 +26,15 @@ serve:
 	@echo "${BLUE}========${NOCOLOR}"
 	${WEBPACK_DEV_SERVER} --port ${PORT} -d --hot --inline
 
+deploy:
+	@echo "${BLUE}Deploying app.${NOCOLOR}"
+	@echo "${BLUE}========${NOCOLOR}"
+	git checkout gh-pages
+	$(MAKE) build
+	git add -A build
+	git commit -m 'Build'
+	git push origin gh-pages
+
 test:
 	${KARMA} start
 
