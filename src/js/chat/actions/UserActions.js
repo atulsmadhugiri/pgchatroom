@@ -1,7 +1,7 @@
 import alt from '../alt';
 import _ from 'underscore';
 
-import { getAttributeFromUrlParams } from '../util';
+import { assert, getAttributeFromUrlParams } from '../util';
 import MessagesActions from './MessagesActions';
 import WaitingRoomActions from './WaitingRoomActions';
 import RoomActions from './RoomActions';
@@ -20,12 +20,17 @@ class UserActions {
     this.dispatch(userId);
   }
 
-  loadAndListen({ baseFb, userId, config }) {
-    this.dispatch();
+  loadAndListen({ StudyStore, UserStore, WaitingRoomStore, MessagesStore }) {
+    assert(StudyStore.get('study') && StudyStore.get('config'),
+      'Study not loaded.');
+    assert(UserStore.get('userId'), 'User not loaded.');
 
-    const { maxWaitingTime } = config;
-    const usersFb = baseFb.child('users');
-    const userFb = usersFb.child(userId);
+    const userId = UserStore.get('userId');
+    const userFb = StudyStore.get('usersFb').child(userId);
+
+    const { maxWaitingTime, roomOpenTime } = StudyStore.get('config');
+
+    this.dispatch(userFb);
 
     userFb.on('value', snapshot => {
       const userState = snapshot.val();
@@ -33,28 +38,26 @@ class UserActions {
 
       switch (userState) {
       case null:
-        this.actions.createUser(userFb, userId);
+        this.actions.createUser(userFb);
         break;
       case 'waiting':
-        MessagesActions.waitingMessage(config);
-        WaitingRoomActions.listenForMoreUsers({
-          baseFb,
-          usersFb,
-          config,
-          currentUserId: userId,
-        });
+        MessagesActions.waitingMessage(StudyStore);
+        WaitingRoomActions.listenForMoreUsers(
+          { StudyStore, UserStore, WaitingRoomStore });
         this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
-        MessagesActions.earlyFinishMessage(config);
+        MessagesActions.earlyFinishMessage(configWithFb);
         break;
       case 'done':
-        MessagesActions.finishMessage(config);
+        userFb.off();
+        MessagesActions.finishMessage(configWithFb);
         break;
       default: // User in room
         const roomId = userState;
-        RoomActions.addUser({ baseFb, userId, roomId });
-        MessagesActions.startMessage(config);
+        RoomActions.addUser({ StudyStore, UserStore, roomId });
+        MessagesActions.startMessage({ StudyStore, MessagesStore });
+        this.actions.startChatTime(userFb, roomOpenTime);
       }
     });
   }
@@ -63,9 +66,11 @@ class UserActions {
     userFb.set('waiting');
   }
 
-  setUsersToRoom({ usersFb, users, roomId }) {
+  setUsersToRoom({ StudyStore, roomId, matchedUsers }) {
+    const usersFb = StudyStore.get('usersFb');
+
     usersFb.update(
-      _.object(users, users.map(() => roomId))
+      _.object(matchedUsers, matchedUsers.map(() => roomId))
     );
   }
 
@@ -79,6 +84,13 @@ class UserActions {
         }
       });
     }, waitingTime);
+  }
+
+  startChatTime(userFb, roomOpenTime) {
+    console.log('Starting chat timer...');
+    setTimeout(() => {
+      userFb.set('done');
+    }, roomOpenTime);
   }
 }
 

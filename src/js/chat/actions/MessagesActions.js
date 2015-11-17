@@ -26,27 +26,49 @@ function earlyFinishMessage(altPassword) {
 
 class MessagesActions {
   constructor() {
-    this.generateActions('enableMessaging', 'disableMessaging',
-      'systemMessage', 'message');
+    this.generateActions('systemMessage', 'receiveMessage');
   }
 
-  waitingMessage({ maxWaitingTime }) {
+  enableMessaging(MessagesStore) {
+    this.dispatch();
+    const messagingFb = MessagesStore.get('messagingFb');
+
+    messagingFb.on('child_added', snapshot => {
+      const message = snapshot.val();
+      this.actions.receiveMessage(message);
+    });
+  }
+
+  disableMessaging() {
+    this.dispatch();
+  }
+
+  sendMessage({ MessagesStore, userId, message }) {
+    const messagingFb = MessagesStore.get('messagingFb');
+    messagingFb.push({ userId, message });
+  }
+
+  waitingMessage(StudyStore) {
+    const maxWaitingTime = StudyStore.get('config').maxWaitingTime;
     this.actions.systemMessage(waitingMessage(maxWaitingTime));
   }
 
-  startMessage({ usersPerRoom, roomOpenTime }) {
-    this.actions.enableMessaging();
+  startMessage({ StudyStore, MessagesStore }) {
+    const { usersPerRoom, roomOpenTime } =
+      StudyStore.get('config').usersPerRoom;
+
     this.actions.systemMessage(startMessage(usersPerRoom, roomOpenTime));
+    this.actions.enableMessaging(MessagesStore);
   }
 
-  finishMessage({ password }) {
+  finishMessage({ baseFb, password }) {
     this.actions.systemMessage(finishMessage(password));
-    this.actions.disableMessaging();
+    this.actions.disableMessaging(baseFb);
   }
 
-  earlyFinishMessage({ altPassword }) {
+  earlyFinishMessage({ baseFb, altPassword }) {
     this.actions.systemMessage(earlyFinishMessage(altPassword));
-    this.actions.disableMessaging();
+    this.actions.disableMessaging(baseFb);
   }
 }
 

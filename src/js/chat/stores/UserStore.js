@@ -4,30 +4,27 @@ import UserActions from '../actions/UserActions';
 
 class UserStore {
   constructor() {
-    // this.bindActions(UserActions);
-    this.bindListeners({
-      onGetInitialUserId: UserActions.getInitialUserId,
-      onUpdateUser: UserActions.updateUser,
-    });
+    this.bindActions(UserActions);
 
     this.userId = null;
     this.userState = null;
+    this.userFb = null;
   }
 
-  onGetInitialUserId(userId) {
+  getInitialUserId(userId) {
     this.userId = userId;
   }
 
-  onUpdateUser(userState) {
+  loadAndListen(userFb) {
+    this.userFb = userFb;
+  }
+
+  updateUser(userState) {
     this.userState = userState;
   }
 
-  static getUserId() {
-    return this.getState().userId;
-  }
-
-  static getUserState() {
-    return this.getState().userState;
+  static get(attr) {
+    return this.getState()[attr];
   }
 }
 

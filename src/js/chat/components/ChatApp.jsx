@@ -1,35 +1,39 @@
 import React from 'react';
 
 import Message from './Message';
+import MessagesActions from '../actions/MessagesActions';
+import StudyActions from '../actions/StudyActions';
+import UserActions from '../actions/UserActions';
+
 import MessagesStore from '../stores/MessagesStore';
 import RoomStore from '../stores/RoomStore';
-import StudyActions from '../actions/StudyActions';
 import StudyStore from '../stores/StudyStore';
-import UserActions from '../actions/UserActions';
 import UserStore from '../stores/UserStore';
 import WaitingRoomStore from '../stores/WaitingRoomStore';
 
 function getStateFromStores() {
   return {
-    config: StudyStore.getConfig(),
-    userId: UserStore.getUserId(),
-    messages: MessagesStore.getMessages(),
-    roomFb: RoomStore.getRoomFb(),
-    messagingEnabled: MessagesStore.getMessagingEnabled(),
+    config: StudyStore.get('config'),
+    userId: UserStore.get('userId'),
+    study: StudyStore.get('study'),
+    messages: MessagesStore.get('messages'),
+    messagingEnabled: MessagesStore.get('messagingEnabled'),
     // These aren't necessary but are useful for debugging
-    study: StudyStore.getStudy(),
-    userState: UserStore.getUserState(),
-    waitingUsers: WaitingRoomStore.getWaitingUsers(),
-    roomId: RoomStore.getRoomId(),
+    userState: UserStore.get('userState'),
+    waitingUsers: WaitingRoomStore.get('waitingUsers'),
+    roomId: RoomStore.get('roomId'),
   };
 }
 
 const ChatApp = React.createClass({
   getInitialState() {
-    return getStateFromStores();
+    return {
+      ...getStateFromStores(),
+      message: '',
+    };
   },
 
-  componentDidMount() {
+  componentWillMount() {
     const stores = [
       StudyStore,
       UserStore,
@@ -42,25 +46,42 @@ const ChatApp = React.createClass({
     this._init();
   },
 
+  componentDidUpdate() {
+    if (this.state.messagingEnabled) {
+      // Scroll to bottom of chat
+      this.refs.messages.scrollTop = this.refs.messages.scrollHeight;
+    }
+  },
+
   _onChange() {
     this.setState(getStateFromStores());
   },
 
+  _onInputChange(e) {
+    this.setState({ message: e.target.value });
+  },
+
   async _init() {
     StudyActions.initStudy();
-    await StudyActions.loadConfig(StudyStore.getConfigFb());
+    await StudyActions.loadConfig(StudyStore.get('configFb'));
 
     UserActions.getInitialUserId();
-    UserActions.loadAndListen({
-      baseFb: StudyStore.getBaseFb(),
-      userId: UserStore.getUserId(),
-      config: StudyStore.getConfig(),
-    });
+    UserActions.loadAndListen({ StudyStore, UserStore,
+      MessagesStore, WaitingRoomStore, RoomStore });
   },
 
   _sendMessage(e) {
-    console.log(`Message sent: ${this.state.userId}`);
-    console.log(e.target.val());
+    e.preventDefault();
+    if (this.state.message === '') {
+      return;
+    }
+
+    MessagesActions.sendMessage({
+      MessagesStore,
+      userId: this.state.userId,
+      message: this.state.message,
+    });
+    this.setState({ message: '' });
   },
 
   render() {
@@ -71,7 +92,11 @@ const ChatApp = React.createClass({
     }
 
     const messages = this.state.messages.map((message, i) => {
-      return <Message user={message.user} message={message.message} key={i} />;
+      return (
+        <Message userId={message.userId}
+          message={message.message}
+          key={i} />
+      );
     });
 
     return (
@@ -84,13 +109,18 @@ const ChatApp = React.createClass({
 
         <div className="spacer"></div>
 
-        <div className="messages">{messages}</div>
+        <div className="messages"
+             ref="messages">
+          {messages}
+        </div>
 
         <div className="spacer"></div>
 
         <form onSubmit={this._sendMessage}>
           <input type="text"
             placeholder="Type a message"
+            onChange={this._onInputChange}
+            value={this.state.message}
             disabled={!this.state.messagingEnabled} />
         </form>
       </div>

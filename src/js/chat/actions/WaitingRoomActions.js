@@ -10,8 +10,11 @@ class WaitingRoomActions {
     this.generateActions('updateWaitingUsers');
   }
 
-  listenForMoreUsers({ baseFb, usersFb, currentUserId, config }) {
-    const { usersPerRoom } = config;
+  listenForMoreUsers({ StudyStore, UserStore, WaitingRoomStore }) {
+    const usersFb = StudyStore.get('usersFb');
+    const usersPerRoom = StudyStore.get('config').usersPerRoom;
+    const currentUserId = UserStore.get('userId');
+
     usersFb.on('value', snapshot => {
       const users = snapshot.val();
       const waitingUsers = filterObject(users,
@@ -23,14 +26,18 @@ class WaitingRoomActions {
       // TODO(sam): Ensure that only one room gets created
       if (_.size(waitingUsers) >= usersPerRoom &&
           _.has(waitingUsers, currentUserId)) {
-        this.actions.sendUsersToRoom({
-          baseFb, usersFb, waitingUsers, currentUserId, usersPerRoom });
+        this.actions.sendUsersToRoom(
+          { StudyStore, UserStore, WaitingRoomStore });
       }
     });
   }
 
-  sendUsersToRoom({ baseFb, usersFb, waitingUsers,
-      currentUserId, usersPerRoom }) {
+  sendUsersToRoom({ StudyStore, UserStore, WaitingRoomStore }) {
+    const usersFb = StudyStore.get('usersFb');
+    const currentUserId = UserStore.get('userId');
+    const usersPerRoom = StudyStore.get('config').usersPerRoom;
+    const waitingUsers = WaitingRoomStore.get('waitingUsers');
+
     usersFb.off();
 
     const matchedUsers = _.chain(waitingUsers)
@@ -39,12 +46,14 @@ class WaitingRoomActions {
       .first(usersPerRoom - 1)
       .value()
       .concat([currentUserId]);
-    const roomId = RoomActions.createRoom(baseFb);
+    const roomId = RoomActions.createRoom(StudyStore);
+
+    debugger;
 
     UserActions.setUsersToRoom({
-      usersFb,
+      StudyStore,
       roomId,
-      users: matchedUsers,
+      matchedUsers,
     });
   }
 }

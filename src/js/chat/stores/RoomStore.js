@@ -11,25 +11,19 @@ class RoomStore {
     this.userIds = [];
   }
 
-  onCreateRoomAndListen(roomFb) {
+  createRoomAndListen(roomFb) {
     this.roomFb = roomFb;
     this.roomId = roomFb.key();
   }
 
-  onAddUser(userId) {
+  addUser({ roomFb, userId }) {
+    this.roomFb = roomFb;
+    this.roomId = roomFb.key();
     this.userIds.push(userId);
   }
 
-  static getRoomFb() {
-    return this.getState().roomFb;
-  }
-
-  static getRoomId() {
-    return this.getState().roomId;
-  }
-
-  static getUserIds() {
-    return this.getState().userIds;
+  static get(attr) {
+    return this.getState()[attr];
   }
 }
 

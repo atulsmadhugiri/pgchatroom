@@ -27,23 +27,10 @@ function filterObject(obj, pred) {
   return _.pick(obj, keys);
 }
 
-// HACKHACKHACK: to allow store updates to trigger other actions
-function deferRun(fn) {
-  setTimeout(fn, 10);
-}
-
-function deferIfUpdated(prevState, state, key, fn) {
-  if (!prevState[key] && state[key]) {
-    deferRun(fn);
-  }
-}
-
 export default {
   assert,
   getAttributeFromUrlParams,
   convertToMs,
   convertToMins,
   filterObject,
-  deferIfUpdated,
-  deferRun,
 };

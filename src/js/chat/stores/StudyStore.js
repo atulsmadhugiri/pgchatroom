@@ -11,12 +11,15 @@ class StudyStore {
     this.bindActions(StudyActions);
 
     this.study = null;
+    this.config = null;
+
+    this.usersFb = null;
+    this.roomsFb = null;
     this.baseFb = null;
     this.configFb = null;
-    this.config = null;
   }
 
-  onInitStudy(study) {
+  initStudy(study) {
     this.study = study;
 
     this.baseFb = new Firebase(`${BASE_URL}/${this.study}`);
@@ -25,32 +28,12 @@ class StudyStore {
     this.roomsFb = this.baseFb.child('rooms');
   }
 
-  onUpdateConfig(config) {
+  updateConfig(config) {
     this.config = config;
   }
 
-  static getStudy() {
-    return this.getState().study;
-  }
-
-  static getConfig() {
-    return this.getState().config;
-  }
-
-  static getBaseFb() {
-    return this.getState().baseFb;
-  }
-
-  static getConfigFb() {
-    return this.getState().configFb;
-  }
-
-  static getUsersFb() {
-    return this.getState().usersFb;
-  }
-
-  static getRoomsFb() {
-    return this.getState().roomsFb;
+  static get(attr) {
+    return this.getState()[attr];
   }
 }
 

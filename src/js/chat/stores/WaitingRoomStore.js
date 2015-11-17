@@ -9,12 +9,12 @@ class WaitingRoomStore {
     this.waitingUsers = null;
   }
 
-  onUpdateWaitingUsers(waitingUsers) {
+  updateWaitingUsers(waitingUsers) {
     this.waitingUsers = waitingUsers;
   }
 
-  static getWaitingUsers() {
-    return this.getState().waitingUsers;
+  static get(attr) {
+    return this.getState()[attr];
   }
 }
 
