@@ -29241,7 +29241,9 @@
 	        usersPerRoom: false,
 	        maxWaitingTime: false,
 	        roomOpenTime: false,
-	        warning: false
+	        warning: false,
+	        password: false,
+	        altPassword: false
 	      }
 	    };
 	  },
@@ -29316,6 +29318,8 @@
 	        this._formInputFor('maxWaitingTime', 'Max waiting time (in minutes)', _chatUtil.convertToMins, _chatUtil.convertToMs),
 	        this._formInputFor('roomOpenTime', 'Time participants have to chat (in minutes)', _chatUtil.convertToMins, _chatUtil.convertToMs),
 	        this._formInputFor('warning', 'Minutes remaining before chat end warning', _chatUtil.convertToMins, _chatUtil.convertToMs),
+	        this._formInputFor('password', 'Password to continue with study after chat'),
+	        this._formInputFor('altPassword', 'Password to continue if not placed in chat room'),
 	        _react2['default'].createElement(
 	          'div',
 	          null,
@@ -31021,7 +31025,7 @@
 	var USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
 	var nameToUrl = function nameToUrl(roomName) {
-	  return 'https://samlau95.github.io/pg-chat-room?' + ('room=' + roomName + '&' + USER_ID_FIELD);
+	  return 'https://samlau95.github.io/pg-chat-room?' + ('study=' + roomName + '&' + USER_ID_FIELD);
 	};
 
 	var UrlGenerator = _react2['default'].createClass({
@@ -31041,6 +31045,11 @@
 	  },
 
 	  render: function render() {
+	    var inputStyle = {
+	      display: 'block',
+	      margin: '0 auto'
+	    };
+
 	    return _react2['default'].createElement(
 	      'div',
 	      null,
@@ -31050,12 +31059,13 @@
 	        _react2['default'].createElement(
 	          'h3',
 	          null,
-	          'Generate a chatroom URL for a given room.'
+	          'Generate a chatroom URL for a given study.'
 	        ),
 	        _react2['default'].createElement('input', { type: 'text',
 	          value: this.state.name,
 	          onChange: this._handleChange,
-	          placeholder: 'Room name' }),
+	          style: inputStyle,
+	          placeholder: 'Study name' }),
 	        _react2['default'].createElement(
 	          'button',
 	          { name: 'submit' },
