@@ -30,6 +30,7 @@ const ChatApp = React.createClass({
     return {
       ...getStateFromStores(),
       message: '',
+      error: null,
     };
   },
 
@@ -62,12 +63,16 @@ const ChatApp = React.createClass({
   },
 
   async _init() {
-    StudyActions.initStudy();
-    await StudyActions.loadConfig(StudyStore.get('configFb'));
+    try {
+      StudyActions.initStudy();
+      await StudyActions.loadConfig(StudyStore.get('configFb'));
 
-    UserActions.getInitialUserId();
-    UserActions.loadAndListen({ StudyStore, UserStore,
-      MessagesStore, WaitingRoomStore, RoomStore });
+      UserActions.getInitialUserId();
+      UserActions.loadAndListen({ StudyStore, UserStore,
+        MessagesStore, WaitingRoomStore, RoomStore });
+    } catch (error) {
+      this.setState({ error });
+    }
   },
 
   _sendMessage(e) {
@@ -86,7 +91,10 @@ const ChatApp = React.createClass({
 
   render() {
     console.log(this.state);
-    // TODO(sam): Show error message if user id not present in url
+    if (this.state.error) {
+      return <div>Error: {this.state.error.message}</div>;
+    }
+
     if (!this.state.userId || !this.state.study || !this.state.config) {
       return <div>Loading...</div>;
     }
