@@ -30909,7 +30909,8 @@
 
 	  getInitialState: function getInitialState() {
 	    return _extends({}, getStateFromStores(), {
-	      message: ''
+	      message: '',
+	      error: null
 	    });
 	  },
 
@@ -30943,21 +30944,31 @@
 	    return _regeneratorRuntime.async(function _init$(context$1$0) {
 	      while (1) switch (context$1$0.prev = context$1$0.next) {
 	        case 0:
+	          context$1$0.prev = 0;
+
 	          _actionsStudyActions2['default'].initStudy();
-	          context$1$0.next = 3;
+	          context$1$0.next = 4;
 	          return _regeneratorRuntime.awrap(_actionsStudyActions2['default'].loadConfig(_storesStudyStore2['default'].get('configFb')));
 
-	        case 3:
+	        case 4:
 
 	          _actionsUserActions2['default'].getInitialUserId();
 	          _actionsUserActions2['default'].loadAndListen({ StudyStore: _storesStudyStore2['default'], UserStore: _storesUserStore2['default'],
 	            MessagesStore: _storesMessagesStore2['default'], WaitingRoomStore: _storesWaitingRoomStore2['default'], RoomStore: _storesRoomStore2['default'] });
+	          context$1$0.next = 11;
+	          break;
 
-	        case 5:
+	        case 8:
+	          context$1$0.prev = 8;
+	          context$1$0.t0 = context$1$0['catch'](0);
+
+	          this.setState({ error: context$1$0.t0 });
+
+	        case 11:
 	        case 'end':
 	          return context$1$0.stop();
 	      }
-	    }, null, this);
+	    }, null, this, [[0, 8]]);
 	  },
 
 	  _sendMessage: function _sendMessage(e) {
@@ -30976,7 +30987,15 @@
 
 	  render: function render() {
 	    console.log(this.state);
-	    // TODO(sam): Show error message if user id not present in url
+	    if (this.state.error) {
+	      return _react2['default'].createElement(
+	        'div',
+	        null,
+	        'Error: ',
+	        this.state.error.message
+	      );
+	    }
+
 	    if (!this.state.userId || !this.state.study || !this.state.config) {
 	      return _react2['default'].createElement(
 	        'div',
