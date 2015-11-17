@@ -47,11 +47,11 @@ class UserActions {
         this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
-        MessagesActions.earlyFinishMessage(configWithFb);
+        MessagesActions.earlyFinishMessage(StudyStore);
         break;
       case 'done':
         userFb.off();
-        MessagesActions.finishMessage(configWithFb);
+        MessagesActions.finishMessage(StudyStore);
         break;
       default: // User in room
         const roomId = userState;

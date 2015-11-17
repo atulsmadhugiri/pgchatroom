@@ -61,12 +61,18 @@ class MessagesActions {
     this.actions.enableMessaging(MessagesStore);
   }
 
-  finishMessage({ baseFb, password }) {
+  finishMessage(StudyStore) {
+    const baseFb = StudyStore.get('baseFb');
+    const password = StudyStore.get('config').password;
+
     this.actions.systemMessage(finishMessage(password));
     this.actions.disableMessaging(baseFb);
   }
 
-  earlyFinishMessage({ baseFb, altPassword }) {
+  earlyFinishMessage(StudyStore) {
+    const baseFb = StudyStore.get('baseFb');
+    const altPassword = StudyStore.get('config').altPassword;
+
     this.actions.systemMessage(earlyFinishMessage(altPassword));
     this.actions.disableMessaging(baseFb);
   }
