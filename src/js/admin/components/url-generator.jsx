@@ -4,7 +4,7 @@ const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
 const nameToUrl = (roomName) => {
   return `https://samlau95.github.io/pg-chat-room?` +
-    `room=${roomName}&${USER_ID_FIELD}`;
+    `study=${roomName}&${USER_ID_FIELD}`;
 };
 
 const UrlGenerator = React.createClass({
@@ -22,15 +22,21 @@ const UrlGenerator = React.createClass({
   },
 
   render() {
+    const inputStyle = {
+      display: 'block',
+      margin: '0 auto',
+    };
+
     return (
       <div>
         <form onSubmit={this._handleSubmit}>
-          <h3>Generate a chatroom URL for a given room.</h3>
+          <h3>Generate a chatroom URL for a given study.</h3>
 
           <input type="text"
             value={this.state.name}
             onChange={this._handleChange}
-            placeholder="Room name" />
+            style={inputStyle}
+            placeholder="Study name" />
 
           <button name="submit">Generate</button>
         </form>
