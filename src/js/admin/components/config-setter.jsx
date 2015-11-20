@@ -28,9 +28,17 @@ const ConfigSetter = React.createClass({
 
   componentWillMount() {
     // Only read in initial data
-    this.props.firebase.on('value', snapshot => {
+    this._loadConfig(this.props);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this._loadConfig(nextProps);
+  },
+
+  _loadConfig(props) {
+    props.firebase.on('value', snapshot => {
       if (!snapshot.val()) {
-        this.props.firebase.set(DEFAULT_ROOM_VALUES, (err) => {
+        props.firebase.set(DEFAULT_ROOM_VALUES, (err) => {
           console.log(err);
         });
       } else {
@@ -69,7 +77,7 @@ const ConfigSetter = React.createClass({
         <label htmlFor={attr}>{label}</label>
         <input type="text"
           id={attr}
-          defaultValue={convertData(this.state.config[attr])}
+          value={convertData(this.state.config[attr])}
           onChange={_.partial(this._handleChange, attr, convertInput)} />
         <div className="spacer"></div>
       </div>

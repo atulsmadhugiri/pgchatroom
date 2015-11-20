@@ -62,6 +62,7 @@ const StudyList = React.createClass({
 
   _handleSelectStudy(e) {
     const study = e.target.innerHTML;
+    console.log(study);
     AdminActions.setSelectedStudy(study);
   },
 
