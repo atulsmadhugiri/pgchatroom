@@ -7,7 +7,7 @@ const ERROR_MESSAGE = 'Study has already been created';
 
 const CreateStudy = React.createClass({
   propTypes: {
-    studies: React.PropTypes.object.isRequired,
+    studies: React.PropTypes.object,
     firebase: React.PropTypes.object.isRequired,
   },
 
@@ -39,19 +39,19 @@ const CreateStudy = React.createClass({
 
   _handleSubmit(e) {
     e.preventDefault();
-    const study = ReactDOM.findDOMNode(this.refs.createStudy).value;
+    const study = ReactDOM.findDOMNode(this.refs.createStudy);
     const studies = {
-      studies: [...this.props.studies.add(study)],
+      studies: [...this.props.studies.add(study.value)],
     };
 
     this.props.firebase.set(studies, (err) => {
-      this.setState({ loaded: true });
+      study.value = '';
       console.log(err);
     });
   },
 
   _hasError() {
-    return this.state.hasError;
+    return this.state.hasError || !this.props.studies;
   },
 
   render() {

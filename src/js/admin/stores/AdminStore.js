@@ -14,6 +14,10 @@ class AdminStore {
     this.studies = new Set(studies);
   }
 
+  setSelectedStudy(study) {
+    this.selectedStudy = study;
+  }
+
   static get(attr) {
     return this.getState()[attr];
   }

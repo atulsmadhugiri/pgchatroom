@@ -56,8 +56,13 @@ const StudyList = React.createClass({
     }
 
     return [...this.state.studies].map(study => {
-      return <div key={study}>{study}</div>;
+      return <div key={study} onClick={this._handleSelectStudy}>{study}</div>;
     });
+  },
+
+  _handleSelectStudy(e) {
+    const study = e.target.innerHTML;
+    AdminActions.setSelectedStudy(study);
   },
 
   render() {

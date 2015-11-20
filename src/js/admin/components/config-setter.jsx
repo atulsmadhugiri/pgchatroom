@@ -2,6 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 
 import { convertToMs, convertToMins } from '../../chat/util';
+import { DEFAULT_ROOM_VALUES } from '../../chat/constants';
 
 const ConfigSetter = React.createClass({
   propTypes: {
@@ -27,11 +28,17 @@ const ConfigSetter = React.createClass({
 
   componentWillMount() {
     // Only read in initial data
-    this.props.firebase.once('value', snapshot => {
-      this.setState({
-        loaded: true,
-        config: snapshot.val(),
-      });
+    this.props.firebase.on('value', snapshot => {
+      if (!snapshot.val()) {
+        this.props.firebase.set(DEFAULT_ROOM_VALUES, (err) => {
+          console.log(err);
+        });
+      } else {
+        this.setState({
+          loaded: true,
+          config: snapshot.val(),
+        });
+      }
     });
   },
 

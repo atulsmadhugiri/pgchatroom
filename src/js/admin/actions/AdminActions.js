@@ -4,7 +4,7 @@ import alt from '../alt';
 
 class AdminActions {
   constructor() {
-    this.generateActions('setStudies');
+    this.generateActions('setStudies', 'setSelectedStudy');
   }
 }
 

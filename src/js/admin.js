@@ -11,8 +11,8 @@ import AdminStore from './admin/stores/AdminStore';
 
 
 // TODO(sam): Move this into the constants file
-const CONFIG_FB = new Firebase('https://research-chat-room.firebaseio.com/constants');
 const STUDIES_FB = new Firebase('https://research-chat-room.firebaseio.com/studies');
+const CONSTANTS_URL = 'https://research-chat-room.firebaseio.com/constants/';
 
 function getStateFromStores() {
   return {
@@ -27,6 +27,18 @@ const AdminApp = React.createClass({
     };
   },
 
+  componentWillMount() {
+    AdminStore.listen(this._onChange);
+  },
+
+  _onChange() {
+    this.setState(getStateFromStores());
+  },
+
+  _getFireBaseFromStudy() {
+    return new Firebase(`${CONSTANTS_URL}${this.state.selectedStudy}`);
+  },
+
   render() {
     return (
       <div>
@@ -38,7 +50,7 @@ const AdminApp = React.createClass({
             <h1>Chat Room Admin Panel</h1>
             <UrlGenerator />
             <hr />
-            <ConfigSetter firebase={CONFIG_FB} />
+            <ConfigSetter firebase={this._getFireBaseFromStudy()} />
           </div>
         }
       </div>
