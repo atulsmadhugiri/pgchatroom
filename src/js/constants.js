@@ -1,6 +1,7 @@
 const ROOT_URL = 'https://research-chat-room.firebaseio.com';
 // const ROOT_URL = `ws://127.0.1:5000`;
 const STUDIES_URL = `${ROOT_URL}/studies`;
+const CONSTANTS_URL = `${ROOT_URL}/constants`;
 
 const DEFAULT_ROOM_VALUES = {
   usersPerRoom: '3',
@@ -14,5 +15,6 @@ const DEFAULT_ROOM_VALUES = {
 export default {
   ROOT_URL,
   STUDIES_URL,
+  CONSTANTS_URL,
   DEFAULT_ROOM_VALUES,
 };
