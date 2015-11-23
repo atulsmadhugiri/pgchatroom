@@ -3,28 +3,27 @@ import Firebase from 'firebase';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import ConfigSetter from './admin/components/config-setter';
+import ConfigSetter from './admin/components/ConfigSetter';
 import StudyList from './admin/components/StudyList';
+import Spacer from './admin/components/Spacer';
 
+// import AdminActions from './admin/actions/AdminActions';
 import AdminStore from './admin/stores/AdminStore';
 
-
 // TODO(sam): Move this into the constants file
-const STUDIES_FB = new Firebase('https://research-chat-room.firebaseio.com/studies');
-const CONSTANTS_URL = 'https://research-chat-room.firebaseio.com/constants/';
 const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
 function getStateFromStores() {
   return {
+    studiesFb: AdminStore.get('studiesFb'),
     selectedStudy: AdminStore.get('selectedStudy'),
+    studies: AdminStore.get('studies'),
   };
 }
 
 const AdminApp = React.createClass({
   getInitialState() {
-    return {
-      ...getStateFromStores(),
-    };
+    return getStateFromStores();
   },
 
   componentWillMount() {
@@ -36,7 +35,7 @@ const AdminApp = React.createClass({
   },
 
   _getFireBaseFromStudy() {
-    return new Firebase(`${CONSTANTS_URL}${this.state.selectedStudy}`);
+    return new Firebase(`${CONSTANTS_URL}/${this.state.selectedStudy}`);
   },
 
   _getChatRoomUrl() {
@@ -45,15 +44,21 @@ const AdminApp = React.createClass({
   },
 
   render() {
+    console.log(this.state);
+    if (!this.state.studies) {
+      return <div>Loading...</div>;
+    }
+
     return (
       <div>
-        <div>
-          <StudyList firebase={STUDIES_FB} />
-        </div>
+        <h1>Chat Room Admin Panel</h1>
+
+        <StudyList studies={this.state.studies} />
+
+        <Spacer />
+
         {!this.state.selectedStudy ? 'No Study Selected' :
           <div>
-            <h1>Chat Room Admin Panel for {`${this.state.selectedStudy}`}</h1>
-
             <h3>URL for study</h3>
             <div>{this._getChatRoomUrl()}</div>
 
