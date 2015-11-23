@@ -1,10 +1,8 @@
 import alt from '../alt';
 
-// import _ from 'underscore';
-
 class AdminActions {
   constructor() {
-    this.generateActions('setStudies', 'setSelectedStudy');
+    this.generateActions('addStudy', 'setSelectedStudy');
   }
 }
 
