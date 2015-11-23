@@ -1,73 +1,61 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import _ from 'underscore';
 
-// import AdminStore from '../stores/AdminStore';
+import AdminActions from '../actions/AdminActions';
 
-const ERROR_MESSAGE = 'Study has already been created';
+const ERROR_MESSAGE = 'This study already exists.';
 
 const CreateStudy = React.createClass({
   propTypes: {
-    studies: React.PropTypes.object,
-    firebase: React.PropTypes.object.isRequired,
+    studies: React.PropTypes.array.isRequired,
   },
 
   getInitialState() {
     return {
-      errorMessage: '',
-      hasError: true,
+      study: '',
     };
   },
 
   _handleChange(e) {
-    console.log(e.target.value);
-    const value = e.target.value;
-    let errorMessage;
-    let hasError;
-    if (this.props.studies.has(value)) {
-      errorMessage = ERROR_MESSAGE;
-      hasError = true;
-    } else {
-      errorMessage = '';
-      hasError = false;
-    }
-
-    this.setState({
-      errorMessage: errorMessage,
-      hasError: hasError,
-    });
+    this.setState({ study: e.target.value });
   },
 
   _handleSubmit(e) {
     e.preventDefault();
-    const study = ReactDOM.findDOMNode(this.refs.createStudy);
-    const studies = {
-      studies: [...this.props.studies.add(study.value)],
-    };
+    if (this._isInvalid()) {
+      throw new Error('Tried to create an invalid study name');
+    }
 
-    this.props.firebase.set(studies, (err) => {
-      study.value = '';
-      console.log(err);
-    });
+    AdminActions.addStudy(this.state.study);
+    this.setState({ study: '' });
   },
 
-  _hasError() {
-    return this.state.hasError || !this.props.studies;
+  _isInvalid() {
+    return !this.state.study || this.state.study.indexOf(' ') >= 0 ||
+      this._studyExists();
+  },
+
+  _studyExists() {
+    return _.contains(this.props.studies, this.state.study);
   },
 
   render() {
+    console.log(this._isInvalid());
     return (
       <form onSubmit={this._handleSubmit}>
         <div>
-          <label htmlFor="createStudy">New Study</label>
-          <input
-            ref="createStudy"
+          <label htmlFor="createStudy">Create a new study</label>
+          <input ref="studyInput"
             type="text"
             id="createStudy"
-            onChange={this._handleChange}/>
+            placeholder="Study name"
+            value={this.state.study}
+            onChange={this._handleChange} />
         </div>
 
-        <h3>{this.state.errorMessage}</h3>
-        <button name="submit" disabled={this._hasError()}>Save</button>
+        {this._studyExists() && <h3>{ERROR_MESSAGE}</h3>}
+
+        <button name="submit" disabled={this._isInvalid()}>Create</button>
       </form>
     );
   },
