@@ -2,7 +2,7 @@ import alt from '../alt';
 import Firebase from 'firebase';
 
 import StudyActions from '../actions/StudyActions';
-import { ROOT_URL } from '../constants';
+import { ROOT_URL } from '../../constants';
 
 class StudyStore {
   constructor() {
@@ -21,7 +21,7 @@ class StudyStore {
     this.study = study;
 
     this.baseFb = new Firebase(`${ROOT_URL}/${this.study}`);
-    this.configFb = new Firebase(`${ROOT_URL}/constants`);
+    this.configFb = new Firebase(`${ROOT_URL}/constants/${this.study}`);
     this.usersFb = this.baseFb.child('users');
     this.roomsFb = this.baseFb.child('rooms');
   }

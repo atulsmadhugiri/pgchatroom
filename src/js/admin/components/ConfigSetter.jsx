@@ -2,10 +2,12 @@ import React from 'react';
 import _ from 'underscore';
 
 import { convertToMs, convertToMins } from '../../chat/util';
+import { DEFAULT_ROOM_VALUES } from '../../constants';
 
 const ConfigSetter = React.createClass({
   propTypes: {
     firebase: React.PropTypes.object.isRequired,
+    study: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -27,11 +29,26 @@ const ConfigSetter = React.createClass({
 
   componentWillMount() {
     // Only read in initial data
-    this.props.firebase.once('value', snapshot => {
-      this.setState({
-        loaded: true,
-        config: snapshot.val(),
-      });
+    this._loadConfig(this.props);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.props.firebase.off();
+    this._loadConfig(nextProps);
+  },
+
+  _loadConfig(props) {
+    props.firebase.on('value', snapshot => {
+      if (!snapshot.val()) {
+        props.firebase.set(DEFAULT_ROOM_VALUES, (err) => {
+          console.log(err);
+        });
+      } else {
+        this.setState({
+          loaded: true,
+          config: snapshot.val(),
+        });
+      }
     });
   },
 
@@ -62,7 +79,7 @@ const ConfigSetter = React.createClass({
         <label htmlFor={attr}>{label}</label>
         <input type="text"
           id={attr}
-          defaultValue={convertData(this.state.config[attr])}
+          value={convertData(this.state.config[attr])}
           onChange={_.partial(this._handleChange, attr, convertInput)} />
         <div className="spacer"></div>
       </div>
@@ -72,7 +89,7 @@ const ConfigSetter = React.createClass({
   render() {
     return (
       <div>
-        <h3>Change the settings for all chat rooms.</h3>
+        <h3>Change the settings for study {this.props.study}.</h3>
 
         {!this.state.loaded ? 'Loading...' :
           <form onSubmit={this._handleSubmit}>
