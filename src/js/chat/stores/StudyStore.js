@@ -2,7 +2,7 @@ import alt from '../alt';
 import Firebase from 'firebase';
 
 import StudyActions from '../actions/StudyActions';
-import { ROOT_URL } from '../constants';
+import { ROOT_URL } from '../../constants';
 
 class StudyStore {
   constructor() {
