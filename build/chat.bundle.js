@@ -35283,9 +35283,13 @@
 	      var _this = this;
 
 	      this.dispatch();
-	      return new _Promise(function (resolve) {
+	      return new _Promise(function (resolve, reject) {
 	        configFb.once('value', function (snapshot) {
 	          var config = snapshot.val();
+	          if (!config) {
+	            reject(new Error('Study not recognized.'));
+	          }
+
 	          _this.actions.updateConfig(config);
 	          resolve(config);
 	        });
