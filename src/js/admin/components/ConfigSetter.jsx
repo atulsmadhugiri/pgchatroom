@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 
 import { convertToMs, convertToMins } from '../../chat/util';
-import { DEFAULT_ROOM_VALUES } from '../../chat/constants';
+import { DEFAULT_ROOM_VALUES } from '../../constants';
 
 const ConfigSetter = React.createClass({
   propTypes: {
