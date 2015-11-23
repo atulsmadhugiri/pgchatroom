@@ -7,6 +7,7 @@ import { DEFAULT_ROOM_VALUES } from '../../constants';
 const ConfigSetter = React.createClass({
   propTypes: {
     firebase: React.PropTypes.object.isRequired,
+    study: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -32,6 +33,7 @@ const ConfigSetter = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
+    this.props.firebase.off();
     this._loadConfig(nextProps);
   },
 
@@ -87,7 +89,7 @@ const ConfigSetter = React.createClass({
   render() {
     return (
       <div>
-        <h3>Change the settings for all chat rooms.</h3>
+        <h3>Change the settings for study {this.props.study}.</h3>
 
         {!this.state.loaded ? 'Loading...' :
           <form onSubmit={this._handleSubmit}>
