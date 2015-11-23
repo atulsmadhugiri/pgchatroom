@@ -1,67 +1,29 @@
 import React from 'react';
-
-import AdminStore from '../stores/AdminStore';
-import CreateStudy from './CreateStudy';
+import _ from 'underscore';
 
 import AdminActions from '../actions/AdminActions';
-
-function getStateFromStores() {
-  return {
-    studies: AdminStore.get('studies'),
-  };
-}
+import CreateStudy from './CreateStudy';
+import Spacer from './Spacer';
 
 const StudyList = React.createClass({
   propTypes: {
-    firebase: React.PropTypes.object.isRequired,
-  },
-
-  getInitialState() {
-    return {
-      ...getStateFromStores(),
-      loaded: false,
-    };
-  },
-
-  componentWillMount() {
-    this.props.firebase.on('value', snapshot => {
-      if (!snapshot.val()) {
-        this.props.firebase.set({ studies: new Set() }, (err) => {
-          this.setState({ loaded: true });
-          console.log(err);
-        });
-      } else {
-        this.setState({ loaded: true });
-        const studies = snapshot.val().studies;
-        if (studies) {
-          AdminActions.setStudies(studies);
-        }
-      }
-    });
-
-    AdminStore.listen(this._onChange);
-  },
-
-  _onChange() {
-    this.setState(getStateFromStores());
+    studies: React.PropTypes.array.isRequired,
   },
 
   _renderStudies() {
-    if (!this.state.loaded || !this.state.studies) {
-      return 'Loading';
+    if (this.props.studies.length === 0) {
+      return 'No studies yet.';
     }
 
-    if (!this.state.studies.size) {
-      return 'No Studies here!';
-    }
-
-    return [...this.state.studies].map(study => {
-      return <div key={study} onClick={this._handleSelectStudy}>{study}</div>;
-    });
+    return this.props.studies.map(study => (
+      <div key={study}
+           onClick={_.partial(this._handleSelectStudy, study)}>
+        {study}
+      </div>)
+    );
   },
 
-  _handleSelectStudy(e) {
-    const study = e.target.innerHTML;
+  _handleSelectStudy(e, study) {
     console.log(study);
     AdminActions.setSelectedStudy(study);
   },
@@ -69,9 +31,12 @@ const StudyList = React.createClass({
   render() {
     return (
       <div>
-        <h3>List of Studies - Click on one to modify the settings</h3>
+        <h3>List of Studies <br/> Click on one to modify its settings</h3>
         {this._renderStudies()}
-        <CreateStudy {...this.props} studies={this.state.studies} />
+
+        <Spacer />
+
+        <CreateStudy studies={this.props.studies} />
       </div>
     );
   },
