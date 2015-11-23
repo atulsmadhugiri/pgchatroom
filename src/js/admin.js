@@ -1,5 +1,4 @@
 import $ from 'jquery';
-import Firebase from 'firebase';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -7,17 +6,15 @@ import ConfigSetter from './admin/components/ConfigSetter';
 import StudyList from './admin/components/StudyList';
 import Spacer from './admin/components/Spacer';
 
-// import AdminActions from './admin/actions/AdminActions';
 import AdminStore from './admin/stores/AdminStore';
 
-// TODO(sam): Move this into the constants file
 const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
 function getStateFromStores() {
   return {
-    studiesFb: AdminStore.get('studiesFb'),
     selectedStudy: AdminStore.get('selectedStudy'),
     studies: AdminStore.get('studies'),
+    constantsFb: AdminStore.get('constantsFb'),
   };
 }
 
@@ -32,10 +29,6 @@ const AdminApp = React.createClass({
 
   _onChange() {
     this.setState(getStateFromStores());
-  },
-
-  _getFireBaseFromStudy() {
-    return new Firebase(`${CONSTANTS_URL}/${this.state.selectedStudy}`);
   },
 
   _getChatRoomUrl() {
@@ -59,11 +52,12 @@ const AdminApp = React.createClass({
 
         {!this.state.selectedStudy ? 'No Study Selected' :
           <div>
-            <h3>URL for study</h3>
+            <h3>URL for {this.state.selectedStudy}</h3>
             <div>{this._getChatRoomUrl()}</div>
 
             <hr />
-            <ConfigSetter firebase={this._getFireBaseFromStudy()} />
+            <ConfigSetter firebase={this.state.constantsFb}
+              study={this.state.selectedStudy} />
           </div>
         }
       </div>
