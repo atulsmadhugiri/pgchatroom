@@ -5,10 +5,9 @@ import ReactDOM from 'react-dom';
 import ConfigSetter from './admin/components/ConfigSetter';
 import StudyList from './admin/components/StudyList';
 import Spacer from './admin/components/Spacer';
+import RoomGenerator from './admin/components/RoomGenerator';
 
 import AdminStore from './admin/stores/AdminStore';
-
-const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
 function getStateFromStores() {
   return {
@@ -31,11 +30,6 @@ const AdminApp = React.createClass({
     this.setState(getStateFromStores());
   },
 
-  _getChatRoomUrl() {
-    return `https://samlau95.github.io/pg-chat-room?study=` +
-      `${this.state.selectedStudy}&${USER_ID_FIELD}`;
-  },
-
   render() {
     console.log(this.state);
     if (!this.state.studies) {
@@ -52,10 +46,8 @@ const AdminApp = React.createClass({
 
         {!this.state.selectedStudy ? 'No Study Selected' :
           <div>
-            <h3>URL for {this.state.selectedStudy}</h3>
-            <div>{this._getChatRoomUrl()}</div>
-
             <hr />
+            <RoomGenerator selectedStudy={this.state.selectedStudy} />
             <ConfigSetter firebase={this.state.constantsFb}
               study={this.state.selectedStudy} />
           </div>
