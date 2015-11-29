@@ -9,6 +9,7 @@ class StudyStore {
     this.bindActions(StudyActions);
 
     this.study = null;
+    this.room = null;
     this.config = null;
 
     this.usersFb = null;
@@ -17,10 +18,11 @@ class StudyStore {
     this.configFb = null;
   }
 
-  initStudy(study) {
+  initStudy(study, room) {
     this.study = study;
+    this.room = room;
 
-    this.baseFb = new Firebase(`${ROOT_URL}/${this.study}`);
+    this.baseFb = new Firebase(`${ROOT_URL}/${this.study}/${this.room}`);
     this.configFb = new Firebase(`${ROOT_URL}/constants/${this.study}`);
     this.usersFb = this.baseFb.child('users');
     this.roomsFb = this.baseFb.child('rooms');
