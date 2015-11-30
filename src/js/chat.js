@@ -1,4 +1,4 @@
-import '../styles/chat.css';
+import '../styles/chat.scss';
 
 import $ from 'jquery';
 import React from 'react';
