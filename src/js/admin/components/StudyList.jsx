@@ -15,8 +15,17 @@ const StudyList = React.createClass({
       return 'No studies yet.';
     }
 
+    const studyStyles = {
+      width: '50%',
+      margin: '10px auto',
+      padding: 10,
+      backgroundColor: '#D7D4FF',
+      borderRadius: 5,
+    };
+
     return this.props.studies.map(study => (
       <div key={study}
+           style={studyStyles}
            onClick={_.partial(this._handleSelectStudy, study)}>
         {study}
       </div>)

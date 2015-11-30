@@ -34,7 +34,9 @@ const RoomGenerator = React.createClass({
       <div>
         <form onSubmit={this._handleSubmit}>
           <div>
-            <label htmlFor="roomInput">Generate a room name</label>
+            <label htmlFor="roomInput">
+              Generate a room for {this.props.selectedStudy}
+            </label>
             <input
               ref="roomInput"
               type="text"
