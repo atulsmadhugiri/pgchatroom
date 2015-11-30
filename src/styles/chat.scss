@@ -1,27 +1,35 @@
+/* Roboto Font */
+@import url(https://fonts.googleapis.com/css?family=Roboto:300,700,300italic,700italic);
+
+$base-font-family: "Roboto", "Helvetica Neue", Arial, Helvetica, sans-serif;
+$base-font-size: 20px;
+$base-font-color: #43464D;
+$width: 526px;
+
 /* Global */
 body {
-  margin-top: 10px;
-  margin-left: auto;
-  margin-right: auto;
-  width: 526px;
-  background-color: #f8f8f8;
-  font-size: 24px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #424547;
+  margin: 10px auto 0;
+  width: $width;
+  background-color: white;
+
+  font-size: $base-font-size;
+  font-family: $base-font-family;
+  line-height: 1.5;
+  color: $base-font-color;
   text-align: center;
 }
 
 h1 {
   font-size: 36px;
   font-weight: bold;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #424547;
+  font-family: $base-font-family;
+  color: $base-font-color;
 }
 
 h3 {
   font-size: 24px;
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  color: #424547;
+  font-family: $base-font-family;
+  color: $base-font-color;
 }
 
 p {
@@ -33,11 +41,12 @@ label {
 }
 
 input {
+  font-family: $base-font-family;
   font-size: 24px;
 }
 
 input[type=text] {
-  color: #424547;
+  color: $base-font-color;
   border: 1px solid #c2c2c2;
   background-color: white;
 }
@@ -62,9 +71,9 @@ em {
   background-color: white;
   overflow: auto;
   height: 230px;
-  width: 526px;
+  width: $width;
   padding: 10px;
-  border: 3px solid #424547;
+  border: 3px solid $base-font-color;
   margin-bottom: 5px;
   text-align: left;
 }
