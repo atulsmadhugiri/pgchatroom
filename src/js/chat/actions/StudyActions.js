@@ -17,7 +17,7 @@ class StudyActions {
     const room = getAttributeFromUrlParams(ROOM_REGEX);
     if (!room) { throw new Error('Missing room in url!'); }
 
-    this.dispatch(study, room);
+    this.dispatch({ study, room });
   }
 
   loadConfig(configFb) {

@@ -18,7 +18,7 @@ class StudyStore {
     this.configFb = null;
   }
 
-  initStudy(study, room) {
+  initStudy({ study, room }) {
     this.study = study;
     this.room = room;
 
