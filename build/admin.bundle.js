@@ -31192,10 +31192,19 @@
 	      return 'No studies yet.';
 	    }
 
+	    var studyStyles = {
+	      width: '50%',
+	      margin: '10px auto',
+	      padding: 10,
+	      backgroundColor: '#D7D4FF',
+	      borderRadius: 5
+	    };
+
 	    return this.props.studies.map(function (study) {
 	      return _react2['default'].createElement(
 	        'div',
 	        { key: study,
+	          style: studyStyles,
 	          onClick: _underscore2['default'].partial(_this._handleSelectStudy, study) },
 	        study
 	      );
@@ -33109,7 +33118,8 @@
 	          _react2['default'].createElement(
 	            'label',
 	            { htmlFor: 'roomInput' },
-	            'Generate a room name'
+	            'Generate a room for ',
+	            this.props.selectedStudy
 	          ),
 	          _react2['default'].createElement('input', {
 	            ref: 'roomInput',
