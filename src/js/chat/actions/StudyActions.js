@@ -3,6 +3,7 @@ import alt from '../alt';
 import { getAttributeFromUrlParams } from '../util';
 
 const STUDY_REGEX = /study=(\w+)/;
+const ROOM_REGEX = /room=(\w+)/;
 
 class StudyActions {
   constructor() {
@@ -13,7 +14,10 @@ class StudyActions {
     const study = getAttributeFromUrlParams(STUDY_REGEX);
     if (!study) { throw new Error('Missing study in url!'); }
 
-    this.dispatch(study);
+    const room = getAttributeFromUrlParams(ROOM_REGEX);
+    if (!room) { throw new Error('Missing room in url!'); }
+
+    this.dispatch({ study, room });
   }
 
   loadConfig(configFb) {
