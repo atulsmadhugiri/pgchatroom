@@ -1,3 +1,5 @@
+import '../styles/chat.css';
+
 import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
