@@ -7,7 +7,7 @@ KARMA=node_modules/karma-cli/bin/karma
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
 
-PORT=8080
+PORT=8081
 
 help:
 	@echo "make serve     # runs the server (port 8080 by default)"
