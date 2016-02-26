@@ -1,37 +1,41 @@
-import _ from 'underscore';
-import $ from 'jquery';
-import BabyParse from 'babyparse';
+import '../styles/chat.scss';
 
-const $dataInput = $('#dataInput');
-const $submitButton = $('button[name="submit"]');
-const $csvResults = $('.csvResults');
+import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
 
-const CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
+import configureStore from './json_to_csv/configureStore';
+import JSONToCSV from './json_to_csv/components';
+// import BabyParse from 'babyparse';
 
-const parseData = (text) => {
-  const json = JSON.parse(text);
-  const data = [];
 
-  _.mapObject(json, (roomTypeData, roomType) => {
-    _.mapObject(roomTypeData.rooms, (roomData, room) => {
-      _.mapObject(roomData.users, (userVal, user) => {
-        data.push([roomType, room, user]);
-      });
-    });
-  });
+// const CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
 
-  return data;
-};
+// // Extracts Room,Room ID,User ID from JSON
+// const parseData = (text) => {
+//   const json = JSON.parse(text);
+//   const data = [];
 
-const dataToCsv = (data) => {
-  return BabyParse.unparse({ fields: CSV_FIELDS, data: data });
-};
+//   _.mapObject(json, (roomTypeData, roomType) => {
+//     _.mapObject(roomTypeData.rooms, (roomData, room) => {
+//       _.mapObject(roomData.users, (userVal, user) => {
+//         data.push([roomType, room, user]);
+//       });
+//     });
+//   });
 
-$(() => {
-  $submitButton.click(() => {
-    const csvData = parseData($dataInput.val());
-    $csvResults.html(dataToCsv(csvData));
-  });
-});
+//   return data;
+// };
 
-export default { parseData, dataToCsv };
+// const dataToCsv = (data) => {
+//   return BabyParse.unparse({ fields: CSV_FIELDS, data: data });
+// };
+
+const store = configureStore();
+
+render(
+  <Provider store={store}>
+    <JSONToCSV />
+  </Provider>,
+  document.getElementById('json-to-csv-app')
+);
