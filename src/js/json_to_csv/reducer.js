@@ -32,19 +32,22 @@ import { handleActions } from 'redux-actions';
 
 const defaultState = {
   study: '',
-  displayOption: '',
+  displayOption: 'USERS',
+  fetchingData: false,
   data: null,
 };
 
 const jsonCsvApp = handleActions({
-  SET_STUDY: (state, action) => ({ study: action.payload }),
+  SET_STUDY: (state, action) => ({ ...state, study: action.payload }),
 
   SET_DISPLAY_OPTION: (state, action) =>
-    ({ displayOption: action.payload }),
+    ({ ...state, displayOption: action.payload }),
 
-  START_DATA_FETCH: (state, action) => ({ fetchingData: true }),
+  START_DATA_FETCH: (state, action) => ({ ...state, fetchingData: true }),
 
-  SET_DATA: (state, action) => ({ fetchingData: false, data: action.payload }),
+  SET_DATA: (state, action) =>
+    ({ ...state, fetchingData: false, data: action.payload }),
+
 }, defaultState);
 
 export default jsonCsvApp;

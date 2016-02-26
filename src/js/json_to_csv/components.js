@@ -1,7 +1,46 @@
+import _ from 'underscore';
 import React from 'react';
 import { connect } from 'react-redux';
+import BabyParse from 'babyparse';
 
 import { setStudyAndStartFetch } from './actions';
+
+const USER_CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
+
+// Extracts Room,Room ID,User ID from JSON
+const parseUserData = (json) => {
+  const data = [];
+
+  _.mapObject(json, (roomTypeData, roomType) => {
+    _.mapObject(roomTypeData.rooms, (roomData, room) => {
+      _.mapObject(roomData.users, (userVal, user) => {
+        data.push([roomType, room, user]);
+      });
+    });
+  });
+
+  return data;
+};
+
+const userDataToCsv = (data) => {
+  return BabyParse.unparse({ fields: USER_CSV_FIELDS, data: data });
+};
+
+const DataDisplay = ({ displayOption, data }) => {
+  let csv;
+  switch (displayOption) {
+  case 'USERS':
+    csv = userDataToCsv(parseUserData(data));
+    break;
+  case 'MESSAGES':
+    csv = 'messages';
+    break;
+  default:
+    csv = 'No data';
+  }
+
+  return <pre>{data && csv}</pre>;
+};
 
 const JSONToCSV = ({ study, displayOption, data, dispatch }) => {
   let studySelect;
@@ -14,13 +53,14 @@ const JSONToCSV = ({ study, displayOption, data, dispatch }) => {
       dispatch(setStudyAndStartFetch(studySelect.value));
     }}>
       <select ref={node => studySelect = node}>
-        <option value="sams_study">Sam's study</option>
+        <option value="ProjectA">Sam's study</option>
       </select>
       <br />
       <button name="submit">Submit</button>
     </form>
 
-    <pre></pre>
+    <br />
+    <DataDisplay displayOption={displayOption} data={data} />
   </div>);
 };
 

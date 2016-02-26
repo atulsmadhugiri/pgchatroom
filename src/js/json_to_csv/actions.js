@@ -13,7 +13,6 @@ export function setStudyAndStartFetch(study) {
 
     return fetch(`https://research-chat-room.firebaseio.com/${study}.json`)
       .then(response => response.json())
-      .then(json => {debugger;})
       .then(json => dispatch(setData(json)));
   };
 }
