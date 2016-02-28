@@ -1,37 +1,17 @@
-import _ from 'underscore';
-import $ from 'jquery';
-import BabyParse from 'babyparse';
+import '../styles/chat.scss';
 
-const $dataInput = $('#dataInput');
-const $submitButton = $('button[name="submit"]');
-const $csvResults = $('.csvResults');
+import React from 'react';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
 
-const CSV_FIELDS = ['Room', 'Room ID', 'User ID'];
+import configureStore from './json_to_csv/configureStore';
+import JSONToCSV from './json_to_csv/components';
 
-const parseData = (text) => {
-  const json = JSON.parse(text);
-  const data = [];
+const store = configureStore();
 
-  _.mapObject(json, (roomTypeData, roomType) => {
-    _.mapObject(roomTypeData.rooms, (roomData, room) => {
-      _.mapObject(roomData.users, (userVal, user) => {
-        data.push([roomType, room, user]);
-      });
-    });
-  });
-
-  return data;
-};
-
-const dataToCsv = (data) => {
-  return BabyParse.unparse({ fields: CSV_FIELDS, data: data });
-};
-
-$(() => {
-  $submitButton.click(() => {
-    const csvData = parseData($dataInput.val());
-    $csvResults.html(dataToCsv(csvData));
-  });
-});
-
-export default { parseData, dataToCsv };
+render(
+  <Provider store={store}>
+    <JSONToCSV />
+  </Provider>,
+  document.getElementById('json-to-csv-app')
+);
