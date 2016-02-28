@@ -1,7 +1,9 @@
 import { handleActions } from 'redux-actions';
 // {
+//   studyList: null,
 //   study: 'ProjectA',
 //   displayOption: 'MESSAGES',
+//   fetchingStudyList: true,
 //   fetchingData: false,
 //   data: {
 //     "weather" : {
@@ -31,13 +33,21 @@ import { handleActions } from 'redux-actions';
 // }
 
 const defaultState = {
+  studyList: [],
   study: '',
+  fetchingStudyList: true,
   displayOption: 'USERS',
   fetchingData: false,
   data: null,
 };
 
 const jsonCsvApp = handleActions({
+  SET_STUDY_LIST: (state, action) => ({
+    ...state,
+    studyList: action.payload,
+    fetchingStudyList: false,
+  }),
+
   SET_STUDY: (state, action) => ({ ...state, study: action.payload }),
 
   SET_DISPLAY_OPTION: (state, action) =>

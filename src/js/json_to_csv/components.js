@@ -3,7 +3,9 @@ import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import BabyParse from 'babyparse';
 
-import { setStudyAndStartFetch, setDisplayOption } from './actions';
+import {
+  fetchStudyList, setStudyAndStartFetch, setDisplayOption,
+} from './actions';
 
 const dataShape = PropTypes.objectOf(PropTypes.shape({
   rooms: PropTypes.objectOf(PropTypes.shape({
@@ -69,42 +71,52 @@ DataDisplay.propTypes = {
   data: dataShape.isRequired,
 };
 
-const JSONToCSV = ({ study, displayOption, data, dispatch }) => {
-  let studySelect;
+class JSONToCSV extends React.Component {
+  componentDidMount() {
+    this.props.dispatch(fetchStudyList());
+  }
 
-  return (<div>
-    <h1>Get Data from Study</h1>
+  render() {
+    const { studyList,
+            displayOption, data, dispatch } = this.props;
+    let studySelect;
 
-    <form onSubmit={(e) => {
-      e.preventDefault();
-      dispatch(setStudyAndStartFetch(studySelect.value));
-    }}>
-      <select ref={node => studySelect = node}>
-        <option value="ProjectA">Sam's study</option>
-      </select>
+    return (<div>
+      <h1>Get Data from Study</h1>
+
+      <form onSubmit={(e) => {
+        e.preventDefault();
+        dispatch(setStudyAndStartFetch(studySelect.value));
+      }}>
+        <select ref={node => studySelect = node}>
+          {_.map(studyList,
+            (s) => <option value={s} key={s}>{s}</option>)}
+        </select>
+        <br />
+        <button name="submit">Submit</button>
+      </form>
+
       <br />
-      <button name="submit">Submit</button>
-    </form>
+      {data && <form>
+        <input type="radio" value="USERS"
+          id="users"
+          checked={displayOption === 'USERS'}
+          onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
+        <label style={{display: 'inline'}} htmlFor="users">Users</label>
+        <input type="radio" value="MESSAGES"
+          id="messages"
+          checked={displayOption === 'MESSAGES'}
+          onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
+        <label style={{display: 'inline'}} htmlFor="messages">Messages</label>
+      </form>}
 
-    <br />
-    {data && <form>
-      <input type="radio" value="USERS"
-        id="users"
-        checked={displayOption === 'USERS'}
-        onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
-      <label style={{display: 'inline'}} htmlFor="users">Users</label>
-      <input type="radio" value="MESSAGES"
-        id="messages"
-        checked={displayOption === 'MESSAGES'}
-        onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
-      <label style={{display: 'inline'}} htmlFor="messages">Messages</label>
-    </form>}
-
-    {data && <DataDisplay displayOption={displayOption} data={data} />}
-  </div>);
-};
+      {data && <DataDisplay displayOption={displayOption} data={data} />}
+    </div>);
+  }
+}
 
 JSONToCSV.propTypes = {
+  studyList: PropTypes.array.isRequired,
   study: PropTypes.string.isRequired,
   displayOption: PropTypes.string.isRequired,
   data: dataShape,
