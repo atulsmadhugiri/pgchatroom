@@ -1,10 +1,20 @@
 import _ from 'underscore';
-import React from 'react';
+import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
 import BabyParse from 'babyparse';
 
 import { setStudyAndStartFetch, setDisplayOption } from './actions';
 
+const dataShape = PropTypes.objectOf(PropTypes.shape({
+  rooms: PropTypes.objectOf(PropTypes.shape({
+    createdAt: PropTypes.number.isRequired,
+    messages: PropTypes.objectOf(PropTypes.shape({
+      message: PropTypes.string.isRequired,
+      userId: PropTypes.string.isRequired,
+    })).isRequired,
+  })),
+  users: PropTypes.objectOf(PropTypes.string.isRequired).isRequired,
+}));
 
 // Extracts Room,Room ID,User ID from data
 function extractUserData(data) {
@@ -51,7 +61,12 @@ const DataDisplay = ({ displayOption, data }) => {
     csv = 'No data available for this study.';
   }
 
-  return <pre>{data && csv}</pre>;
+  return <pre>{csv}</pre>;
+};
+
+DataDisplay.propTypes = {
+  displayOption: PropTypes.string.isRequired,
+  data: dataShape.isRequired,
 };
 
 const JSONToCSV = ({ study, displayOption, data, dispatch }) => {
@@ -74,14 +89,26 @@ const JSONToCSV = ({ study, displayOption, data, dispatch }) => {
     <br />
     {data && <form>
       <input type="radio" value="USERS"
+        id="users"
         checked={displayOption === 'USERS'}
-        onChange={(e) => dispatch(setDisplayOption(e.target.value))} /> Users
+        onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
+      <label style={{display: 'inline'}} htmlFor="users">Users</label>
       <input type="radio" value="MESSAGES"
+        id="messages"
         checked={displayOption === 'MESSAGES'}
-        onChange={(e) => dispatch(setDisplayOption(e.target.value))} /> Messages
+        onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
+      <label style={{display: 'inline'}} htmlFor="messages">Messages</label>
     </form>}
-    <DataDisplay displayOption={displayOption} data={data} />
+
+    {data && <DataDisplay displayOption={displayOption} data={data} />}
   </div>);
+};
+
+JSONToCSV.propTypes = {
+  study: PropTypes.string.isRequired,
+  displayOption: PropTypes.string.isRequired,
+  data: dataShape,
+  dispatch: PropTypes.func.isRequired,
 };
 
 const mapStateToProps = (state) => state;
