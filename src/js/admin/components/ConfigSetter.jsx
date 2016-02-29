@@ -138,10 +138,11 @@ const ConfigSetter = React.createClass({
   _renderMessages() {
     return _.keys(this.state.config.messages).map(key => {
       return (
-        <div key={key}>
-          <span>{`Time: ${convertToMin(key)} Message: ${this.state.config.messages[key]}`} </span>
-          <span onClick={this._removeMessage}>&nbsp;&nbsp;&nbsp;&times;</span>
-        </div>
+        <tr key={key}>
+          <td>{convertToMins(key)}</td>
+          <td>{this.state.config.messages[key]}</td>
+          <td>&times;</td>
+        </tr>
       );
     });
   },
@@ -156,7 +157,6 @@ const ConfigSetter = React.createClass({
             value={this.state.message}
             onChange={this._handleMessageChange} />
           <h3>{this.state.message_error}</h3>
-          <div className="spacer"></div>
         </div>
 
 
@@ -167,7 +167,6 @@ const ConfigSetter = React.createClass({
             value={this.state.message_time}
             onChange={this._handleMessageTimeChange} />
           <h3>{this.state.message_time_error}</h3>
-          <div className="spacer"></div>
         </div>
 
         <button name="submit">Create Message</button>
@@ -176,13 +175,27 @@ const ConfigSetter = React.createClass({
   },
 
   render() {
+    const tableStyle = {
+      margin: '0 auto',
+    };
+
     return (
       <div>
         <h3> Set Messages for study {this.props.study}</h3>
 
         {!this.state.loaded ? 'Loading...' :
           <div>
-            {this._renderMessages()}
+            <table style={tableStyle}>
+              <tbody>
+                <tr>
+                  <th>Time (minutes)</th>
+                  <th>Message</th>
+                  <th>Delete</th>
+                </tr>
+                {this._renderMessages()}
+              </tbody>
+            </table>
+            <div className="spacer"></div>
             {this._renderMessageForm()}
           </div>
         }
