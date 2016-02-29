@@ -10,6 +10,7 @@ const DEFAULT_ROOM_VALUES = {
   warning: 60000,
   password: 'password',
   altPassword: 'altpassword',
+  messages: {},
 };
 
 export default {
