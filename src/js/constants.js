@@ -13,9 +13,15 @@ const DEFAULT_ROOM_VALUES = {
   messages: {},
 };
 
+const MESSAGE_TYPES = {
+  system: 'system',
+  confederate: 'confederate',
+};
+
 export default {
   ROOT_URL,
   STUDIES_URL,
   CONSTANTS_URL,
   DEFAULT_ROOM_VALUES,
+  MESSAGE_TYPES,
 };
