@@ -158,6 +158,32 @@ const ConfigSetter = React.createClass({
     });
   },
 
+  _renderMessageTable() {
+    const tableStyle = {
+      margin: '0 auto',
+    };
+
+    if (!this.state.loaded) {
+      return 'Loading...';
+    } else if (_.isEmpty(this.state.config.messages)) {
+      return '';
+    }
+
+    return (
+      <table style={tableStyle}>
+        <tbody>
+          <tr>
+            <th>Time (minutes)</th>
+            <th>Message</th>
+            <th>Type</th>
+            <th>Delete</th>
+          </tr>
+          {this._renderMessages()}
+        </tbody>
+      </table>
+    );
+  },
+
   _renderMessages() {
     return _.keys(this.state.config.messages).map(key => {
       return (
@@ -220,31 +246,17 @@ const ConfigSetter = React.createClass({
   },
 
   render() {
-    const tableStyle = {
-      margin: '0 auto',
-    };
-
     return (
       <div>
         <h3> Set Messages for study {this.props.study}</h3>
 
-        {!this.state.loaded ? 'Loading...' :
-          <div>
-            <table style={tableStyle}>
-              <tbody>
-                <tr>
-                  <th>Time (minutes)</th>
-                  <th>Message</th>
-                  <th>Type</th>
-                  <th>Delete</th>
-                </tr>
-                {this._renderMessages()}
-              </tbody>
-            </table>
-            <div className="spacer"></div>
-            {this._renderMessageForm()}
-          </div>
-        }
+        <div>
+          {this._renderMessageTable()}
+
+          <div className="spacer"></div>
+
+          {this._renderMessageForm()}
+        </div>
 
         <h3>Change the settings for study {this.props.study}.</h3>
 
