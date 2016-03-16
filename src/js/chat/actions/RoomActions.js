@@ -15,7 +15,6 @@ class RoomActions {
     roomFb.set({ createdAt });
 
     this.dispatch(roomFb);
-
     return roomFb.key();
   }
 

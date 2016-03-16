@@ -8,6 +8,7 @@ class RoomStore {
 
     this.roomFb = null;
     this.roomId = null;
+    this.roomTime = null;
     this.userIds = [];
   }
 
@@ -20,6 +21,11 @@ class RoomStore {
     this.roomFb = roomFb;
     this.roomId = roomFb.key();
     this.userIds.push(userId);
+
+    this.roomFb.on('value', snapshot => {
+      this.roomTime = snapshot.val().createdAt;
+      this.getInstance().emitChange();
+    });
   }
 
   static get(attr) {

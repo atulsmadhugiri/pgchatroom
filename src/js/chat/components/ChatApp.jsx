@@ -11,6 +11,8 @@ import StudyStore from '../stores/StudyStore';
 import UserStore from '../stores/UserStore';
 import WaitingRoomStore from '../stores/WaitingRoomStore';
 
+import { MESSAGE_TYPES } from '../../constants';
+
 function getStateFromStores() {
   return {
     config: StudyStore.get('config'),
@@ -22,6 +24,7 @@ function getStateFromStores() {
     userState: UserStore.get('userState'),
     waitingUsers: WaitingRoomStore.get('waitingUsers'),
     roomId: RoomStore.get('roomId'),
+    roomTime: RoomStore.get('roomTime'),
   };
 }
 
@@ -29,6 +32,9 @@ const ChatApp = React.createClass({
   getInitialState() {
     return {
       ...getStateFromStores(),
+      startedConfederate: false,
+      timeSinceStart: 0,
+      timeSet: false,
       message: '',
       error: null,
     };
@@ -52,6 +58,45 @@ const ChatApp = React.createClass({
       // Scroll to bottom of chat
       this.refs.messages.scrollTop = this.refs.messages.scrollHeight;
     }
+
+    if (this._shouldStartConfederate()) {
+      this.setTime();
+      if (this.state.timeSet) {
+        this.setConfederateInterval();
+      }
+    }
+  },
+
+  setTime() {
+    const timeSinceStart = parseInt((Date.now() - this.state.roomTime) / 1000, 10) * 1000;
+    this.setState({ timeSinceStart: timeSinceStart, timeSet: true });
+  },
+
+  setConfederateInterval() {
+    this.setState({ startedConfederate: true });
+    setInterval(() => {
+      const timeSinceStart = this.state.timeSinceStart;
+      const messageObject = this.state.config.messages[timeSinceStart];
+      if (messageObject) {
+        if (messageObject.type === MESSAGE_TYPES.confederate) {
+          MessagesActions.sendMessage({
+            MessagesStore,
+            userId: '111',
+            message: messageObject.message,
+          });
+        } else {
+          MessagesActions.systemMessage(messageObject.message);
+        }
+      }
+      this.setState({ timeSinceStart: timeSinceStart + 1000 });
+    }, 1000);
+  },
+
+  _shouldStartConfederate() {
+    return this.state.roomTime &&
+      this.state.config &&
+      this.state.config.messages &&
+      !this.state.startedConfederate;
   },
 
   _onChange() {
@@ -90,7 +135,7 @@ const ChatApp = React.createClass({
   },
 
   render() {
-    console.log(this.state);
+    // console.log(this.state);
     if (this.state.error) {
       return <div>Error: {this.state.error.message}</div>;
     }
