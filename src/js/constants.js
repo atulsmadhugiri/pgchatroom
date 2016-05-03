@@ -10,6 +10,12 @@ const DEFAULT_ROOM_VALUES = {
   warning: 60000,
   password: 'password',
   altPassword: 'altpassword',
+  messages: {},
+};
+
+const MESSAGE_TYPES = {
+  system: 'system',
+  confederate: 'confederate',
 };
 
 export default {
@@ -17,4 +23,5 @@ export default {
   STUDIES_URL,
   CONSTANTS_URL,
   DEFAULT_ROOM_VALUES,
+  MESSAGE_TYPES,
 };

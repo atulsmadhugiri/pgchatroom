@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'underscore';
 
 import { convertToMs, convertToMins } from '../../chat/util';
-import { DEFAULT_ROOM_VALUES } from '../../constants';
+import { DEFAULT_ROOM_VALUES, MESSAGE_TYPES } from '../../constants';
 
 const ConfigSetter = React.createClass({
   propTypes: {
@@ -14,7 +14,14 @@ const ConfigSetter = React.createClass({
     return {
       loaded: false, // loaded data from Firebase yet?
       saved: false, // saved back to Firebase yet?
-
+      messageObject: {
+        message: '',
+        type: MESSAGE_TYPES.system,
+      },
+      messageError: '',
+      messageTime: '',
+      messageTimeError: '',
+      message_type: '',
       // All attributes default to false
       config: {
         usersPerRoom: false,
@@ -23,6 +30,7 @@ const ConfigSetter = React.createClass({
         warning: false,
         password: false,
         altPassword: false,
+        messages: false,
       },
     };
   },
@@ -52,7 +60,7 @@ const ConfigSetter = React.createClass({
     });
   },
 
-  _handleSubmit(e) {
+  _handleConfigSubmit(e) {
     e.preventDefault();
     this.props.firebase.set(this.state.config, (err) => {
       this.setState({ saved: !err });
@@ -72,7 +80,7 @@ const ConfigSetter = React.createClass({
     });
   },
 
-  _formInputFor(attr, label, convertData = _.identity,
+  _formGeneralInput(attr, label, convertData = _.identity,
       convertInput = _.identity) {
     return (
       <div>
@@ -86,28 +94,189 @@ const ConfigSetter = React.createClass({
     );
   },
 
+  _handleMessageSubmit(e) {
+    e.preventDefault();
+
+    if (this._hasValidMessage()) {
+      const config = this.state.config;
+      if (_.isUndefined(config.messages)) {
+        config.messages = {};
+      }
+
+      config.messages[convertToMs(parseFloat(this.state.messageTime))] = this.state.messageObject;
+
+      this.props.firebase.set(config, (err) => {
+        this.setState({ messageObject: { message: '', type: MESSAGE_TYPES.system }, messageTime: '', config: config });
+        console.log(this.state);
+      });
+    }
+  },
+
+  _hasValidMessage() {
+    let valid = true;
+
+    if (_.isEmpty(this.state.messageObject.message)) {
+      this.setState({ messageError: 'Empty Message' });
+      valid = false;
+    }
+
+    if (_.isNaN(parseFloat(this.state.messageTime))) {
+      this.setState({ messageTimeError: 'Invalid Time'});
+      valid = false;
+    }
+
+    return valid;
+  },
+
+  _handleMessageChange(e) {
+    const messageObject = this.state.messageObject;
+    messageObject.message = e.target.value;
+    this.setState({ messageObject: messageObject });
+  },
+
+  _handleMessageTimeChange(e) {
+    this.setState({ messageTime: e.target.value });
+  },
+
+  _handleMessageTypeChange(e) {
+    const messageObject = this.state.messageObject;
+    messageObject.type = e.target.value;
+    this.setState({ messageObject: messageObject });
+  },
+
+  _removeMessage(e) {
+    const config = this.state.config;
+    if (_.isEmpty(config.messages)) {
+      config.messages = {};
+    }
+
+    delete config.messages[e.target.parentElement.id];
+
+    this.props.firebase.set(config, (err) => {
+      this.setState({ config: config });
+      console.log(this.state);
+    });
+  },
+
+  _renderMessageTable() {
+    const tableStyle = {
+      margin: '0 auto',
+    };
+
+    if (!this.state.loaded) {
+      return 'Loading...';
+    } else if (_.isEmpty(this.state.config.messages)) {
+      return '';
+    }
+
+    return (
+      <table style={tableStyle}>
+        <tbody>
+          <tr>
+            <th>Time (minutes)</th>
+            <th>Message</th>
+            <th>Type</th>
+            <th>Delete</th>
+          </tr>
+          {this._renderMessages()}
+        </tbody>
+      </table>
+    );
+  },
+
+  _renderMessages() {
+    return _.keys(this.state.config.messages).map(key => {
+      return (
+        <tr key={key} id={key}>
+          <td>{convertToMins(key)}</td>
+          <td>{this.state.config.messages[key].message}</td>
+          <td>{this.state.config.messages[key].type}</td>
+          <td onClick={this._removeMessage}>&times;</td>
+        </tr>
+      );
+    });
+  },
+
+  _renderMessageTypes() {
+    return _.keys(MESSAGE_TYPES).map(key => {
+      return (
+        <option
+          key={key}
+          value={key}>
+          {key.charAt(0).toUpperCase() + key.slice(1)}
+        </option>
+      );
+    });
+  },
+
+  _renderMessageForm() {
+    return (
+      <form onSubmit={this._handleMessageSubmit}>
+        <div>
+          <label htmlFor="message">Message</label>
+          <input type="text"
+            id="message"
+            value={this.state.messageObject.message}
+            onChange={this._handleMessageChange} />
+          <h3>{this.state.messageError}</h3>
+        </div>
+
+        <div>
+          <label htmlFor="message_type">Message type</label>
+          <select
+            id="message_type"
+            value={this.state.messageObject.type}
+            onChange={this._handleMessageTypeChange}>
+            {this._renderMessageTypes()}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="messageTime">Minutes from start of study</label>
+          <input type="text"
+            id="messageTime"
+            value={this.state.messageTime}
+            onChange={this._handleMessageTimeChange} />
+          <h3>{this.state.messageTimeError}</h3>
+        </div>
+
+        <button name="submit">Create Message</button>
+      </form>
+    );
+  },
+
   render() {
     return (
       <div>
+        <h3> Set Messages for study {this.props.study}</h3>
+
+        <div>
+          {this._renderMessageTable()}
+
+          <div className="spacer"></div>
+
+          {this._renderMessageForm()}
+        </div>
+
         <h3>Change the settings for study {this.props.study}.</h3>
 
         {!this.state.loaded ? 'Loading...' :
-          <form onSubmit={this._handleSubmit}>
+          <form onSubmit={this._handleConfigSubmit}>
 
-            {this._formInputFor('usersPerRoom',
+            {this._formGeneralInput('usersPerRoom',
               'Users per chat room')}
-            {this._formInputFor('maxWaitingTime',
+            {this._formGeneralInput('maxWaitingTime',
               'Max waiting time (in minutes)',
               convertToMins, convertToMs)}
-            {this._formInputFor('roomOpenTime',
+            {this._formGeneralInput('roomOpenTime',
               'Time participants have to chat (in minutes)',
               convertToMins, convertToMs)}
-            {this._formInputFor('warning',
+            {this._formGeneralInput('warning',
               'Minutes remaining before chat end warning',
               convertToMins, convertToMs)}
-            {this._formInputFor('password',
+            {this._formGeneralInput('password',
               'Password to continue with study after chat')}
-            {this._formInputFor('altPassword',
+            {this._formGeneralInput('altPassword',
               'Password to continue if not placed in chat room')}
 
             <div>{this.state.saved && 'Saved!'}</div>
