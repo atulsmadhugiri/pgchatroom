@@ -17,11 +17,12 @@ const ConfigSetter = React.createClass({
       messageObject: {
         message: '',
         type: MESSAGE_TYPES.system,
+        id: 111,
       },
       messageError: '',
       messageTime: '',
       messageTimeError: '',
-      message_type: '',
+      messageIDError: '',
       // All attributes default to false
       config: {
         usersPerRoom: false,
@@ -106,7 +107,18 @@ const ConfigSetter = React.createClass({
       config.messages[convertToMs(parseFloat(this.state.messageTime))] = this.state.messageObject;
 
       this.props.firebase.set(config, (err) => {
-        this.setState({ messageObject: { message: '', type: MESSAGE_TYPES.system }, messageTime: '', config: config });
+        this.setState({
+          messageObject: {
+            message: '',
+            type: MESSAGE_TYPES.system,
+            id: 111,
+          },
+          messageError: '',
+          messageTime: '',
+          messageTimeError: '',
+          messageIDError: '',
+          config: config,
+        });
         console.log(this.state);
       });
     }
@@ -125,6 +137,11 @@ const ConfigSetter = React.createClass({
       valid = false;
     }
 
+    if (_.isNaN(parseFloat(this.state.messageObject.id))) {
+      this.setState({ messageIDError: 'Invalid ID'});
+      valid = false;
+    }
+
     return valid;
   },
 
@@ -139,9 +156,16 @@ const ConfigSetter = React.createClass({
   },
 
   _handleMessageTypeChange(e) {
+    console.log(e.target.value);
     const messageObject = this.state.messageObject;
     messageObject.type = e.target.value;
     this.setState({ messageObject: messageObject });
+  },
+
+  _handleMessageIDChange(e) {
+    const messageObject = this.state.messageObject;
+    messageObject.id = e.target.value;
+    this.setState({ messageID: e.target.value });
   },
 
   _removeMessage(e) {
@@ -159,6 +183,7 @@ const ConfigSetter = React.createClass({
   },
 
   _renderMessageTable() {
+    console.log(this.state.config.messages);
     const tableStyle = {
       margin: '0 auto',
     };
@@ -176,6 +201,7 @@ const ConfigSetter = React.createClass({
             <th>Time (minutes)</th>
             <th>Message</th>
             <th>Type</th>
+            <th>ID</th>
             <th>Delete</th>
           </tr>
           {this._renderMessages()}
@@ -191,6 +217,7 @@ const ConfigSetter = React.createClass({
           <td>{convertToMins(key)}</td>
           <td>{this.state.config.messages[key].message}</td>
           <td>{this.state.config.messages[key].type}</td>
+          <td>{this.state.config.messages[key].id}</td>
           <td onClick={this._removeMessage}>&times;</td>
         </tr>
       );
@@ -202,8 +229,8 @@ const ConfigSetter = React.createClass({
       return (
         <option
           key={key}
-          value={key}>
-          {key.charAt(0).toUpperCase() + key.slice(1)}
+          value={MESSAGE_TYPES[key]}>
+          {MESSAGE_TYPES[key]}
         </option>
       );
     });
@@ -222,14 +249,27 @@ const ConfigSetter = React.createClass({
         </div>
 
         <div>
-          <label htmlFor="message_type">Message type</label>
+          <label htmlFor="messageType">Message type</label>
           <select
-            id="message_type"
+            id="messageType"
             value={this.state.messageObject.type}
             onChange={this._handleMessageTypeChange}>
             {this._renderMessageTypes()}
           </select>
         </div>
+
+        {
+          this.state.messageObject.type === MESSAGE_TYPES.system ? '' :
+          <div>
+            <label htmlFor="messageID">ID to show</label>
+            <input type="text"
+              id="messageID"
+              value={this.state.messageObject.id}
+              onChange={this._handleMessageIDChange} />
+            <h3>{this.state.messageIDError}</h3>
+          </div>
+        }
+
 
         <div>
           <label htmlFor="messageTime">Minutes from start of study</label>

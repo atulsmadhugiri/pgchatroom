@@ -14,8 +14,8 @@ const DEFAULT_ROOM_VALUES = {
 };
 
 const MESSAGE_TYPES = {
-  system: 'system',
-  confederate: 'confederate',
+  system: 'System',
+  confederate: 'Confederate',
 };
 
 export default {
