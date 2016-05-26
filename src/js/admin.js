@@ -24,7 +24,7 @@ function getStateFromStores() {
     selectedStudy: AdminStore.get('selectedStudy'),
     studies: AdminStore.get('studies'),
     constantsFb: AdminStore.get('constantsFb'),
-    roomsFb: AdminStore.get('roomsFb');
+    roomsUrl: AdminStore.get('roomsUrl'),
   };
 }
 
@@ -77,7 +77,7 @@ const AdminApp = React.createClass({
         {!this.state.selectedStudy ? 'No Study Selected' :
           <div>
             <hr />
-            <RoomsList firebase={this.state.roomsFb} />
+            <RoomsList roomsUrl={this.state.roomsUrl} />
             <RoomGenerator selectedStudy={this.state.selectedStudy} />
             <ConfigSetter firebase={this.state.constantsFb}
               study={this.state.selectedStudy} />

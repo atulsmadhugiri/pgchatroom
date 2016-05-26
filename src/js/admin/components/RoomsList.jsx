@@ -1,7 +1,8 @@
 import React from 'react';
 import _ from 'underscore';
+import $ from 'jquery';
 
-const DEFAULT_ROOM_LIST = {};
+// const DEFAULT_ROOM_LIST = {};
 
 const RoomsList = React.createClass({
 
@@ -9,36 +10,30 @@ const RoomsList = React.createClass({
     return {
       loaded: false,
       rooms: {},
-    }
+    };
   },
 
   componentWillMount() {
     this._loadRooms(this.props);
   },
 
-  componentWillRecieveProps(nextProps) {
-    this.props.firebase.off();
-    this.loadRooms(nextProps);
+  componentWillReceiveProps(nextProps) {
+    this._loadRooms(nextProps);
   },
 
   _loadRooms(props) {
-    props.firebase.on('value', snapshot => {
-      if (!snapshot.val()) {
-        props.firebase.set(DEFAULT_ROOM_LIST, (err) => {
-          console.log(err);
-        });
-      } else {
-        this.setState({
-          loaded: true,
-          rooms: snapshot.val(),
-        });
-      }
-    });
+    if (!_.isUndefined(props.roomsUrl)) {
+      $.get(props.roomsUrl).done((result) => {
+        if (!_.isEmpty(result)) {
+          this.setState({ rooms: result });
+        }
+      });
+    }
   },
 
   _removeRoom() {
     // Removes room
-  }
+  },
 
   _renderRoomsTable() {
     if (_.isEmpty(this.state.rooms)) {
@@ -50,15 +45,18 @@ const RoomsList = React.createClass({
     };
 
     return (
-      <h3>List of Rooms</h3>
-      <table style={tableStyle}>
-        <tbody>
-          <tr>
-            <th>Room</th>
-            <th>Delete</th>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <h3>List of Rooms</h3>
+        <table style={tableStyle}>
+          <tbody>
+            <tr>
+              <th>Room</th>
+              <th>Delete</th>
+            </tr>
+            {this._renderRooms()}
+          </tbody>
+        </table>
+      </div>
     );
   },
 

@@ -36,7 +36,7 @@ class AdminStore {
     this.constantsFb = new Firebase(`${CONSTANTS_URL}/${study}`);
 
     // This is probably wrong tbh
-    this.roomsFb = new Firebase(`${ROOT_URL}/${study}?shallow=true`)
+    this.roomsUrl = `${ROOT_URL}/${study}.json?shallow=true`;
   }
 
   static get(attr) {
