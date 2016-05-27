@@ -27,7 +27,6 @@ const ConfigSetter = React.createClass({
         usersPerRoom: false,
         maxWaitingTime: false,
         roomOpenTime: false,
-        warning: false,
         password: false,
         altPassword: false,
         messages: false,
@@ -270,9 +269,6 @@ const ConfigSetter = React.createClass({
               convertToMins, convertToMs)}
             {this._formGeneralInput('roomOpenTime',
               'Time participants have to chat (in minutes)',
-              convertToMins, convertToMs)}
-            {this._formGeneralInput('warning',
-              'Minutes remaining before chat end warning',
               convertToMins, convertToMs)}
             {this._formGeneralInput('password',
               'Password to continue with study after chat')}
