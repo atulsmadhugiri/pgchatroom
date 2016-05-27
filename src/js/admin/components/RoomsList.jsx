@@ -1,10 +1,17 @@
 import React from 'react';
 import _ from 'underscore';
 import $ from 'jquery';
+import { ROOT_URL } from '../../constants';
 
-// const DEFAULT_ROOM_LIST = {};
+function deleteMessage(object) {
+  return `Are you sure you want to delete this ${object}? This cannot be undone.`;
+}
 
 const RoomsList = React.createClass({
+  propTypes: {
+    roomsUrl: React.PropTypes.string,
+    study: React.PropTypes.string.isRequired,
+  },
 
   getInitialState() {
     return {
@@ -13,7 +20,7 @@ const RoomsList = React.createClass({
     };
   },
 
-  componentWillMount() {
+  componentDidMount() {
     this._loadRooms(this.props);
   },
 
@@ -31,8 +38,17 @@ const RoomsList = React.createClass({
     }
   },
 
-  _removeRoom() {
-    // Removes room
+  _removeRoom(e) {
+    const confirmDelete = confirm(deleteMessage('room'));
+    const room = e.target.parentElement.id;
+    if (confirmDelete) {
+      const roomFb = new Firebase(`${ROOT_URL}/${this.props.study}/${room}`);
+      roomFb.remove(() => {
+        const rooms = this.state.rooms;
+        delete rooms[room];
+        this.setState({ rooms: rooms });
+      });
+    }
   },
 
   _renderRoomsTable() {
@@ -61,11 +77,15 @@ const RoomsList = React.createClass({
   },
 
   _renderRooms() {
+    const xStyle = {
+      cursor: 'pointer',
+    };
+
     return _.keys(this.state.rooms).map(key => {
       return (
-        <tr key={key}>
+        <tr key={key} id={key}>
           <td>{key}</td>
-          <td onClick={this._removeRoom}>&times;</td>
+          <td style={xStyle} onClick={this._removeRoom}>&times;</td>
         </tr>
       );
     });

@@ -77,10 +77,17 @@ const AdminApp = React.createClass({
         {!this.state.selectedStudy ? 'No Study Selected' :
           <div>
             <hr />
-            <RoomsList roomsUrl={this.state.roomsUrl} />
+            <RoomsList
+              roomsUrl={this.state.roomsUrl}
+              study={this.state.selectedStudy}
+            />
+
             <RoomGenerator selectedStudy={this.state.selectedStudy} />
-            <ConfigSetter firebase={this.state.constantsFb}
-              study={this.state.selectedStudy} />
+
+            <ConfigSetter
+              firebase={this.state.constantsFb}
+              study={this.state.selectedStudy}
+            />
           </div>
         }
       </div>
