@@ -3,6 +3,9 @@ import _ from 'underscore';
 
 const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
+/**
+ * Presentational component that generates URLs for specific rooms in a study.
+ */
 const RoomGenerator = React.createClass({
   propTypes: {
     selectedStudy: React.PropTypes.string.isRequired,

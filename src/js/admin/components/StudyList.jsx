@@ -5,6 +5,9 @@ import AdminActions from '../actions/AdminActions';
 import CreateStudy from './CreateStudy';
 import Spacer from './Spacer';
 
+/**
+ * Renders a list of studies to choose from and edit.
+ */
 const StudyList = React.createClass({
   propTypes: {
     studies: React.PropTypes.array.isRequired,

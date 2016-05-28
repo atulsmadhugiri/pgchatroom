@@ -42,6 +42,10 @@ const AdminApp = React.createClass({
       <div>
         <h1>Chat Room Admin Panel</h1>
 
+        <a href="json_to_csv.html">
+          Click here to access the chat room data instead.
+        </a>
+
         <StudyList studies={this.state.studies} />
 
         <Spacer />

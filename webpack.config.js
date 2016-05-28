@@ -14,6 +14,9 @@ module.exports = {
         publicPath: "/build/",
         filename: "[name].bundle.js"
     },
+    watchOptions: {
+        ignored: /node_modules/,
+    },
     module: {
         preLoaders: [
             { test: /\.jsx?$/, loader: "eslint", exclude: /node_modules/ }

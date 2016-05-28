@@ -5,6 +5,9 @@ import AdminActions from '../actions/AdminActions';
 
 const ERROR_MESSAGE = 'This study already exists.';
 
+/**
+ * Presentational component that renders a form to create a study.
+ */
 const CreateStudy = React.createClass({
   propTypes: {
     studies: React.PropTypes.array.isRequired,

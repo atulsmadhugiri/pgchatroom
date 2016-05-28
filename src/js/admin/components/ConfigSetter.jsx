@@ -4,6 +4,10 @@ import _ from 'underscore';
 import { convertToMs, convertToMins } from '../../chat/util';
 import { DEFAULT_ROOM_VALUES, MESSAGE_TYPES } from '../../constants';
 
+/**
+ * This is a standalone component that manages its own state (no flux).
+ * It allows for editing of a study's settings.
+ */
 const ConfigSetter = React.createClass({
   propTypes: {
     firebase: React.PropTypes.object.isRequired,
