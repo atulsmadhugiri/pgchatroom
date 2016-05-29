@@ -48,7 +48,6 @@ const CreateStudy = React.createClass({
   },
 
   render() {
-    console.log(this._isInvalid());
     return (
       <form onSubmit={this._handleSubmit}>
         <div>
