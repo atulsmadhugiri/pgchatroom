@@ -1,27 +1,52 @@
 {
   "rules": {
     "admins": {
-      ".read": "root.child('admins').child(auth.uid).exists()"
+      ".read": "root.child('admins/' + auth.uid).exists()"
     },
 
-    "$other": {
-      ".read": true,
-      ".write": true
+    "constants": {
+      // ".read": true,
+      ".read": "root.child('admins/' + auth.uid).exists()",
+      ".write": "root.child('admins/' + auth.uid).exists()"
+    },
+
+    "studies": {
+      ".read": "root.child('admins/' + auth.uid).exists()",
+      ".write": "root.child('admins/' + auth.uid).exists()"
+    },
+
+    "$study": {
+      ".read": "root.child('admins/' + auth.uid).exists()",
+      ".write": "root.child('admins/' + auth.uid).exists()",
+
+      "$roomType": {
+        "rooms": {
+          "$roomId": {
+            "createdAt": {
+              ".read": true,
+              ".write": true
+            },
+            "messages": {
+              "$messageId": {
+                ".read": true,
+                ".write": true
+              }
+            },
+            "users": {
+              "$userId": {
+                ".read": true,
+                ".write": true
+              }
+            }
+          },
+          ".read": true,
+          ".write": true
+        },
+        "users": {
+          ".read": true,
+          ".write": true
+        }
+      }
     }
-
-    // "constants": {
-    //   ".read": true,
-    //   ".write": true
-    // },
-
-    // "studies": {
-    //   ".read": true,
-    //   ".write": true
-    // },
-
-    // "$studies": {
-    //   ".read": true,
-    //   ".write": true
-    // }
   }
 }
