@@ -31,17 +31,8 @@ const LoginButton = React.createClass({
   },
 
   render() {
-    const styles = {
-      width: '50%',
-      margin: '10px auto',
-      padding: 10,
-      backgroundColor: '#D7D4FF',
-      borderRadius: 5,
-      cursor: 'pointer',
-    };
-
     return (<div>
-        <div style={styles} onClick={this._loginPopup}>
+        <div className="button" onClick={this._loginPopup}>
           Log in through Google.
         </div>
 
