@@ -4,18 +4,22 @@ import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import JSONToCSVApp from './json_to_csv';
+
 import LoginButton from './admin/components/LoginButton';
 import ConfigSetter from './admin/components/ConfigSetter';
 import StudyList from './admin/components/StudyList';
 import Spacer from './admin/components/Spacer';
 import RoomGenerator from './admin/components/RoomGenerator';
 
+import AdminActions from './admin/actions/AdminActions';
 import AdminStore from './admin/stores/AdminStore';
 
 function getStateFromStores() {
   return {
     fb: AdminStore.get('fb'),
     auth: AdminStore.get('auth'),
+    jsonToCsvSelected: AdminStore.get('jsonToCsvSelected'),
     selectedStudy: AdminStore.get('selectedStudy'),
     studies: AdminStore.get('studies'),
     constantsFb: AdminStore.get('constantsFb'),
@@ -38,18 +42,31 @@ const AdminApp = React.createClass({
     this.setState(getStateFromStores());
   },
 
+  _toggleJsonState() {
+    AdminActions.selectJsonToCsv(!this.state.jsonToCsvSelected);
+  },
+
   render() {
     if (!this.state.auth) {
       return <LoginButton fb={this.state.fb} />;
+    }
+
+    if (this.state.jsonToCsvSelected) {
+      return (<div>
+        <div className="button" onClick={this._toggleJsonState}>
+          Access admin panel
+        </div>
+        <JSONToCSVApp />
+      </div>);
     }
 
     return (
       <div>
         <h1>Chat Room Admin Panel</h1>
 
-        <a href="json_to_csv.html">
-          Click here to access the chat room data instead.
-        </a>
+        <div className="button" onClick={this._toggleJsonState}>
+          Access chat data
+        </div>
 
         <StudyList studies={this.state.studies} />
 

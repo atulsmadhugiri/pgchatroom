@@ -17,6 +17,10 @@ const StudyList = React.createClass({
     AdminActions.listenForStudies();
   },
 
+  componentWillUnmount() {
+    AdminActions.unlistenForStudies();
+  },
+
   _renderStudies() {
     if (this.props.studies.length === 0) {
       return 'No studies yet.';

@@ -7,7 +7,7 @@ const STUDIES_FB = new Firebase(STUDIES_URL);
 
 class AdminActions {
   constructor() {
-    this.generateActions('setAuth', 'setSelectedStudy');
+    this.generateActions('selectJsonToCsv', 'setAuth', 'setSelectedStudy');
   }
 
   listenForStudies() {
@@ -15,6 +15,10 @@ class AdminActions {
       const studies = snapshot.val() || [];
       this.dispatch(studies);
     });
+  }
+
+  unlistenForStudies() {
+    STUDIES_FB.off();
   }
 
   setStudies(studies) {

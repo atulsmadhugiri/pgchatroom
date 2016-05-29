@@ -10,11 +10,16 @@ class AdminStore {
   constructor() {
     this.bindActions(AdminActions);
 
+    this.jsonToCsvSelected = true;
     this.auth = null;
     this.selectedStudy = null;
     this.studies = null;
     this.fb = ROOT_FB;
     this.constantsFb = null;
+  }
+
+  selectJsonToCsv(selected) {
+    this.jsonToCsvSelected = selected;
   }
 
   listenForStudies(studies) {
