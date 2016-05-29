@@ -7,7 +7,7 @@ const STUDIES_FB = new Firebase(STUDIES_URL);
 
 class AdminActions {
   constructor() {
-    this.generateActions('setSelectedStudy');
+    this.generateActions('setAuth', 'setSelectedStudy');
   }
 
   listenForStudies() {

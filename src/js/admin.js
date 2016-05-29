@@ -4,6 +4,7 @@ import $ from 'jquery';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+import LoginButton from './admin/components/LoginButton';
 import ConfigSetter from './admin/components/ConfigSetter';
 import StudyList from './admin/components/StudyList';
 import Spacer from './admin/components/Spacer';
@@ -38,9 +39,9 @@ const AdminApp = React.createClass({
   },
 
   render() {
-    // if (!this.state.auth) {
-    //   return <div>Need to log in.</div>;
-    // }
+    if (!this.state.auth) {
+      return <LoginButton fb={this.state.fb} />;
+    }
 
     return (
       <div>

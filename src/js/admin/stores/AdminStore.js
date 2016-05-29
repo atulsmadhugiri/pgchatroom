@@ -14,6 +14,7 @@ class AdminStore {
     this.auth = null;
     this.selectedStudy = null;
     this.studies = null;
+    this.fb = ROOT_FB;
     this.constantsFb = null;
   }
 
