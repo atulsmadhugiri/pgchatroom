@@ -10,7 +10,7 @@ class AdminStore {
   constructor() {
     this.bindActions(AdminActions);
 
-    this.jsonToCsvSelected = true;
+    this.jsonToCsvSelected = false;
     this.auth = null;
     this.selectedStudy = null;
     this.studies = null;
