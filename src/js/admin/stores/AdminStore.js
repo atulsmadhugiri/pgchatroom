@@ -5,7 +5,6 @@ import AdminActions from '../actions/AdminActions';
 import { ROOT_URL, CONSTANTS_URL } from '../../constants';
 
 const ROOT_FB = new Firebase(ROOT_URL);
-console.log(ROOT_FB);
 
 class AdminStore {
   constructor() {

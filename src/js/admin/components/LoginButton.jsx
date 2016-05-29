@@ -11,13 +11,21 @@ const LoginButton = React.createClass({
     fb: React.PropTypes.object.isRequired,
   },
 
+  getInitialState() {
+    return { error: '' };
+  },
+
   _loginPopup() {
+    const setError = (error) => this.setState({ error: error.toString() });
+
     this.props.fb.authWithOAuthPopup('google', (err, auth) => {
       if (err) {
-        console.log('Login failed!', err);
+        setError(err);
       } else {
-        console.log('Logged in with payload:', auth);
-        AdminActions.setAuth(auth);
+        this.props.fb.child('admins').once('value',
+          (snapshot) => AdminActions.setAuth(auth),
+          setError,
+        );
       }
     });
   },
@@ -32,9 +40,12 @@ const LoginButton = React.createClass({
       cursor: 'pointer',
     };
 
-    return (
-      <div style={styles} onClick={this._loginPopup}>
-        Log in through Google.
+    return (<div>
+        <div style={styles} onClick={this._loginPopup}>
+          Log in through Google.
+        </div>
+
+        <p>{this.state.error}</p>
       </div>
     );
   },

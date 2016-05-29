@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "admins": {
+      ".read": "root.child('admins').child(auth.uid).exists()"
+    },
+
+    "$other": {
+      ".read": true,
+      ".write": true
+    }
+
+    // "constants": {
+    //   ".read": true,
+    //   ".write": true
+    // },
+
+    // "studies": {
+    //   ".read": true,
+    //   ".write": true
+    // },
+
+    // "$studies": {
+    //   ".read": true,
+    //   ".write": true
+    // }
+  }
+}
