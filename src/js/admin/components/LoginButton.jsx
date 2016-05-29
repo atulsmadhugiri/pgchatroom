@@ -9,36 +9,42 @@ import AdminActions from '../actions/AdminActions';
 const LoginButton = React.createClass({
   propTypes: {
     fb: React.PropTypes.object.isRequired,
+    auth: React.PropTypes.object,
+    authError: React.PropTypes.string,
   },
 
-  getInitialState() {
-    return { error: '' };
+  componentWillMount() {
+    AdminActions.listenForAuth();
   },
 
   _loginPopup() {
-    const setError = (error) => this.setState({ error: error.toString() });
-
     this.props.fb.authWithOAuthPopup('google', (err, auth) => {
       if (err) {
-        setError(err);
+        AdminActions.setAuthError(err.toString());
       } else {
-        this.props.fb.child('admins').once('value',
-          (snapshot) => AdminActions.setAuth(auth),
-          setError,
-        );
+        // We're listening to auth so the store will get the new value
       }
     });
   },
 
+  _logout() {
+    AdminActions.logout();
+  },
+
   render() {
     return (<div>
+      {this.props.auth ?
+        <div className="button" onClick={this._logout}>
+          Log out
+        </div>
+        :
         <div className="button" onClick={this._loginPopup}>
           Log in through Google.
         </div>
+      }
 
-        <p>{this.state.error}</p>
-      </div>
-    );
+      <p>{this.props.authError}</p>
+    </div>);
   },
 });
 
