@@ -10,7 +10,11 @@ import Spacer from './Spacer';
  */
 const StudyList = React.createClass({
   propTypes: {
-    studies: React.PropTypes.array.isRequired,
+    studies: React.PropTypes.array,
+  },
+
+  componentWillMount() {
+    AdminActions.listenForStudies();
   },
 
   _renderStudies() {
@@ -41,6 +45,10 @@ const StudyList = React.createClass({
   },
 
   render() {
+    if (!this.props.studies) {
+      return <div>Loading...</div>;
+    }
+
     return (
       <div>
         <h3>List of Studies <br/> Click on one to modify its settings</h3>

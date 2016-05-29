@@ -13,12 +13,17 @@ import AdminStore from './admin/stores/AdminStore';
 
 function getStateFromStores() {
   return {
+    fb: AdminStore.get('fb'),
+    auth: AdminStore.get('auth'),
     selectedStudy: AdminStore.get('selectedStudy'),
     studies: AdminStore.get('studies'),
     constantsFb: AdminStore.get('constantsFb'),
   };
 }
 
+/**
+ * Stateful wrapper component for the admin page.
+ */
 const AdminApp = React.createClass({
   getInitialState() {
     return getStateFromStores();
@@ -33,10 +38,9 @@ const AdminApp = React.createClass({
   },
 
   render() {
-    console.log(this.state);
-    if (!this.state.studies) {
-      return <div>Loading...</div>;
-    }
+    // if (!this.state.auth) {
+    //   return <div>Need to log in.</div>;
+    // }
 
     return (
       <div>

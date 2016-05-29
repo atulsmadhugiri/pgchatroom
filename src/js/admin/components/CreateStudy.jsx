@@ -29,7 +29,12 @@ const CreateStudy = React.createClass({
       throw new Error('Tried to create an invalid study name');
     }
 
-    AdminActions.addStudy(this.state.study);
+    const newStudy = this.state.study;
+    const newStudies = this.props.studies.concat([newStudy]);
+    AdminActions.setStudies(newStudies);
+    AdminActions.setSelectedStudy(newStudy);
+
+    // Clear input
     this.setState({ study: '' });
   },
 

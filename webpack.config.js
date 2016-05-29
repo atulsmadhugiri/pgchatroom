@@ -23,6 +23,7 @@ module.exports = {
         ],
         loaders: [
             { test: require.resolve("react"), loader: "expose?React" },
+            { test: require.resolve("firebase"), loader: "expose?Firebase" },
             { test: /\.s?css$/, loader: "style!css!sass" },
             { test: /\.jsx?$/, loaders: ["react-hot", "babel?optional=runtime"], exclude: /node_modules/ }
         ]
