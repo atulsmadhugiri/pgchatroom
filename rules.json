@@ -1,50 +1,68 @@
 {
   "rules": {
+    // Admins can read and write everything
+    ".read": "auth !== null && root.child('admins/' + auth.uid).exists()",
+    ".write": "auth !== null && root.child('admins/' + auth.uid).exists()",
+
     "admins": {
-      ".read": "root.child('admins/' + auth.uid).exists()"
     },
 
     "constants": {
-      // ".read": true,
-      ".read": "root.child('admins/' + auth.uid).exists()",
-      ".write": "root.child('admins/' + auth.uid).exists()"
+      ".read": true
     },
 
     "studies": {
-      ".read": "root.child('admins/' + auth.uid).exists()",
-      ".write": "root.child('admins/' + auth.uid).exists()"
+    },
+
+    // This data maps UIDs from Firebase auth to user IDs in Qualtrics. This is
+    // used to make sure each user only gets access to the data they need and no
+    // more.
+    //
+    // Use the Qualtrics ID in rules with:
+    // auth !== null && root.child('user_auth/' + auth.uid).val() === somestuff
+    "user_auth": {
+      // This is append-only by public users
+      "$uid": {
+        ".read": "!data.exists()",
+        ".write": "!data.exists()"
+      }
     },
 
     "$study": {
-      ".read": "root.child('admins/' + auth.uid).exists()",
-      ".write": "root.child('admins/' + auth.uid).exists()",
-
       "$roomType": {
+        // The user needs to be able to read other user states and move people
+        // into rooms.
+        "users": {
+          ".read": "auth !== null",
+          ".write": "auth !== null"
+        },
+
         "rooms": {
+          // Append-only since rooms should only be created by users
+          ".read": "!data.exists()",
+          ".write": "!newData.exists()",
+
           "$roomId": {
-            "createdAt": {
-              ".read": true,
-              ".write": true
-            },
+            // A user that belongs to this room should be able to read/write
+            // this room's stuff. We check if the user state in $roomType/users
+            // matches the $roomId.
+            ".read": "auth !== null &&
+              root.child($study + '/' + $roomType + '/users').child(
+                root.child('user_auth/' + auth.uid).val()
+              ).val() === $roomId",
+            ".write": "auth !== null &&
+              root.child($study + '/' + $roomType + '/users').child(
+                root.child('user_auth/' + auth.uid).val()
+              ).val() === $roomId",
+
+            "createdAt": {},
             "messages": {
-              "$messageId": {
-                ".read": true,
-                ".write": true
-              }
+              "$messageId": {}
             },
             "users": {
-              "$userId": {
-                ".read": true,
-                ".write": true
-              }
+              "$userId": {}
             }
-          },
-          ".read": true,
-          ".write": true
-        },
-        "users": {
-          ".read": true,
-          ".write": true
+          }
         }
       }
     }
