@@ -16,6 +16,7 @@ class AdminStore {
     this.studies = null;
     this.fb = ROOT_FB;
     this.constantsFb = null;
+    this.roomsFb = null;
   }
 
   selectJsonToCsv(selected) {
@@ -33,6 +34,9 @@ class AdminStore {
   setSelectedStudy(study) {
     this.selectedStudy = study;
     this.constantsFb = new Firebase(`${CONSTANTS_URL}/${study}`);
+
+    // This is probably wrong tbh
+    this.roomsUrl = `${ROOT_URL}/${study}.json?shallow=true`;
   }
 
   static get(attr) {

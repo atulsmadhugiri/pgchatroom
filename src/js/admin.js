@@ -11,6 +11,7 @@ import ConfigSetter from './admin/components/ConfigSetter';
 import StudyList from './admin/components/StudyList';
 import Spacer from './admin/components/Spacer';
 import RoomGenerator from './admin/components/RoomGenerator';
+import RoomsList from './admin/components/RoomsList';
 
 import AdminActions from './admin/actions/AdminActions';
 import AdminStore from './admin/stores/AdminStore';
@@ -23,6 +24,7 @@ function getStateFromStores() {
     selectedStudy: AdminStore.get('selectedStudy'),
     studies: AdminStore.get('studies'),
     constantsFb: AdminStore.get('constantsFb'),
+    roomsUrl: AdminStore.get('roomsUrl'),
   };
 }
 
@@ -75,9 +77,17 @@ const AdminApp = React.createClass({
         {!this.state.selectedStudy ? 'No Study Selected' :
           <div>
             <hr />
+            <RoomsList
+              roomsUrl={this.state.roomsUrl}
+              study={this.state.selectedStudy}
+            />
+
             <RoomGenerator selectedStudy={this.state.selectedStudy} />
-            <ConfigSetter firebase={this.state.constantsFb}
-              study={this.state.selectedStudy} />
+
+            <ConfigSetter
+              firebase={this.state.constantsFb}
+              study={this.state.selectedStudy}
+            />
           </div>
         }
       </div>
