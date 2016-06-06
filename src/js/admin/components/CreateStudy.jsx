@@ -5,6 +5,9 @@ import AdminActions from '../actions/AdminActions';
 
 const ERROR_MESSAGE = 'This study already exists.';
 
+/**
+ * Presentational component that renders a form to create a study.
+ */
 const CreateStudy = React.createClass({
   propTypes: {
     studies: React.PropTypes.array.isRequired,
@@ -26,7 +29,12 @@ const CreateStudy = React.createClass({
       throw new Error('Tried to create an invalid study name');
     }
 
-    AdminActions.addStudy(this.state.study);
+    const newStudy = this.state.study;
+    const newStudies = this.props.studies.concat([newStudy]);
+    AdminActions.setStudies(newStudies);
+    AdminActions.setSelectedStudy(newStudy);
+
+    // Clear input
     this.setState({ study: '' });
   },
 
@@ -40,7 +48,6 @@ const CreateStudy = React.createClass({
   },
 
   render() {
-    console.log(this._isInvalid());
     return (
       <form onSubmit={this._handleSubmit}>
         <div>

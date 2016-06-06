@@ -4,6 +4,10 @@ import _ from 'underscore';
 import { convertToMs, convertToMins } from '../../chat/util';
 import { DEFAULT_ROOM_VALUES, MESSAGE_TYPES } from '../../constants';
 
+/**
+ * This is a standalone component that manages its own state (no flux).
+ * It allows for editing of a study's settings.
+ */
 const ConfigSetter = React.createClass({
   propTypes: {
     firebase: React.PropTypes.object.isRequired,
@@ -64,7 +68,6 @@ const ConfigSetter = React.createClass({
     e.preventDefault();
     this.props.firebase.set(this.state.config, (err) => {
       this.setState({ saved: !err });
-      console.log(this.state);
     });
   },
 
@@ -106,8 +109,14 @@ const ConfigSetter = React.createClass({
       config.messages[convertToMs(parseFloat(this.state.messageTime))] = this.state.messageObject;
 
       this.props.firebase.set(config, (err) => {
-        this.setState({ messageObject: { message: '', type: MESSAGE_TYPES.system }, messageTime: '', config: config });
-        console.log(this.state);
+        this.setState({
+          messageObject: {
+            message: '',
+            type: MESSAGE_TYPES.system,
+          },
+          messageTime: '',
+          config: config,
+        });
       });
     }
   },

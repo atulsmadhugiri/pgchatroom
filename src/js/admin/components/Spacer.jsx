@@ -1,5 +1,8 @@
 import React from 'react';
 
+/**
+ * Just used to put some vertical space in between components; no functionality.
+ */
 const Spacer = React.createClass({
   propTypes: {
     height: React.PropTypes.number,
