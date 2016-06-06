@@ -12,10 +12,14 @@ const dataShape = PropTypes.objectOf(PropTypes.shape({
     createdAt: PropTypes.number.isRequired,
     messages: PropTypes.objectOf(PropTypes.shape({
       message: PropTypes.string.isRequired,
-      userId: PropTypes.string.isRequired,
-    })).isRequired,
+      userId: PropTypes.oneOfType(
+        [PropTypes.string, PropTypes.number]).isRequired,
+    })),
   })),
-  users: PropTypes.objectOf(PropTypes.string.isRequired).isRequired,
+  users: PropTypes.oneOfType([
+    PropTypes.object,
+    PropTypes.array,
+  ]).isRequired,
 }));
 
 // Extracts Room,Room ID,User ID from data

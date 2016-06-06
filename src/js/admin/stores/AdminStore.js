@@ -12,6 +12,7 @@ class AdminStore {
 
     this.jsonToCsvSelected = false;
     this.auth = null;
+    this.authError = null;
     this.selectedStudy = null;
     this.studies = null;
     this.fb = ROOT_FB;
@@ -26,8 +27,13 @@ class AdminStore {
     this.studies = studies;
   }
 
-  setAuth(auth) {
+  listenForAuth(auth) {
     this.auth = auth;
+    this.authError = null;
+  }
+
+  setAuthError(authError) {
+    this.authError = authError;
   }
 
   setSelectedStudy(study) {
