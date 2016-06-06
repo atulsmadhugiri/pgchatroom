@@ -101,3 +101,15 @@ em {
 .csvResults {
   margin-top: 20px;
 }
+
+/**
+ * Stylings for buttons
+ */
+.button {
+  width: 50%;
+  margin: 10px auto;
+  padding: 10px;
+  background-color: #D7D4FF;
+  border-radius: 5px;
+  cursor: pointer;
+}
