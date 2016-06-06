@@ -1,6 +1,6 @@
 import React from 'react';
 import _ from 'underscore';
-import $ from 'jquery';
+// import $ from 'jquery';
 import { ROOT_URL } from '../../constants';
 
 function deleteMessage(object) {
@@ -9,7 +9,8 @@ function deleteMessage(object) {
 
 const RoomsList = React.createClass({
   propTypes: {
-    roomsUrl: React.PropTypes.string,
+    // roomsUrl: React.PropTypes.string,
+    roomsUrl: React.PropTypes.object,
     study: React.PropTypes.string.isRequired,
   },
 
@@ -30,11 +31,16 @@ const RoomsList = React.createClass({
 
   _loadRooms(props) {
     if (!_.isUndefined(props.roomsUrl)) {
-      $.get(props.roomsUrl).done((result) => {
-        if (!_.isEmpty(result)) {
-          this.setState({ rooms: result });
+      props.roomsUrl.on('value', snapshot => {
+        if (snapshot.val()) {
+          this.setState({ rooms: snapshot.val() });
         }
       });
+      // $.get(props.roomsUrl).done((result) => {
+      //   if (!_.isEmpty(result)) {
+      //     this.setState({ rooms: result });
+      //   }
+      // });
     }
   },
 
