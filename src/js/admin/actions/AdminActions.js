@@ -18,7 +18,8 @@ class AdminActions {
     ROOT_FB.onAuth((auth) => {
       ROOT_FB.child('admins').once('value',
         () => this.dispatch(auth),
-        this.actions.setAuthError,
+        (err) => this.actions.setAuthError(`${err.toString()} | Send Sam
+          your UID: ${auth.uid} if you believe this is an error.`),
       );
     });
   }
