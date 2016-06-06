@@ -156,7 +156,6 @@ const ConfigSetter = React.createClass({
   },
 
   _handleMessageTypeChange(e) {
-    console.log(e.target.value);
     const messageObject = this.state.messageObject;
     messageObject.type = e.target.value;
     this.setState({ messageObject: messageObject });
@@ -178,12 +177,10 @@ const ConfigSetter = React.createClass({
 
     this.props.firebase.set(config, (err) => {
       this.setState({ config: config });
-      console.log(this.state);
     });
   },
 
   _renderMessageTable() {
-    console.log(this.state.config.messages);
     const tableStyle = {
       margin: '0 auto',
     };
