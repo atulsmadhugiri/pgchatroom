@@ -83,6 +83,8 @@ const AdminApp = React.createClass({
             </div>
           }
         </div>}
+
+        <Spacer />
       </div>
     );
   },

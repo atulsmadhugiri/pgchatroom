@@ -47,9 +47,11 @@ class UserActions {
         this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
+        this.actions.logout(userAuthFb);
         MessagesActions.earlyFinishMessage(StudyStore);
         break;
       case 'done':
+        this.actions.logout(userAuthFb);
         userFb.off();
         MessagesActions.finishMessage(StudyStore);
         break;
@@ -64,6 +66,25 @@ class UserActions {
 
   createUser(userFb) {
     userFb.set('waiting');
+  }
+
+  authUser(userId, userAuthFb) {
+    this.dispatch();
+
+    return new Promise((resolve, reject) => {
+      userAuthFb.authAnonymously((err, auth) => {
+        if (err) {
+          throw Error(`Login failed: ${err.toString()}`);
+        } else {
+          userAuthFb.child(auth.uid).set(userId);
+          resolve(auth);
+        }
+      });
+    });
+  }
+
+  logout(userAuthFb) {
+    userAuthFb.unauth();
   }
 
   setUsersToRoom({ StudyStore, roomId, matchedUsers }) {
