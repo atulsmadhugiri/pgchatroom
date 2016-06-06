@@ -5,8 +5,7 @@ import MessagesActions from '../actions/MessagesActions';
 import RoomActions from '../actions/RoomActions';
 import RoomStore from './RoomStore';
 import StudyStore from './StudyStore';
-
-const SYSTEM = 'System';
+import { MESSAGE_TYPES } from '../../constants';
 
 class MessagesStore {
   constructor() {
@@ -29,11 +28,16 @@ class MessagesStore {
   }
 
   systemMessage(message) {
-    this.messages.push({ userId: SYSTEM, message: message });
+    if (this.messagingFb) {
+      this.messagingFb.push({ userId: MESSAGE_TYPES.system, message, generated: true });
+    }
+    this.messages.push({ userId: MESSAGE_TYPES.system, message: message });
   }
 
   receiveMessage(message) {
-    this.messages.push(message);
+    if (message.userId !== MESSAGE_TYPES.system && !message.generated) {
+      this.messages.push(message);
+    }
   }
 
   enableMessaging() {

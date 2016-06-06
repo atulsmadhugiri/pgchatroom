@@ -180,7 +180,6 @@ const ConfigSetter = React.createClass({
 
     this.props.firebase.set(config, (err) => {
       this.setState({ config: config });
-      console.log(this.state);
     });
   },
 

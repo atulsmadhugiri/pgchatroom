@@ -43,9 +43,13 @@ class MessagesActions {
     this.dispatch();
   }
 
-  sendMessage({ MessagesStore, userId, message }) {
+  sendMessage({ MessagesStore, userId, message, generated }) {
     const messagingFb = MessagesStore.get('messagingFb');
-    messagingFb.push({ userId, message });
+    messagingFb.push({ userId, message, generated });
+    console.log(generated);
+    if (generated) {
+      MessagesStore.get('messages').push({ userId, message });
+    }
   }
 
   waitingMessage(StudyStore) {
