@@ -7,7 +7,6 @@ const DEFAULT_ROOM_VALUES = {
   usersPerRoom: '3',
   maxWaitingTime: 300000,
   roomOpenTime: 180000,
-  warning: 60000,
   password: 'password',
   altPassword: 'altpassword',
   messages: {},
