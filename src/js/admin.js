@@ -20,6 +20,7 @@ function getStateFromStores() {
   return {
     fb: AdminStore.get('fb'),
     auth: AdminStore.get('auth'),
+    authError: AdminStore.get('authError'),
     jsonToCsvSelected: AdminStore.get('jsonToCsvSelected'),
     selectedStudy: AdminStore.get('selectedStudy'),
     studies: AdminStore.get('studies'),
@@ -49,47 +50,46 @@ const AdminApp = React.createClass({
   },
 
   render() {
-    if (!this.state.auth) {
-      return <LoginButton fb={this.state.fb} />;
-    }
-
-    if (this.state.jsonToCsvSelected) {
-      return (<div>
-        <div className="button" onClick={this._toggleJsonState}>
-          Access admin panel
-        </div>
-        <JSONToCSVApp />
-      </div>);
-    }
-
     return (
       <div>
         <h1>Chat Room Admin Panel</h1>
 
-        <div className="button" onClick={this._toggleJsonState}>
-          Access chat data
-        </div>
+        <LoginButton
+          fb={this.state.fb}
+          auth={this.state.auth}
+          authError={this.state.authError}
+        />
 
-        <StudyList studies={this.state.studies} />
+        {this.state.auth && this.state.jsonToCsvSelected && <div>
+          <div className="button" onClick={this._toggleJsonState}>
+            Access admin panel
+          </div>
+          <JSONToCSVApp />
+        </div>}
+
+        {this.state.auth && !this.state.jsonToCsvSelected && <div>
+          <div className="button" onClick={this._toggleJsonState}>
+            Access chat data
+
+          <StudyList studies={this.state.studies} />
+
+          <Spacer />
+
+          {!this.state.selectedStudy ? 'No Study Selected' :
+            <div>
+              <hr />
+              <RoomsList
+                roomsUrl={this.state.roomsUrl}
+                study={this.state.selectedStudy}
+              />
+              <RoomGenerator selectedStudy={this.state.selectedStudy} />
+              <ConfigSetter firebase={this.state.constantsFb}
+                study={this.state.selectedStudy} />
+            </div>
+          }
+        </div>}
 
         <Spacer />
-
-        {!this.state.selectedStudy ? 'No Study Selected' :
-          <div>
-            <hr />
-            <RoomsList
-              roomsUrl={this.state.roomsUrl}
-              study={this.state.selectedStudy}
-            />
-
-            <RoomGenerator selectedStudy={this.state.selectedStudy} />
-
-            <ConfigSetter
-              firebase={this.state.constantsFb}
-              study={this.state.selectedStudy}
-            />
-          </div>
-        }
       </div>
     );
   },

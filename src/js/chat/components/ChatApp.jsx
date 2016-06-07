@@ -114,6 +114,9 @@ const ChatApp = React.createClass({
       await StudyActions.loadConfig(StudyStore.get('configFb'));
 
       UserActions.getInitialUserId();
+      await UserActions.authUser(
+        UserStore.get('userId'), StudyStore.get('userAuthFb')
+      );
       UserActions.loadAndListen({ StudyStore, UserStore,
         MessagesStore, WaitingRoomStore, RoomStore });
     } catch (error) {

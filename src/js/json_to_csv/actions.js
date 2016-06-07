@@ -1,7 +1,10 @@
+import Firebase from 'firebase';
 import { createAction } from 'redux-actions';
-import fetch from 'isomorphic-fetch';
 
 import { ROOT_URL, STUDIES_URL } from '../constants';
+
+const ROOT_FB = new Firebase(ROOT_URL);
+const STUDIES_FB = new Firebase(STUDIES_URL);
 
 export const setStudyList = createAction('SET_STUDY_LIST');
 export const setStudy = createAction('SET_STUDY');
@@ -11,9 +14,8 @@ export const setData = createAction('SET_DATA');
 
 export function fetchStudyList() {
   return (dispatch) => {
-    return fetch(`${STUDIES_URL}.json`)
-      .then(response => response.json())
-      .then(json => dispatch(setStudyList(json)));
+    return STUDIES_FB.once('value')
+      .then(response => dispatch(setStudyList(response.val())));
   };
 }
 
@@ -22,8 +24,7 @@ export function setStudyAndStartFetch(study) {
     dispatch(setStudy(study));
     dispatch(startDataFetch(study));
 
-    return fetch(`${ROOT_URL}/${study}.json`)
-      .then(response => response.json())
-      .then(json => dispatch(setData(json)));
+    return ROOT_FB.child(study).once('value')
+      .then(response => dispatch(setData(response.val())));
   };
 }
