@@ -49,6 +49,23 @@ const AdminApp = React.createClass({
     AdminActions.selectJsonToCsv(!this.state.jsonToCsvSelected);
   },
 
+  _renderStudySettings() {
+    if (!this.state.selectedStudy) {
+      return 'No Study Selected';
+    }
+
+    return (<div>
+      <hr />
+      <RoomsList
+        roomsUrl={this.state.roomsUrl}
+        study={this.state.selectedStudy}
+      />
+      <RoomGenerator selectedStudy={this.state.selectedStudy} />
+      <ConfigSetter firebase={this.state.constantsFb}
+        study={this.state.selectedStudy} />
+    </div>);
+  },
+
   render() {
     return (
       <div>
@@ -70,23 +87,13 @@ const AdminApp = React.createClass({
         {this.state.auth && !this.state.jsonToCsvSelected && <div>
           <div className="button" onClick={this._toggleJsonState}>
             Access chat data
+          </div>
 
           <StudyList studies={this.state.studies} />
 
           <Spacer />
 
-          {!this.state.selectedStudy ? 'No Study Selected' :
-            <div>
-              <hr />
-              <RoomsList
-                roomsUrl={this.state.roomsUrl}
-                study={this.state.selectedStudy}
-              />
-              <RoomGenerator selectedStudy={this.state.selectedStudy} />
-              <ConfigSetter firebase={this.state.constantsFb}
-                study={this.state.selectedStudy} />
-            </div>
-          }
+          {this._renderStudySettings()}
         </div>}
 
         <Spacer />
