@@ -27,6 +27,7 @@ class UserActions {
 
     const userId = UserStore.get('userId');
     const userFb = StudyStore.get('usersFb').child(userId);
+    const userAuthFb = StudyStore.get('userAuthFb');
 
     const { maxWaitingTime, roomOpenTime } = StudyStore.get('config');
 
@@ -48,6 +49,7 @@ class UserActions {
         break;
       case 'early-done':
         this.actions.logout(userAuthFb);
+        userFb.off();
         MessagesActions.earlyFinishMessage(StudyStore);
         break;
       case 'done':
