@@ -38,10 +38,6 @@
         },
 
         "rooms": {
-          // Append-only since rooms should only be created by users
-          ".read": "!data.exists()",
-          ".write": "!newData.exists()",
-
           "$roomId": {
             // A user that belongs to this room should be able to read/write
             // this room's stuff. We check if the user state in $roomType/users
@@ -50,7 +46,8 @@
               root.child($study + '/' + $roomType + '/users').child(
                 root.child('user_auth/' + auth.uid).val()
               ).val() === $roomId",
-            ".write": "auth !== null &&
+            // Allow room creation by allowing write if !data.exists()
+            ".write": "auth !== null && !data.exists() ||
               root.child($study + '/' + $roomType + '/users').child(
                 root.child('user_auth/' + auth.uid).val()
               ).val() === $roomId",

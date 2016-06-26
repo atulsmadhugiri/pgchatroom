@@ -16,6 +16,11 @@ import RoomsList from './admin/components/RoomsList';
 import AdminActions from './admin/actions/AdminActions';
 import AdminStore from './admin/stores/AdminStore';
 
+// Don't swallow errors in promises
+process.on('unhandledRejection', (error, promise) => {
+  console.error('UNHANDLED REJECTION', error.stack);
+});
+
 function getStateFromStores() {
   return {
     fb: AdminStore.get('fb'),

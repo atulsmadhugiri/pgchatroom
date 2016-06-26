@@ -7,8 +7,8 @@ import JSONToCSV from './json_to_csv/components';
 const store = configureStore();
 
 /**
- * This used to be its own page. Now we stick it under the admin section because
- * we want it to be auth'd.
+ * This used to be its own page. Now we stick it under the admin section
+ * because we want it to be auth'd.
  */
 const JSONToCSVApp = React.createClass({
   render() {
