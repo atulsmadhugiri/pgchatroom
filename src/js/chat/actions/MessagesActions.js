@@ -1,6 +1,7 @@
 import alt from '../alt';
 
-import { convertToMins } from '../util';
+import { convertToMins, findLowestUserId } from '../util';
+import { MESSAGE_TYPES } from '../../constants';
 
 function waitingMessage(maxWaitingTime) {
   return `Please wait while we match you to a room. If we are ` +
@@ -26,7 +27,7 @@ function earlyFinishMessage(altPassword) {
 
 class MessagesActions {
   constructor() {
-    this.generateActions('systemMessage', 'receiveMessage');
+    this.generateActions('receiveMessage');
   }
 
   enableMessaging(MessagesStore) {
@@ -43,40 +44,83 @@ class MessagesActions {
     this.dispatch();
   }
 
-  sendMessage({ MessagesStore, userId, message, generated }) {
+  waitingMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
+    const maxWaitingTime = StudyStore.get('config').maxWaitingTime;
+    this.actions.systemMessage({
+      MessagesStore,
+      UserStore,
+      RoomStore,
+      message: waitingMessage(maxWaitingTime),
+      pushToFb: false,
+    });
+  }
+
+  systemMessage({ MessagesStore, UserStore, RoomStore, message, pushToFb }) {
+    const lowestId = findLowestUserId(RoomStore.get('userIds'));
+    const userId = parseInt(UserStore.get('userId'), 10);
+
     const messagingFb = MessagesStore.get('messagingFb');
-    messagingFb.push({ userId, message, generated });
-    console.log(generated);
-    if (generated) {
-      MessagesStore.get('messages').push({ userId, message });
+    const messageObj = { userId: MESSAGE_TYPES.system, message, generated: true };
+
+    if (messagingFb && userId === lowestId && pushToFb) {
+      messagingFb.push(messageObj);
+    } else if (!pushToFb) {
+      MessagesStore.get('messages').push(messageObj);
     }
   }
 
-  waitingMessage(StudyStore) {
-    const maxWaitingTime = StudyStore.get('config').maxWaitingTime;
-    this.actions.systemMessage(waitingMessage(maxWaitingTime));
+  sendMessage({ MessagesStore, UserStore, RoomStore, userId, message, generated }) {
+    const lowestId = findLowestUserId(RoomStore.get('userIds'));
+    const chatUserId = parseInt(UserStore.get('userId'), 10);
+
+    const messagingFb = MessagesStore.get('messagingFb');
+
+    if (!generated || (generated && lowestId === chatUserId)) {
+      messagingFb.push({ userId, message, generated });
+    }
   }
 
-  startMessage({ StudyStore, MessagesStore }) {
+  startMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const { usersPerRoom, roomOpenTime } = StudyStore.get('config');
 
-    this.actions.systemMessage(startMessage(usersPerRoom, roomOpenTime));
+    this.actions.systemMessage({
+      MessagesStore,
+      UserStore,
+      RoomStore,
+      message: startMessage(usersPerRoom, roomOpenTime),
+      pushToFb: false,
+    });
+
     this.actions.enableMessaging(MessagesStore);
   }
 
-  finishMessage(StudyStore) {
+  finishMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const baseFb = StudyStore.get('baseFb');
     const password = StudyStore.get('config').password;
 
-    this.actions.systemMessage(finishMessage(password));
+    this.actions.systemMessage({
+      MessagesStore,
+      UserStore,
+      RoomStore,
+      message: finishMessage(password),
+      pushToFb: false,
+    });
+
     this.actions.disableMessaging(baseFb);
   }
 
-  earlyFinishMessage(StudyStore) {
+  earlyFinishMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const baseFb = StudyStore.get('baseFb');
     const altPassword = StudyStore.get('config').altPassword;
 
-    this.actions.systemMessage(earlyFinishMessage(altPassword));
+    this.actions.systemMessage({
+      MessagesStore,
+      UserStore,
+      RoomStore,
+      message: earlyFinishMessage(altPassword),
+      pushToFb: false,
+    });
+
     this.actions.disableMessaging(baseFb);
   }
 }

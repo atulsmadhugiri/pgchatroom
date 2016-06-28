@@ -20,12 +20,15 @@ class RoomStore {
   addUser({ roomFb, userId }) {
     this.roomFb = roomFb;
     this.roomId = roomFb.key();
-    this.userIds.push(userId);
 
     this.roomFb.on('value', snapshot => {
       this.roomTime = snapshot.val().createdAt;
       this.getInstance().emitChange();
     });
+  }
+
+  addUsers({ userIds }) {
+    this.userIds = userIds;
   }
 
   static get(attr) {

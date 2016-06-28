@@ -27,10 +27,15 @@ function filterObject(obj, pred) {
   return _.pick(obj, keys);
 }
 
+function findLowestUserId(userIds) {
+  return Math.min(...userIds);
+}
+
 export default {
   assert,
   getAttributeFromUrlParams,
   convertToMs,
   convertToMins,
   filterObject,
+  findLowestUserId,
 };

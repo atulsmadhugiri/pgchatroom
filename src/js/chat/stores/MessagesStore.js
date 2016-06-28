@@ -5,7 +5,6 @@ import MessagesActions from '../actions/MessagesActions';
 import RoomActions from '../actions/RoomActions';
 import RoomStore from './RoomStore';
 import StudyStore from './StudyStore';
-import { MESSAGE_TYPES } from '../../constants';
 
 class MessagesStore {
   constructor() {
@@ -15,6 +14,7 @@ class MessagesStore {
     this.messagingEnabled = false;
     this.messagingFb = null;
     this.messages = [];
+    this.systemMessagesSeen = {};
   }
 
   addUser() {
@@ -27,17 +27,8 @@ class MessagesStore {
     this.messagingFb = baseFb.child(`rooms/${roomId}/messages`);
   }
 
-  systemMessage(message) {
-    if (this.messagingFb) {
-      this.messagingFb.push({ userId: MESSAGE_TYPES.system, message, generated: true });
-    }
-    this.messages.push({ userId: MESSAGE_TYPES.system, message: message });
-  }
-
   receiveMessage(message) {
-    if (message.userId !== MESSAGE_TYPES.system && !message.generated) {
-      this.messages.push(message);
-    }
+    this.messages.push(message);
   }
 
   enableMessaging() {

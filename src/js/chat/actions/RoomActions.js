@@ -3,7 +3,7 @@ import Firebase from 'firebase';
 
 class RoomActions {
   constructor() {
-    // this.generateActions('addUser');
+    this.generateActions('addUsers');
   }
 
   createRoom(StudyStore) {

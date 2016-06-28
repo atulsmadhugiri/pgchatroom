@@ -10,7 +10,7 @@ class WaitingRoomActions {
     this.generateActions('updateWaitingUsers');
   }
 
-  listenForMoreUsers({ StudyStore, UserStore, WaitingRoomStore }) {
+  listenForMoreUsers({ RoomStore, StudyStore, UserStore, WaitingRoomStore }) {
     const usersFb = StudyStore.get('usersFb');
     const usersPerRoom = StudyStore.get('config').usersPerRoom;
     const currentUserId = UserStore.get('userId');
@@ -24,12 +24,12 @@ class WaitingRoomActions {
       if (_.size(waitingUsers) >= usersPerRoom &&
           _.has(waitingUsers, currentUserId)) {
         this.actions.sendUsersToRoom(
-          { StudyStore, UserStore, WaitingRoomStore });
+          { RoomStore, StudyStore, UserStore, WaitingRoomStore });
       }
     });
   }
 
-  sendUsersToRoom({ StudyStore, UserStore, WaitingRoomStore }) {
+  sendUsersToRoom({ RoomStore, StudyStore, UserStore, WaitingRoomStore }) {
     const usersFb = StudyStore.get('usersFb');
     const currentUserId = UserStore.get('userId');
     const usersPerRoom = StudyStore.get('config').usersPerRoom;
@@ -49,13 +49,15 @@ class WaitingRoomActions {
     const shouldCreateRoom = _.min(matchedUsers) === currentUserId;
     if (shouldCreateRoom) {
       const roomId = RoomActions.createRoom(StudyStore);
-
       UserActions.setUsersToRoom({
+        RoomStore,
         StudyStore,
         roomId,
         matchedUsers,
       });
     }
+
+    RoomActions.addUsers({ userIds: matchedUsers.map((el) => parseInt(el, 10)) });
   }
 }
 

@@ -81,12 +81,20 @@ const ChatApp = React.createClass({
         if (messageObject.type === MESSAGE_TYPES.confederate) {
           MessagesActions.sendMessage({
             MessagesStore,
+            UserStore,
+            RoomStore,
             userId: messageObject.id || '111',
             message: messageObject.message,
             generated: true,
           });
         } else {
-          MessagesActions.systemMessage(messageObject.message);
+          MessagesActions.systemMessage({
+            MessagesStore,
+            UserStore,
+            RoomStore,
+            message: messageObject.message,
+            pushToFb: true,
+          });
         }
       }
       this.setState({ timeSinceStart: timeSinceStart + 1000 });
@@ -132,6 +140,8 @@ const ChatApp = React.createClass({
 
     MessagesActions.sendMessage({
       MessagesStore,
+      UserStore,
+      RoomStore,
       userId: this.state.userId,
       message: this.state.message,
       generated: false,

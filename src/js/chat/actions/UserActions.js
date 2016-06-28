@@ -20,7 +20,7 @@ class UserActions {
     this.dispatch(userId);
   }
 
-  loadAndListen({ StudyStore, UserStore, WaitingRoomStore, MessagesStore }) {
+  loadAndListen({ RoomStore, StudyStore, UserStore, WaitingRoomStore, MessagesStore }) {
     assert(StudyStore.get('study') && StudyStore.get('config'),
       'Study not loaded.');
     assert(UserStore.get('userId'), 'User not loaded.');
@@ -42,25 +42,26 @@ class UserActions {
         this.actions.createUser(userFb);
         break;
       case 'waiting':
-        MessagesActions.waitingMessage(StudyStore);
+        console.log('waiting');
+        MessagesActions.waitingMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
         WaitingRoomActions.listenForMoreUsers(
-          { StudyStore, UserStore, WaitingRoomStore });
+          { RoomStore, StudyStore, UserStore, WaitingRoomStore });
         this.actions.startWaitingTime(userFb, maxWaitingTime);
         break;
       case 'early-done':
         this.actions.logout(userAuthFb);
         userFb.off();
-        MessagesActions.earlyFinishMessage(StudyStore);
+        MessagesActions.earlyFinishMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
         break;
       case 'done':
         this.actions.logout(userAuthFb);
         userFb.off();
-        MessagesActions.finishMessage(StudyStore);
+        MessagesActions.finishMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
         break;
       default: // User in room
         const roomId = userState;
         RoomActions.addUser({ StudyStore, UserStore, roomId });
-        MessagesActions.startMessage({ StudyStore, MessagesStore });
+        MessagesActions.startMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
         this.actions.startChatTime(userFb, roomOpenTime);
       }
     });
