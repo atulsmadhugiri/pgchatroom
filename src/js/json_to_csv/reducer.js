@@ -39,6 +39,7 @@ const defaultState = {
   displayOption: 'USERS',
   fetchingData: false,
   data: null,
+  error: null,
 };
 
 const jsonCsvApp = handleActions({
@@ -57,6 +58,13 @@ const jsonCsvApp = handleActions({
 
   SET_DATA: (state, action) =>
     ({ ...state, fetchingData: false, data: action.payload }),
+
+  FAILED_DATA_FETCH: (state, action) => ({
+    ...state,
+    fetchingData: false,
+    data: null,
+    error: action.payload.toString(),
+  }),
 
 }, defaultState);
 
