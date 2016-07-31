@@ -4,6 +4,8 @@ const STUDIES_URL = `${ROOT_URL}/studies`;
 const CONSTANTS_URL = `${ROOT_URL}/constants`;
 const USER_AUTH_URL = `${ROOT_URL}/user_auth`;
 
+const BASE_CHAT_ROOM_URL = 'https://www.samlau.me/pg-chat-room';
+
 const DEFAULT_ROOM_VALUES = {
   usersPerRoom: '3',
   maxWaitingTime: 300000,
@@ -23,8 +25,7 @@ export default {
   STUDIES_URL,
   CONSTANTS_URL,
   USER_AUTH_URL,
+  BASE_CHAT_ROOM_URL,
   DEFAULT_ROOM_VALUES,
   MESSAGE_TYPES,
 };
-
-

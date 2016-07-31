@@ -1,6 +1,8 @@
 import React from 'react';
 import _ from 'underscore';
 
+import { BASE_CHAT_ROOM_URL } from '../../constants';
+
 const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
 
 /**
@@ -28,8 +30,10 @@ const RoomGenerator = React.createClass({
       return '';
     }
 
-    return `https://samlau95.github.io/pg-chat-room?study=` +
-      `${this.props.selectedStudy}&room=${this.state.room}&${USER_ID_FIELD}`;
+    return BASE_CHAT_ROOM_URL +
+      `?study=${this.props.selectedStudy}` +
+      `&room=${this.state.room}` +
+      `&${USER_ID_FIELD}`;
   },
 
   render() {
