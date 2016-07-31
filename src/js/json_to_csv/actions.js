@@ -11,6 +11,7 @@ export const setStudy = createAction('SET_STUDY');
 export const setDisplayOption = createAction('SET_DISPLAY_OPTION');
 export const startDataFetch = createAction('START_DATA_FETCH');
 export const setData = createAction('SET_DATA');
+export const failedDataFetch = createAction('FAILED_DATA_FETCH');
 
 export function fetchStudyList() {
   return (dispatch) => {
@@ -25,6 +26,7 @@ export function setStudyAndStartFetch(study) {
     dispatch(startDataFetch(study));
 
     return ROOT_FB.child(study).once('value')
-      .then(response => dispatch(setData(response.val())));
+      .then(response => dispatch(setData(response.val())))
+      .catch(err => dispatch(failedDataFetch(err)));
   };
 }
