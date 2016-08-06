@@ -30,7 +30,7 @@ const RoomGenerator = React.createClass({
       return '';
     }
 
-    return BASE_CHAT_ROOM_URL +
+    return BASE_CHAT_ROOM_URL + '/' +
       `?study=${this.props.selectedStudy}` +
       `&room=${this.state.room}` +
       `&${USER_ID_FIELD}`;
