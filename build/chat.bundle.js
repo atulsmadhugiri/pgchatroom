@@ -33224,6 +33224,8 @@
 	var CONSTANTS_URL = ROOT_URL + '/constants';
 	var USER_AUTH_URL = ROOT_URL + '/user_auth';
 
+	var BASE_CHAT_ROOM_URL = 'https://www.samlau.me/pg-chat-room';
+
 	var DEFAULT_ROOM_VALUES = {
 	  usersPerRoom: '3',
 	  maxWaitingTime: 300000,
@@ -33243,6 +33245,7 @@
 	  STUDIES_URL: STUDIES_URL,
 	  CONSTANTS_URL: CONSTANTS_URL,
 	  USER_AUTH_URL: USER_AUTH_URL,
+	  BASE_CHAT_ROOM_URL: BASE_CHAT_ROOM_URL,
 	  DEFAULT_ROOM_VALUES: DEFAULT_ROOM_VALUES,
 	  MESSAGE_TYPES: MESSAGE_TYPES
 	};

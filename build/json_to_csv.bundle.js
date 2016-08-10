@@ -21296,7 +21296,8 @@
 	  fetchingStudyList: true,
 	  displayOption: 'USERS',
 	  fetchingData: false,
-	  data: null
+	  data: null,
+	  error: null
 	};
 
 	var jsonCsvApp = (0, _reduxActions.handleActions)({
@@ -21321,6 +21322,14 @@
 
 	  SET_DATA: function SET_DATA(state, action) {
 	    return _extends({}, state, { fetchingData: false, data: action.payload });
+	  },
+
+	  FAILED_DATA_FETCH: function FAILED_DATA_FETCH(state, action) {
+	    return _extends({}, state, {
+	      fetchingData: false,
+	      data: null,
+	      error: action.payload.toString()
+	    });
 	  }
 
 	}, defaultState);
@@ -22949,6 +22958,7 @@
 	      var displayOption = _props.displayOption;
 	      var data = _props.data;
 	      var dispatch = _props.dispatch;
+	      var error = _props.error;
 
 	      var studySelect = undefined;
 
@@ -22987,6 +22997,7 @@
 	          )
 	        ),
 	        _react2['default'].createElement('br', null),
+	        error,
 	        data && _react2['default'].createElement(
 	          'form',
 	          null,
@@ -23026,7 +23037,8 @@
 	  study: _react.PropTypes.string.isRequired,
 	  displayOption: _react.PropTypes.string.isRequired,
 	  data: dataShape,
-	  dispatch: _react.PropTypes.func.isRequired
+	  dispatch: _react.PropTypes.func.isRequired,
+	  error: _react.PropTypes.object
 	};
 
 	var mapStateToProps = function mapStateToProps(state) {
@@ -26584,8 +26596,10 @@
 	var startDataFetch = (0, _reduxActions.createAction)('START_DATA_FETCH');
 	exports.startDataFetch = startDataFetch;
 	var setData = (0, _reduxActions.createAction)('SET_DATA');
-
 	exports.setData = setData;
+	var failedDataFetch = (0, _reduxActions.createAction)('FAILED_DATA_FETCH');
+
+	exports.failedDataFetch = failedDataFetch;
 
 	function fetchStudyList() {
 	  return function (dispatch) {
@@ -26602,6 +26616,8 @@
 
 	    return ROOT_FB.child(study).once('value').then(function (response) {
 	      return dispatch(setData(response.val()));
+	    })['catch'](function (err) {
+	      return dispatch(failedDataFetch(err));
 	    });
 	  };
 	}
@@ -26910,6 +26926,8 @@
 	var CONSTANTS_URL = ROOT_URL + '/constants';
 	var USER_AUTH_URL = ROOT_URL + '/user_auth';
 
+	var BASE_CHAT_ROOM_URL = 'https://www.samlau.me/pg-chat-room';
+
 	var DEFAULT_ROOM_VALUES = {
 	  usersPerRoom: '3',
 	  maxWaitingTime: 300000,
@@ -26929,6 +26947,7 @@
 	  STUDIES_URL: STUDIES_URL,
 	  CONSTANTS_URL: CONSTANTS_URL,
 	  USER_AUTH_URL: USER_AUTH_URL,
+	  BASE_CHAT_ROOM_URL: BASE_CHAT_ROOM_URL,
 	  DEFAULT_ROOM_VALUES: DEFAULT_ROOM_VALUES,
 	  MESSAGE_TYPES: MESSAGE_TYPES
 	};
