@@ -2,7 +2,7 @@
   "name": "pg-chat-room",
   "version": "1.0.0",
   "description": "Chat room for Leadership in Unusual Contexts research studies",
-  "main": "chat.js",
+  "main": "chat.jsx",
   "scripts": {
     "test": "make test_once"
   },
@@ -18,7 +18,10 @@
   "homepage": "https://github.com/SamLau95/pg-chat-room#readme",
   "dependencies": {
     "alt": "^0.18.6",
-    "babel-core": "^6.26.3",
+    "@babel/core": "^7.2.2",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.2.3",
+    "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "babyparse": "^0.4.6",
@@ -31,6 +34,7 @@
     "jquery": "^3.3.1",
     "node-sass": "^4.11.0",
     "react": "^16.7.0",
+    "create-react-class": "^15.6.3",
     "react-dom": "^16.7.0",
     "react-redux": "^6.0.0",
     "redux": "^4.0.1",

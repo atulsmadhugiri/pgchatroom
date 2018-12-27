@@ -2,9 +2,9 @@ var webpack = require("webpack");
 
 module.exports = {
     entry: {
-        chat: ["./src/js/chat.js"],
-        json_to_csv: ["./src/js/json_to_csv.js"],
-        admin: ["./src/js/admin.js"],
+        chat: ["./src/js/chat.jsx"],
+        json_to_csv: ["./src/js/x"],
+        admin: ["./src/js/admin.jsx"],
     },
     resolve: {
         extensions: ["*", ".webpack.js", ".web.js", ".js", ".jsx"]
@@ -22,16 +22,19 @@ module.exports = {
             {
                 enforce: 'pre',
                 test: /\.jsx?$/,
-                loader: 'eslint',
+                loader: 'eslint-loader',
                 exclude: /node_modules/,
+                options: {
+                    configFile: ".eslintrc"
+                }
             },
             {
                 test: require.resolve("react"),
-                loader: "expose?React"
+                loader: "expose-loader?React"
             },
             {
                 test: require.resolve("firebase"),
-                loader: "expose?Firebase"
+                loader: "expose-loader?Firebase"
             },
             {
                 test: /\.s?css$/, 
@@ -39,7 +42,7 @@ module.exports = {
             },
             {
                 test: /\.jsx?$/,
-                loaders: ["react-hot", "babel?optional=runtime"],
+                loaders: ["react-hot-loader/webpack", "babel-loader"],
                 exclude: /node_modules/
             }
         ],
@@ -53,6 +56,7 @@ module.exports = {
     },
     plugins: [
       new webpack.NoEmitOnErrorsPlugin(),
+
     ],
     // eslint: {
     //     configFile: ".eslintrc"

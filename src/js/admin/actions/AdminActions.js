@@ -1,6 +1,6 @@
-import alt from '../alt';
 import Firebase from 'firebase';
 
+import alt from '../alt';
 import { ROOT_URL, STUDIES_URL } from '../../constants';
 
 const ROOT_FB = new Firebase(ROOT_URL);
@@ -16,11 +16,9 @@ class AdminActions {
   // This only allows admins to auth through
   listenForAuth() {
     ROOT_FB.onAuth((auth) => {
-      ROOT_FB.child('admins').once('value',
-        () => this.dispatch(auth),
-        (err) => this.actions.setAuthError(`${err.toString()} | Send Sam
-          your UID: ${auth.uid} if you believe this is an error.`),
-      );
+      ROOT_FB.child('admins').once('value', () => this.dispatch(auth),
+        err => this.actions.setAuthError(`${err.toString()} | Send Sam
+          your UID: ${auth.uid} if you believe this is an error.`));
     });
   }
 
@@ -29,22 +27,22 @@ class AdminActions {
   }
 
   logout() {
-    ROOT_FB.unauth();
+    this.ROOT_FB.unauth();
   }
 
   listenForStudies() {
-    STUDIES_FB.on('value', snapshot => {
+    STUDIES_FB.on('value', (snapshot) => {
       const studies = snapshot.val() || [];
       this.dispatch(studies);
     });
   }
 
   unlistenForStudies() {
-    STUDIES_FB.off();
+    this.STUDIES_FB.off();
   }
 
   setStudies(studies) {
-    STUDIES_FB.set(studies);
+    this.STUDIES_FB.set(studies);
   }
 }
 

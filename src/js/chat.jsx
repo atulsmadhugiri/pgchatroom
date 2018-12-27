@@ -14,6 +14,6 @@ process.on('unhandledRejection', (error, promise) => {
 $(() => {
   ReactDOM.render(
     <ChatApp />,
-    document.getElementById('chat-app')
+    this.document.getElementById('chat-app'),
   );
 });

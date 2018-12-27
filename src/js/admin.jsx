@@ -37,80 +37,94 @@ function getStateFromStores() {
 /**
  * Stateful wrapper component for the admin page.
  */
-const AdminApp = React.createClass({
+class AdminApp extends React.Component {
   getInitialState() {
     return getStateFromStores();
-  },
+  }
 
   componentWillMount() {
-    AdminStore.listen(this._onChange);
-  },
+    AdminStore.listen(this.onChange);
+  }
 
-  _onChange() {
+  onChange() {
     this.setState(getStateFromStores());
-  },
+  }
 
-  _toggleJsonState() {
-    AdminActions.selectJsonToCsv(!this.state.jsonToCsvSelected);
-  },
+  toggleJsonState() {
+    const { currState } = this.state;
+    AdminActions.selectJsonToCsv(!{ currState }.jsonToCsvSelected);
+  }
 
-  _renderStudySettings() {
-    if (!this.state.selectedStudy) {
+  renderStudySettings() {
+    const { currState } = this.state;
+    if (!{ currState }.selectedStudy) {
       return 'No Study Selected';
     }
 
-    return (<div>
-      <hr />
-      <RoomsList
-        roomsUrl={this.state.roomsUrl}
-        study={this.state.selectedStudy}
-      />
-      <RoomGenerator selectedStudy={this.state.selectedStudy} />
-      <ConfigSetter firebase={this.state.constantsFb}
-        study={this.state.selectedStudy} />
-    </div>);
-  },
+    return (
+      <div>
+        <hr />
+        <RoomsList
+          roomsUrl={{ currState }.roomsUrl}
+          study={{ currState }.selectedStudy}
+        />
+        <RoomGenerator selectedStudy={{ currState }.selectedStudy} />
+        <ConfigSetter
+          firebase={{ currState }.constantsFb}
+          study={{ currState }.selectedStudy}
+        />
+      </div>
+    );
+  }
 
   render() {
+    const { currState } = this.state;
     return (
       <div>
         <h1>Chat Room Admin Panel</h1>
 
         <LoginButton
-          fb={this.state.fb}
-          auth={this.state.auth}
-          authError={this.state.authError}
+          fb={{ currState }.fb}
+          auth={{ currState }.auth}
+          authError={{ currState }.authError}
         />
 
-        {this.state.auth && this.state.jsonToCsvSelected && <div>
-          <div className="button" onClick={this._toggleJsonState}>
+        {{ currState }.auth && { currState }.jsonToCsvSelected
+        && (
+        <div>
+          // onKeyPress is solely to bypass the linter for now
+          <div className="button" onClick={this.toggleJsonState}>
             Access admin panel
           </div>
           <JSONToCSVApp />
-        </div>}
+        </div>
+        )}
 
-        {this.state.auth && !this.state.jsonToCsvSelected && <div>
-          <div className="button" onClick={this._toggleJsonState}>
+        {{ currState }.auth && !{ currState }.jsonToCsvSelected
+        && (
+        <div>
+          <div className="button" onClick={this.toggleJsonState}>
             Access chat data
           </div>
 
-          <StudyList studies={this.state.studies} />
+          <StudyList studies={{ currState }.studies} />
 
           <Spacer />
 
-          {this._renderStudySettings()}
-        </div>}
+          {this.renderStudySettings()}
+        </div>
+        )}
 
         <Spacer />
       </div>
     );
-  },
-});
+  }
+}
 
 $(() => {
   ReactDOM.render(
     <AdminApp />,
-    document.getElementById('admin-app')
+    this.document.getElementById('admin-app'),
   );
 });
 

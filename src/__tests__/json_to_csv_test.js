@@ -25,7 +25,7 @@ const testJSON = {
 
 const testText = JSON.stringify(testJSON);
 
-describe('json_to_csv.js', () => {
+describe('json_to_csv.jsx', () => {
   describe('parseData', () => {
     it('exists', () => {
       expect(parseData).to.be.ok;
