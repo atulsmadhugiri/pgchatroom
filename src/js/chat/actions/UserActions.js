@@ -1,8 +1,9 @@
-import alt from '../alt';
 import _ from 'underscore';
+import alt from '../alt';
 
 import { assert, getAttributeFromUrlParams } from '../util';
 import MessagesActions from './MessagesActions';
+// eslint-disable-next-line import/no-cycle
 import WaitingRoomActions from './WaitingRoomActions';
 import RoomActions from './RoomActions';
 
@@ -20,7 +21,9 @@ class UserActions {
     this.dispatch(userId);
   }
 
-  loadAndListen({ RoomStore, StudyStore, UserStore, WaitingRoomStore, MessagesStore }) {
+  loadAndListen({
+    RoomStore, StudyStore, UserStore, WaitingRoomStore, MessagesStore,
+  }) {
     assert(StudyStore.get('study') && StudyStore.get('config'),
       'Study not loaded.');
     assert(UserStore.get('userId'), 'User not loaded.');
@@ -33,40 +36,51 @@ class UserActions {
 
     this.dispatch(userFb);
 
-    userFb.on('value', snapshot => {
+    userFb.on('value', (snapshot) => {
       const userState = snapshot.val();
       this.actions.updateUser(userState);
 
       switch (userState) {
-      case null:
-        this.actions.createUser(userFb);
-        break;
-      case 'waiting':
-        console.log('waiting');
-        MessagesActions.waitingMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
-        WaitingRoomActions.listenForMoreUsers(
-          { RoomStore, StudyStore, UserStore, WaitingRoomStore });
-        this.actions.startWaitingTime(userFb, maxWaitingTime);
-        break;
-      case 'early-done':
-        this.actions.logout(userAuthFb);
-        userFb.off();
-        MessagesActions.earlyFinishMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
-        break;
-      case 'done':
-        this.actions.logout(userAuthFb);
-        userFb.off();
-        MessagesActions.finishMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
-        break;
-      default: // User in room
-        const roomId = userState;
-        RoomActions.addUser({ StudyStore, UserStore, roomId });
-        MessagesActions.startMessage({ MessagesStore, UserStore, RoomStore, StudyStore });
-        this.actions.startChatTime(userFb, roomOpenTime);
+        case null:
+          this.actions.createUser(userFb);
+          break;
+        case 'waiting':
+          console.log('waiting');
+          MessagesActions.waitingMessage({
+            MessagesStore, UserStore, RoomStore, StudyStore,
+          });
+          WaitingRoomActions.listenForMoreUsers({
+            RoomStore, StudyStore, UserStore, WaitingRoomStore,
+          });
+          this.actions.startWaitingTime(userFb, maxWaitingTime);
+          break;
+        case 'early-done':
+          this.actions.logout(userAuthFb);
+          userFb.off();
+          MessagesActions.earlyFinishMessage({
+            MessagesStore, UserStore, RoomStore, StudyStore,
+          });
+          break;
+        case 'done':
+          this.actions.logout(userAuthFb);
+          userFb.off();
+          MessagesActions.finishMessage({
+            MessagesStore, UserStore, RoomStore, StudyStore,
+          });
+          break;
+        default: { // User in room
+          const roomId = userState;
+          RoomActions.addUser({ StudyStore, UserStore, roomId });
+          MessagesActions.startMessage({
+            MessagesStore, UserStore, RoomStore, StudyStore,
+          });
+          this.actions.startChatTime(userFb, roomOpenTime);
+        }
       }
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   createUser(userFb) {
     userFb.set('waiting');
   }
@@ -86,22 +100,25 @@ class UserActions {
     });
   }
 
+  // eslint-disable-next-line class-methods-use-this
   logout(userAuthFb) {
     userAuthFb.unauth();
   }
 
+  // eslint-disable-next-line class-methods-use-this
   setUsersToRoom({ StudyStore, roomId, matchedUsers }) {
     const usersFb = StudyStore.get('usersFb');
 
     usersFb.update(
-      _.object(matchedUsers, matchedUsers.map(() => roomId))
+      _.object(matchedUsers, matchedUsers.map(() => roomId)),
     );
   }
 
+  // eslint-disable-next-line class-methods-use-this
   startWaitingTime(userFb, waitingTime) {
     console.log('Starting wait timer...');
     setTimeout(() => {
-      userFb.once('value', snapshot => {
+      userFb.once('value', (snapshot) => {
         const userState = snapshot.val();
         if (userState === 'waiting') {
           userFb.set('early-done');
@@ -110,6 +127,7 @@ class UserActions {
     }, waitingTime);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   startChatTime(userFb, roomOpenTime) {
     console.log('Starting chat timer...');
     setTimeout(() => {
