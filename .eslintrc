@@ -5,7 +5,14 @@
       "no-unused-vars": [2, { "args": "none" }],
       "react/no-multi-comp": 0,
       "jsx-a11y/click-events-have-key-events": "off",
-      "jsx-a11y/no-static-element-interactions": "off"
+      "jsx-a11y/no-static-element-interactions": "off",
+      "react/destructuring-assignment": "off",
+      "jsx-a11y/label-has-for": "off",
+      "prefer-destructuring": "off",
+      "jsx-a11y/label-has-associated-control": "off",
+      "jsx-a11y/no-noninteractive-element-interactions": "off",
+      "react/no-access-state-in-setstate": "off"
+
 
     }
 }

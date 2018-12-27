@@ -1,4 +1,6 @@
+/* eslint-disable react/forbid-prop-types */
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import { convertToMs, convertToMins } from '../../chat/util';
@@ -8,12 +10,7 @@ import { DEFAULT_ROOM_VALUES, MESSAGE_TYPES } from '../../constants';
  * This is a standalone component that manages its own state (no flux).
  * It allows for editing of a study's settings.
  */
-const ConfigSetter = React.createClass({
-  propTypes: {
-    firebase: React.PropTypes.object.isRequired,
-    study: React.PropTypes.string.isRequired,
-  },
-
+class ConfigSetter extends React.Component {
   getInitialState() {
     return {
       loaded: false, // loaded data from Firebase yet?
@@ -37,20 +34,20 @@ const ConfigSetter = React.createClass({
         messages: false,
       },
     };
-  },
+  }
 
   componentWillMount() {
     // Only read in initial data
-    this._loadConfig(this.props);
-  },
+    this.loadConfig(this.props);
+  }
 
   componentWillReceiveProps(nextProps) {
     this.props.firebase.off();
-    this._loadConfig(nextProps);
-  },
+    this.loadConfig(nextProps);
+  }
 
-  _loadConfig(props) {
-    props.firebase.on('value', snapshot => {
+  loadConfig(props) {
+    props.firebase.on('value', (snapshot) => {
       if (!snapshot.val()) {
         props.firebase.set(DEFAULT_ROOM_VALUES, (err) => {
           console.log(err);
@@ -62,45 +59,47 @@ const ConfigSetter = React.createClass({
         });
       }
     });
-  },
+  }
 
-  _handleConfigSubmit(e) {
+  handleConfigSubmit(e) {
     e.preventDefault();
     this.props.firebase.set(this.state.config, (err) => {
       this.setState({ saved: !err });
     });
-  },
+  }
 
   // transform arg is used to change from mins to ms
-  _handleChange(attr, transform = _.identity, e) {
+  handleChange(attr, transform = _.identity, e) {
     const config = _.extend({}, this.state.config, {
       [attr]: transform(e.target.value),
     });
 
     this.setState({
       saved: false,
-      config: config,
+      config,
     });
-  },
+  }
 
-  _formGeneralInput(attr, label, convertData = _.identity,
-      convertInput = _.identity) {
+  formGeneralInput(attr, label, convertData = _.identity,
+    convertInput = _.identity) {
     return (
       <div>
         <label htmlFor={attr}>{label}</label>
-        <input type="text"
+        <input
+          type="text"
           id={attr}
           value={convertData(this.state.config[attr])}
-          onChange={_.partial(this._handleChange, attr, convertInput)} />
-        <div className="spacer"></div>
+          onChange={_.partial(this.handleChange, attr, convertInput)}
+        />
+        <div className="spacer" />
       </div>
     );
-  },
+  }
 
-  _handleMessageSubmit(e) {
+  handleMessageSubmit(e) {
     e.preventDefault();
 
-    if (this._hasValidMessage()) {
+    if (this.hasValidMessage()) {
       const config = this.state.config;
       if (_.isUndefined(config.messages)) {
         config.messages = {};
@@ -119,14 +118,14 @@ const ConfigSetter = React.createClass({
           messageTime: '',
           messageTimeError: '',
           messageIDError: '',
-          config: config,
+          config,
         });
         console.log(this.state);
       });
     }
-  },
+  }
 
-  _hasValidMessage() {
+  hasValidMessage() {
     let valid = true;
 
     if (_.isEmpty(this.state.messageObject.message)) {
@@ -135,42 +134,42 @@ const ConfigSetter = React.createClass({
     }
 
     if (_.isNaN(parseFloat(this.state.messageTime))) {
-      this.setState({ messageTimeError: 'Invalid Time'});
+      this.setState({ messageTimeError: 'Invalid Time' });
       valid = false;
     }
 
     if (_.isNaN(parseFloat(this.state.messageObject.id))) {
-      this.setState({ messageIDError: 'Invalid ID'});
+      this.setState({ messageIDError: 'Invalid ID' });
       valid = false;
     }
 
     return valid;
-  },
+  }
 
-  _handleMessageChange(e) {
+  handleMessageChange(e) {
     const messageObject = this.state.messageObject;
     messageObject.message = e.target.value;
-    this.setState({ messageObject: messageObject });
-  },
+    this.setState({ messageObject });
+  }
 
-  _handleMessageTimeChange(e) {
+  handleMessageTimeChange(e) {
     this.setState({ messageTime: e.target.value });
-  },
+  }
 
-  _handleMessageTypeChange(e) {
+  handleMessageTypeChange(e) {
     console.log(e.target.value);
     const messageObject = this.state.messageObject;
     messageObject.type = e.target.value;
-    this.setState({ messageObject: messageObject });
-  },
+    this.setState({ messageObject });
+  }
 
-  _handleMessageIDChange(e) {
+  handleMessageIDChange(e) {
     const messageObject = this.state.messageObject;
     messageObject.id = e.target.value;
     this.setState({ messageID: e.target.value });
-  },
+  }
 
-  _removeMessage(e) {
+  removeMessage(e) {
     const config = this.state.config;
     if (_.isEmpty(config.messages)) {
       config.messages = {};
@@ -179,11 +178,11 @@ const ConfigSetter = React.createClass({
     delete config.messages[e.target.parentElement.id];
 
     this.props.firebase.set(config, (err) => {
-      this.setState({ config: config });
+      this.setState({ config });
     });
-  },
+  }
 
-  _renderMessageTable() {
+  renderMessageTable() {
     console.log(this.state.config.messages);
     const tableStyle = {
       margin: '0 auto',
@@ -191,7 +190,7 @@ const ConfigSetter = React.createClass({
 
     if (!this.state.loaded) {
       return 'Loading...';
-    } else if (_.isEmpty(this.state.config.messages)) {
+    } if (_.isEmpty(this.state.config.messages)) {
       return '';
     }
 
@@ -205,47 +204,46 @@ const ConfigSetter = React.createClass({
             <th>ID</th>
             <th>Delete</th>
           </tr>
-          {this._renderMessages()}
+          {this.renderMessages()}
         </tbody>
       </table>
     );
-  },
+  }
 
-  _renderMessages() {
-    return _.keys(this.state.config.messages).map(key => {
-      return (
-        <tr key={key} id={key}>
-          <td>{convertToMins(key)}</td>
-          <td>{this.state.config.messages[key].message}</td>
-          <td>{this.state.config.messages[key].type}</td>
-          <td>{this.state.config.messages[key].id}</td>
-          <td onClick={this._removeMessage}>&times;</td>
-        </tr>
-      );
-    });
-  },
+  renderMessages() {
+    return _.keys(this.state.config.messages).map(key => (
+      <tr key={key} id={key}>
+        <td>{convertToMins(key)}</td>
+        <td>{this.state.config.messages[key].message}</td>
+        <td>{this.state.config.messages[key].type}</td>
+        <td>{this.state.config.messages[key].id}</td>
+        <td onClick={this.removeMessage}>&times;</td>
+      </tr>
+    ));
+  }
 
-  _renderMessageTypes() {
-    return _.keys(MESSAGE_TYPES).map(key => {
-      return (
-        <option
-          key={key}
-          value={MESSAGE_TYPES[key]}>
-          {MESSAGE_TYPES[key]}
-        </option>
-      );
-    });
-  },
+  renderMessageTypes() {
+    return _.keys(this.MESSAGE_TYPES).map(key => (
+      <option
+        key={key}
+        value={this.MESSAGE_TYPES[key]}
+      >
+        {this.MESSAGE_TYPES[key]}
+      </option>
+    ));
+  }
 
-  _renderMessageForm() {
+  renderMessageForm() {
     return (
-      <form onSubmit={this._handleMessageSubmit}>
+      <form onSubmit={this.handleMessageSubmit}>
         <div>
           <label htmlFor="message">Message</label>
-          <input type="text"
+          <input
+            type="text"
             id="message"
             value={this.state.messageObject.message}
-            onChange={this._handleMessageChange} />
+            onChange={this.handleMessageChange}
+          />
           <h3>{this.state.messageError}</h3>
         </div>
 
@@ -254,76 +252,96 @@ const ConfigSetter = React.createClass({
           <select
             id="messageType"
             value={this.state.messageObject.type}
-            onChange={this._handleMessageTypeChange}>
-            {this._renderMessageTypes()}
+            onChange={this.handleMessageTypeChange}
+          >
+            {this.renderMessageTypes()}
           </select>
         </div>
 
         {
-          this.state.messageObject.type === MESSAGE_TYPES.system ? '' :
-          <div>
-            <label htmlFor="messageID">ID to show</label>
-            <input type="text"
-              id="messageID"
-              value={this.state.messageObject.id}
-              onChange={this._handleMessageIDChange} />
-            <h3>{this.state.messageIDError}</h3>
-          </div>
+          this.state.messageObject.type === MESSAGE_TYPES.system ? ''
+            : (
+              <div>
+                <label htmlFor="messageID">ID to show</label>
+                <input
+                  type="text"
+                  id="messageID"
+                  value={this.state.messageObject.id}
+                  onChange={this.handleMessageIDChange}
+                />
+                <h3>{this.state.messageIDError}</h3>
+              </div>
+            )
         }
 
 
         <div>
           <label htmlFor="messageTime">Minutes from start of study</label>
-          <input type="text"
+          <input
+            type="text"
             id="messageTime"
             value={this.state.messageTime}
-            onChange={this._handleMessageTimeChange} />
+            onChange={this.handleMessageTimeChange}
+          />
           <h3>{this.state.messageTimeError}</h3>
         </div>
 
-        <button name="submit">Create Message</button>
+        <button name="submit" type="submit">Create Message</button>
       </form>
     );
-  },
+  }
 
   render() {
     return (
       <div>
-        <h3> Set Messages for study {this.props.study}</h3>
+        <h3>
+          {' '}
+Set Messages for study
+          {' '}
+          {this.props.study}
+        </h3>
 
         <div>
-          {this._renderMessageTable()}
+          {this.renderMessageTable()}
 
-          <div className="spacer"></div>
+          <div className="spacer" />
 
-          {this._renderMessageForm()}
+          {this.renderMessageForm()}
         </div>
 
-        <h3>Change the settings for study {this.props.study}.</h3>
+        <h3>
+Change the settings for study
+          {' '}
+          {this.props.study}
+.
+        </h3>
 
-        {!this.state.loaded ? 'Loading...' :
-          <form onSubmit={this._handleConfigSubmit}>
+        {!this.state.loaded ? 'Loading...' : (
+          <form onSubmit={this.handleConfigSubmit}>
 
-            {this._formGeneralInput('usersPerRoom',
+            {this.formGeneralInput('usersPerRoom',
               'Users per chat room')}
-            {this._formGeneralInput('maxWaitingTime',
+            {this.formGeneralInput('maxWaitingTime',
               'Max waiting time (in minutes)',
               convertToMins, convertToMs)}
-            {this._formGeneralInput('roomOpenTime',
+            {this.formGeneralInput('roomOpenTime',
               'Time participants have to chat (in minutes)',
               convertToMins, convertToMs)}
-            {this._formGeneralInput('password',
+            {this.formGeneralInput('password',
               'Password to continue with study after chat')}
-            {this._formGeneralInput('altPassword',
+            {this.formGeneralInput('altPassword',
               'Password to continue if not placed in chat room')}
 
             <div>{this.state.saved && 'Saved!'}</div>
-            <button name="submit">Save</button>
+            <button name="submit" type="submit">Save</button>
           </form>
-        }
+        )}
       </div>
     );
-  },
-});
-
+  }
+}
+ConfigSetter.propTypes = {
+  firebase: PropTypes.object.isRequired,
+  study: PropTypes.string.isRequired,
+};
 export default ConfigSetter;
