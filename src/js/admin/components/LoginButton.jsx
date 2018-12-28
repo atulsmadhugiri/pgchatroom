@@ -15,7 +15,7 @@ class LoginButton extends React.Component {
   loginPopup() {
     this.props.fb.authWithOAuthPopup('google', (err, auth) => {
       if (err) {
-        AdminActions.setAuthError(`${err.toString()} | Send Sam your UID:
+        AdminActions.setAuthError(`${err.toString()} | Send Atul your UID:
           ${auth.uid} if you believe this is an error.`);
       } else {
         // We're listening to auth so the store will get the new value
