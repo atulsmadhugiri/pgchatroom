@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import AdminActions from '../actions/AdminActions';
@@ -8,24 +9,20 @@ const ERROR_MESSAGE = 'This study already exists.';
 /**
  * Presentational component that renders a form to create a study.
  */
-const CreateStudy = React.createClass({
-  propTypes: {
-    studies: React.PropTypes.array.isRequired,
-  },
-
+class CreateStudy extends React.Component {
   getInitialState() {
     return {
       study: '',
     };
-  },
+  }
 
-  _handleChange(e) {
+  handleChange(e) {
     this.setState({ study: e.target.value });
-  },
+  }
 
-  _handleSubmit(e) {
+  handleSubmit(e) {
     e.preventDefault();
-    if (this._isInvalid()) {
+    if (this.isInvalid()) {
       throw new Error('Tried to create an invalid study name');
     }
 
@@ -36,36 +33,42 @@ const CreateStudy = React.createClass({
 
     // Clear input
     this.setState({ study: '' });
-  },
+  }
 
-  _isInvalid() {
-    return !this.state.study || this.state.study.indexOf(' ') >= 0 ||
-      this._studyExists();
-  },
+  isInvalid() {
+    return !this.state.study || this.state.study.indexOf(' ') >= 0
+      || this.studyExists();
+  }
 
-  _studyExists() {
+  studyExists() {
     return _.contains(this.props.studies, this.state.study);
-  },
+  }
 
   render() {
     return (
-      <form onSubmit={this._handleSubmit}>
+      <form onSubmit={this.handleSubmit}>
         <div>
           <label htmlFor="createStudy">Create a new study</label>
-          <input ref="studyInput"
+          <input
+            ref="studyInput"
             type="text"
             id="createStudy"
             placeholder="Study name"
             value={this.state.study}
-            onChange={this._handleChange} />
+            onChange={this.handleChange}
+          />
         </div>
 
-        {this._studyExists() && <h3>{ERROR_MESSAGE}</h3>}
+        {this.studyExists() && <h3>{ERROR_MESSAGE}</h3>}
 
-        <button name="submit" disabled={this._isInvalid()}>Create</button>
+        <button name="submit" disabled={this.isInvalid()}>Create</button>
       </form>
     );
-  },
-});
+  }
+}
+
+CreateStudy.propTypes = {
+  studies: PropTypes.array.isRequired,
+};
 
 export default CreateStudy;
