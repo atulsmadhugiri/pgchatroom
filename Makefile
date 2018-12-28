@@ -36,7 +36,7 @@ deploy:
 	git push origin gh-pages
 
 test:
-	@echo "No tests :("
+	${KARMA} start
 
 test_once:
 	@echo "No tests :("
