@@ -28,7 +28,7 @@ function getStateFromStores() {
   };
 }
 
-const ChatApp = React.createClass({
+class ChatApp extends React.Component {
   getInitialState() {
     return {
       ...getStateFromStores(),
@@ -38,7 +38,7 @@ const ChatApp = React.createClass({
       message: '',
       error: null,
     };
-  },
+  }
 
   componentWillMount() {
     const stores = [
@@ -48,10 +48,10 @@ const ChatApp = React.createClass({
       WaitingRoomStore,
       RoomStore,
     ];
-    stores.forEach(store => store.listen(this._onChange));
+    stores.forEach(store => store.listen(this.onChange));
 
-    this._init();
-  },
+    this.init();
+  }
 
   componentDidUpdate() {
     if (this.state.messagingEnabled) {
@@ -59,18 +59,26 @@ const ChatApp = React.createClass({
       this.refs.messages.scrollTop = this.refs.messages.scrollHeight;
     }
 
-    if (this._shouldStartConfederate()) {
+    if (this.shouldStartConfederate()) {
       this.setTime();
       if (this.state.timeSet) {
         this.setConfederateInterval();
       }
     }
-  },
+  }
+
+  onChange() {
+    this.setState(getStateFromStores());
+  }
+
+  onInputChange(e) {
+    this.setState({ message: e.target.value });
+  }
 
   setTime() {
     const timeSinceStart = parseInt((Date.now() - this.state.roomTime) / 1000, 10) * 1000;
-    this.setState({ timeSinceStart: timeSinceStart, timeSet: true });
-  },
+    this.setState({ timeSinceStart, timeSet: true });
+  }
 
   setConfederateInterval() {
     this.setState({ startedConfederate: true });
@@ -99,40 +107,37 @@ const ChatApp = React.createClass({
       }
       this.setState({ timeSinceStart: timeSinceStart + 1000 });
     }, 1000);
-  },
+  }
 
-  _shouldStartConfederate() {
-    return this.state.roomTime &&
-      this.state.config &&
-      this.state.config.messages &&
-      !this.state.startedConfederate;
-  },
+  shouldStartConfederate() {
+    return this.state.roomTime
+      && this.state.config
+      && this.state.config.messages
+      && !this.state.startedConfederate;
+  }
 
-  _onChange() {
-    this.setState(getStateFromStores());
-  },
-
-  _onInputChange(e) {
-    this.setState({ message: e.target.value });
-  },
-
-  async _init() {
+  async init() {
     try {
       StudyActions.initStudy();
       await StudyActions.loadConfig(StudyStore.get('configFb'));
 
       UserActions.getInitialUserId();
       await UserActions.authUser(
-        UserStore.get('userId'), StudyStore.get('userAuthFb')
+        UserStore.get('userId'), StudyStore.get('userAuthFb'),
       );
-      UserActions.loadAndListen({ StudyStore, UserStore,
-        MessagesStore, WaitingRoomStore, RoomStore });
+      UserActions.loadAndListen({
+        StudyStore,
+        UserStore,
+        MessagesStore,
+        WaitingRoomStore,
+        RoomStore,
+      });
     } catch (error) {
       this.setState({ error });
     }
-  },
+  }
 
-  _sendMessage(e) {
+  sendMessage(e) {
     e.preventDefault();
     if (this.state.message === '') {
       return;
@@ -147,53 +152,65 @@ const ChatApp = React.createClass({
       generated: false,
     });
     this.setState({ message: '' });
-  },
+  }
 
   render() {
     // console.log(this.state);
     if (this.state.error) {
-      return <div>Error: {this.state.error.message}</div>;
+      return (
+        <div>
+Error:
+          {' '}
+          {this.state.error.message}
+        </div>
+      );
     }
 
     if (!this.state.userId || !this.state.study || !this.state.config) {
       return <div>Loading...</div>;
     }
 
-    const messages = this.state.messages.map((message, i) => {
-      return (
-        <Message userId={message.userId}
-          message={message.message}
-          key={i} />
-      );
-    });
+    const messages = this.state.messages.map((message, i) => (
+      <Message
+        userId={message.userId}
+        message={message.message}
+        key={i}
+      />
+    ));
 
     return (
       <div>
         <h1>Chat Room</h1>
 
         <div>
-          Your user ID is: {this.state.userId}
+          Your user ID is:
+          {' '}
+          {this.state.userId}
         </div>
 
-        <div className="spacer"></div>
+        <div className="spacer" />
 
-        <div className="messages"
-             ref="messages">
+        <div
+          className="messages"
+          ref="messages"
+        >
           {messages}
         </div>
 
-        <div className="spacer"></div>
+        <div className="spacer" />
 
-        <form onSubmit={this._sendMessage}>
-          <input type="text"
+        <form onSubmit={this.sendMessage}>
+          <input
+            type="text"
             placeholder="Type a message"
-            onChange={this._onInputChange}
+            onChange={this.onInputChange}
             value={this.state.message}
-            disabled={!this.state.messagingEnabled} />
+            disabled={!this.state.messagingEnabled}
+          />
         </form>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ChatApp;

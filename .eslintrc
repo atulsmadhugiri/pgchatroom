@@ -13,7 +13,12 @@
       "jsx-a11y/no-noninteractive-element-interactions": "off",
       "react/no-access-state-in-setstate": "off",
       "react/forbid-prop-types": "off",
-      "class-methods-use-this": "off"
+      "class-methods-use-this": "off",
+      "react/no-string-refs": "off",
+      "react/no-array-index-key": "off",
+      "react/no-unused-prop-types": "off",
+      "no-return-assign": "off",
+      "react/button-has-type": "off"
 
     }
 }
