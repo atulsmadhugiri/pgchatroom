@@ -81,7 +81,7 @@ class AdminApp extends React.Component {
     const { currState } = this.state;
     return (
       <div>
-        <h1>Chat Room Admin Panel</h1>
+        <h1>Chat Room Admin Panel (test?)</h1>
 
         <LoginButton
           fb={{ currState }.fb}
