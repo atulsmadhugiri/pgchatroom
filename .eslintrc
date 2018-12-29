@@ -18,7 +18,10 @@
       "react/no-array-index-key": "off",
       "react/no-unused-prop-types": "off",
       "no-return-assign": "off",
-      "react/button-has-type": "off"
-
+      "react/button-has-type": "off",
+      "react/prefer-stateless-function": "off",
+      "import/no-cycle": "off",
+      "global-require": "off",
+      "no-undef": "off"
     }
 }

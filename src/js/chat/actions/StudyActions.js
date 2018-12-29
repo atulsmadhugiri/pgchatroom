@@ -23,7 +23,7 @@ class StudyActions {
   loadConfig(configFb) {
     this.dispatch();
     return new Promise((resolve, reject) => {
-      configFb.once('value', snapshot => {
+      configFb.once('value', (snapshot) => {
         const config = snapshot.val();
         if (!config) { reject(new Error('Study not recognized.')); }
 

@@ -1,5 +1,5 @@
-import alt from '../alt';
 import Firebase from 'firebase';
+import alt from '../alt';
 
 class RoomActions {
   constructor() {

@@ -1,10 +1,10 @@
-import alt from '../alt';
 import Firebase from 'firebase';
+import alt from '../alt';
 
 import AdminActions from '../actions/AdminActions';
 import { ROOT_URL, CONSTANTS_URL } from '../../constants';
 
-const ROOT_FB = new Firebase(ROOT_URL);
+const ROOT_FB = Firebase.database().ref();
 
 class AdminStore {
   constructor() {

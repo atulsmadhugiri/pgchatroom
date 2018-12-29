@@ -1,5 +1,5 @@
-import alt from '../alt';
 import Firebase from 'firebase';
+import alt from '../alt';
 
 import StudyActions from '../actions/StudyActions';
 import { ROOT_URL, USER_AUTH_URL } from '../../constants';

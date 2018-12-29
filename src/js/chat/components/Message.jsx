@@ -1,11 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const Message = React.createClass({
-  propTypes: {
-    userId: React.PropTypes.string.isRequired,
-    message: React.PropTypes.string.isRequired,
-  },
-
+class Message extends React.Component {
   render() {
     return (
       <div className="row">
@@ -13,7 +9,12 @@ const Message = React.createClass({
         <div className="message">{this.props.message}</div>
       </div>
     );
-  },
-});
+  }
+}
+
+Message.propTypes = {
+  userId: PropTypes.string.isRequired,
+  message: PropTypes.string.isRequired,
+};
 
 export default Message;

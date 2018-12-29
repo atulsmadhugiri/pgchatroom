@@ -1,0 +1,74 @@
+{
+  "rules": {
+    "admins": {
+      // Admins only
+      ".read": "auth !== null && root.child('admins/' + auth.uid).exists()",
+      ".write": "auth !== null && root.child('admins/' + auth.uid).exists()"
+    },
+
+    "constants": {
+      ".read": true,
+      ".write": "auth !== null && root.child('admins/' + auth.uid).exists()"
+    },
+
+    "studies": {
+      // Admins only
+      ".read": "auth !== null && root.child('admins/' + auth.uid).exists()",
+      ".write": "auth !== null && root.child('admins/' + auth.uid).exists()"
+    },
+
+    // This data maps UIDs from Firebase auth to user IDs in Qualtrics. This is
+    // used to make sure each user only gets access to the data they need and
+    // no more.
+    //
+    // Use the Qualtrics ID in rules with:
+    // auth !== null && root.child('user_auth/' + auth.uid).val() === somestuff
+    "user_auth": {
+      // This is append-only by public users
+      "$uid": {
+        ".read": "!data.exists()",
+        ".write": "!data.exists()"
+      }
+    },
+
+    "$study": {
+      // Only admins that have access should be able to read study's data
+      ".read": "auth !== null &&
+        root.hasChild('admins/' + auth.uid + '/' + $study)",
+
+      "$roomType": {
+        // The user needs to be able to read other user states and move people
+        // into rooms.
+        "users": {
+          ".read": "auth !== null",
+          ".write": "auth !== null"
+        },
+
+        "rooms": {
+          "$roomId": {
+            // A user that belongs to this room should be able to read/write
+            // this room's stuff. We check if the user state in $roomType/users
+            // matches the $roomId.
+            ".read": "auth !== null &&
+              root.child($study + '/' + $roomType + '/users').child(
+                root.child('user_auth/' + auth.uid).val()
+              ).val() === $roomId",
+            // Allow room creation by allowing write if !data.exists()
+            ".write": "auth !== null && !data.exists() ||
+              root.child($study + '/' + $roomType + '/users').child(
+                root.child('user_auth/' + auth.uid).val()
+              ).val() === $roomId",
+
+            "createdAt": {},
+            "messages": {
+              "$messageId": {}
+            },
+            "users": {
+              "$userId": {}
+            }
+          }
+        }
+      }
+    }
+  }
+}

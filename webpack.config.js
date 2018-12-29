@@ -3,7 +3,7 @@ var webpack = require("webpack");
 module.exports = {
     entry: {
         chat: ["./src/js/chat.jsx"],
-        json_to_csv: ["./src/js/x"],
+        json_to_csv: ["./src/js/json_to_csv.jsx"],
         admin: ["./src/js/admin.jsx"],
     },
     resolve: {
@@ -38,7 +38,7 @@ module.exports = {
             },
             {
                 test: /\.s?css$/, 
-                loader: "style!css!sass"
+                loader: "style-loader!css-loader!sass-loader"
             },
             {
                 test: /\.jsx?$/,
@@ -58,6 +58,9 @@ module.exports = {
       new webpack.NoEmitOnErrorsPlugin(),
 
     ],
+    node: {
+        fs: 'empty',
+      }
     // eslint: {
     //     configFile: ".eslintrc"
     // }

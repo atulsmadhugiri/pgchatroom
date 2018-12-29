@@ -7,7 +7,7 @@ export function assert(condition, message = 'Assertion failed.') {
 }
 
 export function getAttributeFromUrlParams(regex) {
-  const params = regex.exec(location.search);
+  const params = regex.exec(this.location.search);
   return params && params[1];
 }
 
