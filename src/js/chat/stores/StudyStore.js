@@ -1,4 +1,4 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 import alt from '../alt';
 
 import StudyActions from '../actions/StudyActions';
@@ -23,9 +23,9 @@ class StudyStore {
     this.study = study;
     this.room = room;
 
-    this.baseFb = new Firebase(`${ROOT_URL}/${this.study}/${this.room}`);
-    this.configFb = new Firebase(`${ROOT_URL}/constants/${this.study}`);
-    this.userAuthFb = new Firebase(USER_AUTH_URL);
+    this.baseFb = new firebase(`${ROOT_URL}/${this.study}/${this.room}`);
+    this.configFb = new firebase(`${ROOT_URL}/constants/${this.study}`);
+    this.userAuthFb = new firebase(USER_AUTH_URL);
     this.usersFb = this.baseFb.child('users');
     this.roomsFb = this.baseFb.child('rooms');
   }

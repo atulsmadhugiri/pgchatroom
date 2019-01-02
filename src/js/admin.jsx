@@ -51,13 +51,11 @@ class AdminApp extends React.Component {
   }
 
   toggleJsonState() {
-    const { currState } = this.state;
-    AdminActions.selectJsonToCsv(!{ currState }.jsonToCsvSelected);
+    AdminActions.selectJsonToCsv(!this.state.jsonToCsvSelected);
   }
 
   renderStudySettings() {
-    const { currState } = this.state;
-    if (!{ currState }.selectedStudy) {
+    if (!this.state.selectedStudy) {
       return 'No Study Selected';
     }
 
@@ -65,34 +63,32 @@ class AdminApp extends React.Component {
       <div>
         <hr />
         <RoomsList
-          roomsUrl={{ currState }.roomsUrl}
-          study={{ currState }.selectedStudy}
+          roomsUrl={this.state.roomsUrl}
+          study={this.state.selectedStudy}
         />
-        <RoomGenerator selectedStudy={{ currState }.selectedStudy} />
+        <RoomGenerator selectedStudy={this.state.selectedStudy} />
         <ConfigSetter
-          firebase={{ currState }.constantsFb}
-          study={{ currState }.selectedStudy}
+          firebase={this.state.constantsFb}
+          study={this.state.selectedStudy}
         />
       </div>
     );
   }
 
   render() {
-    const { currState } = this.state;
     return (
       <div>
         <h1>Chat Room Admin Panel (test?)</h1>
 
         <LoginButton
-          fb={{ currState }.fb}
-          auth={{ currState }.auth}
-          authError={{ currState }.authError}
+          fb={this.state.fb}
+          auth={this.state.auth}
+          authError={this.state.authError}
         />
 
-        {{ currState }.auth && { currState }.jsonToCsvSelected
+        {this.state.auth && this.state.jsonToCsvSelected
         && (
         <div>
-          // onKeyPress is solely to bypass the linter for now
           <div className="button" onClick={this.toggleJsonState}>
             Access admin panel
           </div>
@@ -100,14 +96,14 @@ class AdminApp extends React.Component {
         </div>
         )}
 
-        {{ currState }.auth && !{ currState }.jsonToCsvSelected
+        {this.state.auth && !this.state.jsonToCsvSelected
         && (
         <div>
           <div className="button" onClick={this.toggleJsonState}>
             Access chat data
           </div>
 
-          <StudyList studies={{ currState }.studies} />
+          <StudyList studies={this.state.studies} />
 
           <Spacer />
 
@@ -124,7 +120,7 @@ class AdminApp extends React.Component {
 $(() => {
   ReactDOM.render(
     <AdminApp />,
-    this.document.getElementById('admin-app'),
+    document.getElementById('admin-app'),
   );
 });
 

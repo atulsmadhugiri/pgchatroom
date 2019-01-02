@@ -1,4 +1,4 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 import alt from '../alt';
 
 class RoomActions {
@@ -11,7 +11,7 @@ class RoomActions {
 
     // TODO(sam): Read createdAt and use that to determine the time left
     // instead of just waiting the roomOpenTime.
-    const createdAt = Firebase.ServerValue.TIMESTAMP;
+    const createdAt = firebase.ServerValue.TIMESTAMP;
     roomFb.set({ createdAt });
 
     this.dispatch(roomFb);

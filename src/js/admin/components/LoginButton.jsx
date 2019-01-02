@@ -13,13 +13,20 @@ class LoginButton extends React.Component {
   }
 
   loginPopup() {
-    this.props.fb.authWithOAuthPopup('google', (err, auth) => {
-      if (err) {
-        AdminActions.setAuthError(`${err.toString()} | Send Atul your UID:
-          ${auth.uid} if you believe this is an error.`);
-      } else {
-        // We're listening to auth so the store will get the new value
-      }
+    // this.props.fb.authWithOAuthPopup('google', (err, auth) => {
+    //   if (err) {
+    //     AdminActions.setAuthError(`${err.toString()} | Send Atul your UID:
+    //       ${auth.uid} if you believe this is an error.`);
+    //   } else {
+    //     // We're listening to auth so the store will get the new value
+    //   }
+    // });
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider).then(function (result) {
+      var user = result.user;
+      console.log(user);
+    }).catch(function (error) {
+      AdminActions.setAuthError(`${err.toString()} | Send Atul your UID: ${auth.uid} if you believe this is an error.`);
     });
   }
 
@@ -38,7 +45,7 @@ class LoginButton extends React.Component {
           )
           : (
             <div className="button" onClick={this.loginPopup}>
-            Log in through Google.
+            Log in through Google. Hi
             </div>
           )
         }
@@ -50,9 +57,10 @@ class LoginButton extends React.Component {
 }
 
 LoginButton.propTypes = {
-  fb: PropTypes.object.isRequired,
+  fb: PropTypes.object,
   auth: PropTypes.object.isRequired,
   authError: PropTypes.string.isRequired,
 };
+
 
 export default LoginButton;

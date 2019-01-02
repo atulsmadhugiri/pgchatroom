@@ -1,10 +1,20 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 
 import alt from '../alt';
-// import { ROOT_URL, AUTH_DOMAIN, API_KEY } from '../../constants';
+import { API_KEY, AUTH_DOMAIN, ROOT_URL } from '../../constants';
 
-const ROOT_FB = Firebase.database().ref();
-const STUDIES_FB = Firebase.database().ref('/studies');
+const config = {
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: ROOT_URL,
+};
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(config);
+}
+
+const ROOT_FB = firebase.database().ref();
+const STUDIES_FB = firebase.database().ref('/studies');
 
 class AdminActions {
   constructor() {

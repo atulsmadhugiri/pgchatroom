@@ -1,4 +1,4 @@
-import Firebase from 'firebase';
+import firebase from 'firebase';
 import { createAction } from 'redux-actions';
 
 import {
@@ -10,9 +10,9 @@ const config = {
   authDomain: AUTH_DOMAIN,
   databaseURL: ROOT_URL,
 };
-Firebase.initializeApp(config);
-const ROOT_FB = Firebase.database().ref();
-const STUDIES_FB = Firebase.database().ref('/studies');
+firebase.initializeApp(config);
+const ROOT_FB = firebase.database().ref();
+const STUDIES_FB = firebase.database().ref('/studies');
 
 export const setStudyList = createAction('SET_STUDY_LIST');
 export const setStudy = createAction('SET_STUDY');

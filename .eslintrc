@@ -22,6 +22,11 @@
       "react/prefer-stateless-function": "off",
       "import/no-cycle": "off",
       "global-require": "off",
-      "no-undef": "off"
+      "no-undef": "off",
+      "func-names": "off",
+      "prefer-arrow-callback": "off",
+      "no-var": "off",
+      "new-cap": "off",
+      "react/require-default-props": "off"
     }
 }

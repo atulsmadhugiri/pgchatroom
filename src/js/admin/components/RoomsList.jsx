@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
-import Firebase from 'firebase';
+import firebase from 'firebase';
 // import $ from 'jquery';
 import { ROOT_URL } from '../../constants';
 
@@ -44,7 +44,7 @@ class RoomsList extends React.Component {
     const confirmDelete = this.window.confirm(deleteMessage('room'));
     const room = e.target.parentElement.id;
     if (confirmDelete) {
-      const roomFb = new Firebase(`${ROOT_URL}/${this.props.study}/${room}`);
+      const roomFb = new firebase(`${ROOT_URL}/${this.props.study}/${room}`);
       roomFb.remove(() => {
         const rooms = this.state.rooms;
         delete rooms[room];
