@@ -61,8 +61,7 @@ const CreateStudy = React.createClass({
         </div>
 
         {this._studyExists() && <h3>{ERROR_MESSAGE}</h3>}
-
-        <button name="submit" disabled={this._isInvalid()}>Create</button>
+        <button className="button" name="submit" disabled={this._isInvalid()}>Create</button>
       </form>
     );
   },

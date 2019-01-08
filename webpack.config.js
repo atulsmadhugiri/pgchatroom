@@ -33,5 +33,8 @@ module.exports = {
     ],
     eslint: {
         configFile: ".eslintrc"
+    },
+    node: {
+        fs: 'empty'
     }
 };

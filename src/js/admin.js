@@ -74,7 +74,7 @@ const AdminApp = React.createClass({
   render() {
     return (
       <div>
-        <h1>Chat Room Admin Panel</h1>
+        <h1>pg-chat-room admin</h1>
 
         <LoginButton
           fb={this.state.fb}
@@ -93,7 +93,6 @@ const AdminApp = React.createClass({
           <div className="button" onClick={this._toggleJsonState}>
             Access chat data
           </div>
-
           <StudyList studies={this.state.studies} />
 
           <Spacer />

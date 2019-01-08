@@ -2,12 +2,12 @@ import alt from '../alt';
 import Firebase from 'firebase';
 
 import StudyActions from '../actions/StudyActions';
-import { ROOT_URL, USER_AUTH_URL } from '../../constants';
+// import { ROOT_URL, USER_AUTH_URL } from '../../constants';
+import { ROOT_URL, API_KEY, AUTH_DOMAIN } from '../../constants';
 
 class StudyStore {
   constructor() {
     this.bindActions(StudyActions);
-
     this.study = null;
     this.room = null;
     this.config = null;
@@ -22,10 +22,19 @@ class StudyStore {
   initStudy({ study, room }) {
     this.study = study;
     this.room = room;
-
-    this.baseFb = new Firebase(`${ROOT_URL}/${this.study}/${this.room}`);
-    this.configFb = new Firebase(`${ROOT_URL}/constants/${this.study}`);
-    this.userAuthFb = new Firebase(USER_AUTH_URL);
+    const fbinit = {
+      apiKey: API_KEY,
+      authDomain: AUTH_DOMAIN,
+      databaseURL: ROOT_URL,
+    };
+    Firebase.initializeApp(fbinit);
+    this.baseFb = Firebase.database().ref(ROOT_URL + '/' + this.study + '/' + this.room);
+    // this.baseFb = new Firebase(`${ROOT_URL}/${this.study}/${this.room}`);
+    // this.configFb = new Firebase(`${ROOT_URL}/constants/${this.study}`);
+    this.configFb = Firebase.database().ref(ROOT_URL + '/constants/' + this.study);
+    // FIXME - authURL correct?
+    // this.userAuthFb = new Firebase(USER_AUTH_URL);
+    this.userAuthFb = Firebase.database.ref('user_auth');
     this.usersFb = this.baseFb.child('users');
     this.roomsFb = this.baseFb.child('rooms');
   }

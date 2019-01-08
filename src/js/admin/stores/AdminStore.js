@@ -2,9 +2,9 @@ import alt from '../alt';
 import Firebase from 'firebase';
 
 import AdminActions from '../actions/AdminActions';
-import { ROOT_URL, CONSTANTS_URL } from '../../constants';
+// import { ROOT_URL, CONSTANTS_URL } from '../../constants';
 
-const ROOT_FB = new Firebase(ROOT_URL);
+const ROOT_FB = Firebase.database().ref();
 
 class AdminStore {
   constructor() {
@@ -39,11 +39,14 @@ class AdminStore {
 
   setSelectedStudy(study) {
     this.selectedStudy = study;
-    this.constantsFb = new Firebase(`${CONSTANTS_URL}/${study}`);
 
+    this.constantsFb = Firebase.database().ref('constants/' + study);
+    console.log(this.constantsFb);
     // This is probably wrong tbh
     // this.roomsUrl = `${ROOT_URL}/${study}.json?shallow=true`;
-    this.roomsUrl = new Firebase(`${ROOT_URL}/${study}`);
+    // this.roomsUrl = new Firebase(`${ROOT_URL}/${study}`);
+    this.roomsUrl = Firebase.database().ref(study);
+    console.log(this.roomsUrl);
   }
 
   static get(attr) {

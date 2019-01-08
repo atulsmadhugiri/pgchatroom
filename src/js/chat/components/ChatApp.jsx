@@ -14,6 +14,8 @@ import WaitingRoomStore from '../stores/WaitingRoomStore';
 import { MESSAGE_TYPES } from '../../constants';
 
 function getStateFromStores() {
+  console.log('getting state from store');
+  console.log(StudyStore.get('config'));
   return {
     config: StudyStore.get('config'),
     userId: UserStore.get('userId'),
@@ -150,7 +152,6 @@ const ChatApp = React.createClass({
   },
 
   render() {
-    // console.log(this.state);
     if (this.state.error) {
       return <div>Error: {this.state.error.message}</div>;
     }

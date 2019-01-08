@@ -1,4 +1,5 @@
 import React from 'react';
+import Firebase from 'firebase';
 
 import AdminActions from '../actions/AdminActions';
 
@@ -18,13 +19,15 @@ const LoginButton = React.createClass({
   },
 
   _loginPopup() {
-    this.props.fb.authWithOAuthPopup('google', (err, auth) => {
-      if (err) {
-        AdminActions.setAuthError(`${err.toString()} | Send Sam your UID:
-          ${auth.uid} if you believe this is an error.`);
-      } else {
-        // We're listening to auth so the store will get the new value
-      }
+    const provider = new Firebase.auth.GoogleAuthProvider();
+    provider.addScope('profile');
+    provider.addScope('email');
+    provider.addScope('openid');
+    Firebase.auth().signInWithPopup(provider).then(function(auth) {
+      console.log(auth);
+      AdminActions.listenForAuth();
+    }).catch(function(error) {
+      AdminActions.setAuthError(`${error.toString()} | Send Atul your UID: if you believe this is an error.`);
     });
   },
 
@@ -35,7 +38,7 @@ const LoginButton = React.createClass({
   render() {
     return (<div>
       {this.props.auth ?
-        <div className="button" onClick={this._logout}>
+        <div className="logoutbutton" onClick={this._logout}>
           Log out
         </div>
         :

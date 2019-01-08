@@ -72,16 +72,26 @@ class UserActions {
   }
 
   authUser(userId, userAuthFb) {
+    console.log('auth attempt');
     this.dispatch();
 
+    // return new Promise((resolve, reject) => {
+    //   userAuthFb.authAnonymously((err, auth) => {
+    //     if (err) {
+    //       console.log('hello world');
+    //       throw Error(`Login failed: ${err.toString()}`);
+    //     } else {
+    //       userAuthFb.child(auth.uid).set(userId);
+    //       resolve(auth);
+    //     }
+    //   });
+    // });
+
     return new Promise((resolve, reject) => {
-      userAuthFb.authAnonymously((err, auth) => {
-        if (err) {
-          throw Error(`Login failed: ${err.toString()}`);
-        } else {
-          userAuthFb.child(auth.uid).set(userId);
-          resolve(auth);
-        }
+      firebase.auth().signInAnonymouslyAndRetrieveData().then(function(result) {
+        userAuthFb.child(result.uid).set(userId);
+      }).catch(function(error) {
+        throw Error('Login failed:' + err.toString());
       });
     });
   }

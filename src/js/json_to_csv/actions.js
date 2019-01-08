@@ -1,10 +1,16 @@
 import Firebase from 'firebase';
 import { createAction } from 'redux-actions';
 
-import { ROOT_URL, STUDIES_URL } from '../constants';
+import { ROOT_URL, AUTH_DOMAIN, API_KEY } from '../constants';
 
-const ROOT_FB = new Firebase(ROOT_URL);
-const STUDIES_FB = new Firebase(STUDIES_URL);
+const config = {
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  databaseURL: ROOT_URL,
+};
+Firebase.initializeApp(config);
+const ROOT_FB = Firebase.database().ref();
+const STUDIES_FB = Firebase.database().ref('/studies');
 
 export const setStudyList = createAction('SET_STUDY_LIST');
 export const setStudy = createAction('SET_STUDY');
