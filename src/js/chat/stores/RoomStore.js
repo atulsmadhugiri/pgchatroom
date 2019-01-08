@@ -21,7 +21,7 @@ class RoomStore {
     this.roomFb = roomFb;
     this.roomId = roomFb.key();
 
-    this.roomFb.on('value', (snapshot) => {
+    this.roomFb.on('value', snapshot => {
       this.roomTime = snapshot.val().createdAt;
       this.getInstance().emitChange();
     });

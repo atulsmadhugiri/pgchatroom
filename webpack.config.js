@@ -2,12 +2,12 @@ var webpack = require("webpack");
 
 module.exports = {
     entry: {
-        chat: ["./src/js/chat.jsx"],
-        json_to_csv: ["./src/js/json_to_csv.jsx"],
-        admin: ["./src/js/admin.jsx"],
+        chat: ["./src/js/chat.js"],
+        json_to_csv: ["./src/js/json_to_csv.js"],
+        admin: ["./src/js/admin.js"],
     },
     resolve: {
-        extensions: ["*", ".webpack.js", ".web.js", ".js", ".jsx"]
+        extensions: ["", ".webpack.js", ".web.js", ".js", ".jsx"]
     },
     output: {
         path: __dirname + "/build",
@@ -18,50 +18,20 @@ module.exports = {
         ignored: /node_modules/,
     },
     module: {
-        rules: [
-            {
-                enforce: 'pre',
-                test: /\.jsx?$/,
-                loader: 'eslint-loader',
-                exclude: /node_modules/,
-                options: {
-                    configFile: ".eslintrc"
-                }
-            },
-            {
-                test: require.resolve("react"),
-                loader: "expose-loader?React"
-            },
-            {
-                test: require.resolve("firebase"),
-                loader: "expose-loader?Firebase"
-            },
-            {
-                test: /\.s?css$/, 
-                loader: "style-loader!css-loader!sass-loader"
-            },
-            {
-                test: /\.jsx?$/,
-                loaders: ["react-hot-loader/webpack", "babel-loader"],
-                exclude: /node_modules/
-            }
+        preLoaders: [
+            { test: /\.jsx?$/, loader: "eslint", exclude: /node_modules/ }
         ],
-
-        // loaders: [
-        //     { test: require.resolve("react"), loader: "expose?React" },
-        //     { test: require.resolve("firebase"), loader: "expose?Firebase" },
-        //     { test: /\.s?css$/, loader: "style!css!sass" },
-        //     { test: /\.jsx?$/, loaders: ["react-hot", "babel?optional=runtime"], exclude: /node_modules/ }
-        // ]
+        loaders: [
+            { test: require.resolve("react"), loader: "expose?React" },
+            { test: require.resolve("firebase"), loader: "expose?Firebase" },
+            { test: /\.s?css$/, loader: "style!css!sass" },
+            { test: /\.jsx?$/, loaders: ["react-hot", "babel?optional=runtime"], exclude: /node_modules/ }
+        ]
     },
     plugins: [
-      new webpack.NoEmitOnErrorsPlugin(),
-
+      new webpack.NoErrorsPlugin(),
     ],
-    node: {
-        fs: 'empty',
-      }
-    // eslint: {
-    //     configFile: ".eslintrc"
-    // }
+    eslint: {
+        configFile: ".eslintrc"
+    }
 };

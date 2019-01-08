@@ -1,29 +1,28 @@
-/* eslint-disable class-methods-use-this */
 import alt from '../alt';
 
 import { convertToMins, findLowestUserId } from '../util';
 import { MESSAGE_TYPES } from '../../constants';
 
 function waitingMessage(maxWaitingTime) {
-  return 'Please wait while we match you to a room. If we are '
-    + `not able to match you in ${convertToMins(maxWaitingTime)} minutes you `
-    + 'will be able to move on to the next part of the survey.';
+  return `Please wait while we match you to a room. If we are ` +
+    `not able to match you in ${convertToMins(maxWaitingTime)} minutes you ` +
+    `will be able to move on to the next part of the survey.`;
 }
 
 function startMessage(usersPerRoom, roomOpenTime) {
-  return `You have been matched to ${usersPerRoom - 1} other participants. `
-    + `You have ${convertToMins(roomOpenTime)} minutes to chat.`;
+  return `You have been matched to ${usersPerRoom - 1} other participants. ` +
+    `You have ${convertToMins(roomOpenTime)} minutes to chat.`;
 }
 
 function finishMessage(password) {
-  return 'Your chat time is over. Please proceed to the next section of '
-   + `the survey using the password "${password}" (without quotes).`;
+  return `Your chat time is over. Please proceed to the next section of ` +
+   `the survey using the password "${password}" (without quotes).`;
 }
 
 function earlyFinishMessage(altPassword) {
-  return 'We were not able to match you with other participants in time. '
-    + 'Please proceed to the next section of the survey using the password '
-    + `"${altPassword}" (without quotes)`;
+  return `We were not able to match you with other participants in time. ` +
+    `Please proceed to the next section of the survey using the password ` +
+    `"${altPassword}" (without quotes)`;
 }
 
 class MessagesActions {
@@ -35,7 +34,7 @@ class MessagesActions {
     this.dispatch();
     const messagingFb = MessagesStore.get('messagingFb');
 
-    messagingFb.on('child_added', (snapshot) => {
+    messagingFb.on('child_added', snapshot => {
       const message = snapshot.val();
       this.actions.receiveMessage(message);
     });
@@ -45,9 +44,7 @@ class MessagesActions {
     this.dispatch();
   }
 
-  waitingMessage({
-    MessagesStore, UserStore, RoomStore, StudyStore,
-  }) {
+  waitingMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const maxWaitingTime = StudyStore.get('config').maxWaitingTime;
     this.actions.systemMessage({
       MessagesStore,
@@ -58,9 +55,7 @@ class MessagesActions {
     });
   }
 
-  systemMessage({
-    MessagesStore, UserStore, RoomStore, message, pushToFb,
-  }) {
+  systemMessage({ MessagesStore, UserStore, RoomStore, message, pushToFb }) {
     const lowestId = findLowestUserId(RoomStore.get('userIds'));
     const userId = parseInt(UserStore.get('userId'), 10);
 
@@ -74,9 +69,7 @@ class MessagesActions {
     }
   }
 
-  sendMessage({
-    MessagesStore, UserStore, RoomStore, userId, message, generated,
-  }) {
+  sendMessage({ MessagesStore, UserStore, RoomStore, userId, message, generated }) {
     const lowestId = findLowestUserId(RoomStore.get('userIds'));
     const chatUserId = parseInt(UserStore.get('userId'), 10);
 
@@ -87,9 +80,7 @@ class MessagesActions {
     }
   }
 
-  startMessage({
-    MessagesStore, UserStore, RoomStore, StudyStore,
-  }) {
+  startMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const { usersPerRoom, roomOpenTime } = StudyStore.get('config');
 
     this.actions.systemMessage({
@@ -103,9 +94,7 @@ class MessagesActions {
     this.actions.enableMessaging(MessagesStore);
   }
 
-  finishMessage({
-    MessagesStore, UserStore, RoomStore, StudyStore,
-  }) {
+  finishMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const baseFb = StudyStore.get('baseFb');
     const password = StudyStore.get('config').password;
 
@@ -120,9 +109,7 @@ class MessagesActions {
     this.actions.disableMessaging(baseFb);
   }
 
-  earlyFinishMessage({
-    MessagesStore, UserStore, RoomStore, StudyStore,
-  }) {
+  earlyFinishMessage({ MessagesStore, UserStore, RoomStore, StudyStore }) {
     const baseFb = StudyStore.get('baseFb');
     const altPassword = StudyStore.get('config').altPassword;
 

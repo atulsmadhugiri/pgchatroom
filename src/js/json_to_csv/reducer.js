@@ -51,11 +51,13 @@ const jsonCsvApp = handleActions({
 
   SET_STUDY: (state, action) => ({ ...state, study: action.payload }),
 
-  SET_DISPLAY_OPTION: (state, action) => ({ ...state, displayOption: action.payload }),
+  SET_DISPLAY_OPTION: (state, action) =>
+    ({ ...state, displayOption: action.payload }),
 
   START_DATA_FETCH: (state, action) => ({ ...state, fetchingData: true }),
 
-  SET_DATA: (state, action) => ({ ...state, fetchingData: false, data: action.payload }),
+  SET_DATA: (state, action) =>
+    ({ ...state, fetchingData: false, data: action.payload }),
 
   FAILED_DATA_FETCH: (state, action) => ({
     ...state,

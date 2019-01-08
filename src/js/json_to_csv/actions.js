@@ -1,18 +1,10 @@
-import firebase from 'firebase';
+import Firebase from 'firebase';
 import { createAction } from 'redux-actions';
 
-import {
-  ROOT_URL, AUTH_DOMAIN, API_KEY,
-} from '../constants';
+import { ROOT_URL, STUDIES_URL } from '../constants';
 
-const config = {
-  apiKey: API_KEY,
-  authDomain: AUTH_DOMAIN,
-  databaseURL: ROOT_URL,
-};
-firebase.initializeApp(config);
-const ROOT_FB = firebase.database().ref();
-const STUDIES_FB = firebase.database().ref('/studies');
+const ROOT_FB = new Firebase(ROOT_URL);
+const STUDIES_FB = new Firebase(STUDIES_URL);
 
 export const setStudyList = createAction('SET_STUDY_LIST');
 export const setStudy = createAction('SET_STUDY');
@@ -22,8 +14,10 @@ export const setData = createAction('SET_DATA');
 export const failedDataFetch = createAction('FAILED_DATA_FETCH');
 
 export function fetchStudyList() {
-  return dispatch => STUDIES_FB.once('value')
-    .then(response => dispatch(setStudyList(response.val())));
+  return (dispatch) => {
+    return STUDIES_FB.once('value')
+      .then(response => dispatch(setStudyList(response.val())));
+  };
 }
 
 export function setStudyAndStartFetch(study) {

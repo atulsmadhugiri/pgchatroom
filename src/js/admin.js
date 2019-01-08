@@ -37,48 +37,44 @@ function getStateFromStores() {
 /**
  * Stateful wrapper component for the admin page.
  */
-class AdminApp extends React.Component {
+const AdminApp = React.createClass({
   getInitialState() {
     return getStateFromStores();
-  }
+  },
 
   componentWillMount() {
-    AdminStore.listen(this.onChange);
-  }
+    AdminStore.listen(this._onChange);
+  },
 
-  onChange() {
+  _onChange() {
     this.setState(getStateFromStores());
-  }
+  },
 
-  toggleJsonState() {
+  _toggleJsonState() {
     AdminActions.selectJsonToCsv(!this.state.jsonToCsvSelected);
-  }
+  },
 
-  renderStudySettings() {
+  _renderStudySettings() {
     if (!this.state.selectedStudy) {
       return 'No Study Selected';
     }
 
-    return (
-      <div>
-        <hr />
-        <RoomsList
-          roomsUrl={this.state.roomsUrl}
-          study={this.state.selectedStudy}
-        />
-        <RoomGenerator selectedStudy={this.state.selectedStudy} />
-        <ConfigSetter
-          firebase={this.state.constantsFb}
-          study={this.state.selectedStudy}
-        />
-      </div>
-    );
-  }
+    return (<div>
+      <hr />
+      <RoomsList
+        roomsUrl={this.state.roomsUrl}
+        study={this.state.selectedStudy}
+      />
+      <RoomGenerator selectedStudy={this.state.selectedStudy} />
+      <ConfigSetter firebase={this.state.constantsFb}
+        study={this.state.selectedStudy} />
+    </div>);
+  },
 
   render() {
     return (
       <div>
-        <h1>Chat Room Admin Panel (test?)</h1>
+        <h1>Chat Room Admin Panel</h1>
 
         <LoginButton
           fb={this.state.fb}
@@ -86,20 +82,15 @@ class AdminApp extends React.Component {
           authError={this.state.authError}
         />
 
-        {this.state.auth && this.state.jsonToCsvSelected
-        && (
-        <div>
-          <div className="button" onClick={this.toggleJsonState}>
+        {this.state.auth && this.state.jsonToCsvSelected && <div>
+          <div className="button" onClick={this._toggleJsonState}>
             Access admin panel
           </div>
           <JSONToCSVApp />
-        </div>
-        )}
+        </div>}
 
-        {this.state.auth && !this.state.jsonToCsvSelected
-        && (
-        <div>
-          <div className="button" onClick={this.toggleJsonState}>
+        {this.state.auth && !this.state.jsonToCsvSelected && <div>
+          <div className="button" onClick={this._toggleJsonState}>
             Access chat data
           </div>
 
@@ -107,20 +98,19 @@ class AdminApp extends React.Component {
 
           <Spacer />
 
-          {this.renderStudySettings()}
-        </div>
-        )}
+          {this._renderStudySettings()}
+        </div>}
 
         <Spacer />
       </div>
     );
-  }
-}
+  },
+});
 
 $(() => {
   ReactDOM.render(
     <AdminApp />,
-    document.getElementById('admin-app'),
+    document.getElementById('admin-app')
   );
 });
 

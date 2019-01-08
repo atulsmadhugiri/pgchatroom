@@ -1,20 +1,10 @@
-import firebase from 'firebase';
-
 import alt from '../alt';
-import { API_KEY, AUTH_DOMAIN, ROOT_URL } from '../../constants';
+import Firebase from 'firebase';
 
-const config = {
-  apiKey: API_KEY,
-  authDomain: AUTH_DOMAIN,
-  databaseURL: ROOT_URL,
-};
+import { ROOT_URL, STUDIES_URL } from '../../constants';
 
-if (!firebase.apps.length) {
-  firebase.initializeApp(config);
-}
-
-const ROOT_FB = firebase.database().ref();
-const STUDIES_FB = firebase.database().ref('/studies');
+const ROOT_FB = new Firebase(ROOT_URL);
+const STUDIES_FB = new Firebase(STUDIES_URL);
 
 class AdminActions {
   constructor() {
@@ -26,9 +16,11 @@ class AdminActions {
   // This only allows admins to auth through
   listenForAuth() {
     ROOT_FB.onAuth((auth) => {
-      ROOT_FB.child('admins').once('value', () => this.dispatch(auth),
-        err => this.actions.setAuthError(`${err.toString()} | Send Sam
-          your UID: ${auth.uid} if you believe this is an error.`));
+      ROOT_FB.child('admins').once('value',
+        () => this.dispatch(auth),
+        (err) => this.actions.setAuthError(`${err.toString()} | Send Sam
+          your UID: ${auth.uid} if you believe this is an error.`),
+      );
     });
   }
 
@@ -37,22 +29,22 @@ class AdminActions {
   }
 
   logout() {
-    this.ROOT_FB.unauth();
+    ROOT_FB.unauth();
   }
 
   listenForStudies() {
-    STUDIES_FB.on('value', (snapshot) => {
+    STUDIES_FB.on('value', snapshot => {
       const studies = snapshot.val() || [];
       this.dispatch(studies);
     });
   }
 
   unlistenForStudies() {
-    this.STUDIES_FB.off();
+    STUDIES_FB.off();
   }
 
   setStudies(studies) {
-    this.STUDIES_FB.set(studies);
+    STUDIES_FB.set(studies);
   }
 }
 

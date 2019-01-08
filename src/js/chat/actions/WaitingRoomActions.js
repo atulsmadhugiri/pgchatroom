@@ -1,5 +1,5 @@
-import _ from 'underscore';
 import alt from '../alt';
+import _ from 'underscore';
 
 import { filterObject } from '../util';
 import RoomActions from './RoomActions';
@@ -10,33 +10,26 @@ class WaitingRoomActions {
     this.generateActions('updateWaitingUsers');
   }
 
-  listenForMoreUsers({
-    RoomStore, StudyStore, UserStore, WaitingRoomStore,
-  }) {
+  listenForMoreUsers({ RoomStore, StudyStore, UserStore, WaitingRoomStore }) {
     const usersFb = StudyStore.get('usersFb');
     const usersPerRoom = StudyStore.get('config').usersPerRoom;
     const currentUserId = UserStore.get('userId');
 
-    usersFb.on('value', (snapshot) => {
+    usersFb.on('value', snapshot => {
       const users = snapshot.val();
       const waitingUsers = filterObject(users,
         userState => userState === 'waiting');
       this.actions.updateWaitingUsers(waitingUsers);
 
-      if (_.size(waitingUsers) >= usersPerRoom
-          && _.has(waitingUsers, currentUserId)) {
+      if (_.size(waitingUsers) >= usersPerRoom &&
+          _.has(waitingUsers, currentUserId)) {
         this.actions.sendUsersToRoom(
-          {
-            RoomStore, StudyStore, UserStore, WaitingRoomStore,
-          },
-        );
+          { RoomStore, StudyStore, UserStore, WaitingRoomStore });
       }
     });
   }
 
-  sendUsersToRoom({
-    RoomStore, StudyStore, UserStore, WaitingRoomStore,
-  }) {
+  sendUsersToRoom({ RoomStore, StudyStore, UserStore, WaitingRoomStore }) {
     const usersFb = StudyStore.get('usersFb');
     const currentUserId = UserStore.get('userId');
     const usersPerRoom = StudyStore.get('config').usersPerRoom;
@@ -64,7 +57,7 @@ class WaitingRoomActions {
       });
     }
 
-    RoomActions.addUsers({ userIds: matchedUsers.map(el => parseInt(el, 10)) });
+    RoomActions.addUsers({ userIds: matchedUsers.map((el) => parseInt(el, 10)) });
   }
 }
 
