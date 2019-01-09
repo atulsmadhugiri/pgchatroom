@@ -1,5 +1,6 @@
 import alt from '../alt';
 import _ from 'underscore';
+import Firebase from 'firebase';
 
 import { assert, getAttributeFromUrlParams } from '../util';
 import MessagesActions from './MessagesActions';
@@ -72,7 +73,6 @@ class UserActions {
   }
 
   authUser(userId, userAuthFb) {
-    console.log('auth attempt');
     this.dispatch();
 
     // return new Promise((resolve, reject) => {
@@ -86,12 +86,12 @@ class UserActions {
     //     }
     //   });
     // });
-
     return new Promise((resolve, reject) => {
-      firebase.auth().signInAnonymouslyAndRetrieveData().then(function(result) {
-        userAuthFb.child(result.uid).set(userId);
+      Firebase.auth().signInAnonymously().then(function(result) {
+        // console.log(result.user.uid);
+        userAuthFb.child(result.user.uid).set(userId);
       }).catch(function(error) {
-        throw Error('Login failed:' + err.toString());
+        throw Error('Login failed:' + error.toString());
       });
     });
   }

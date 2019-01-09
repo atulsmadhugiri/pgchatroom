@@ -1,6 +1,5 @@
-var webpack = require("webpack");
-
 require("babel-polyfill");
+var webpack = require("webpack");
 
 module.exports = {
     entry: {
@@ -29,7 +28,7 @@ module.exports = {
             { test: require.resolve("firebase"), loader: "expose?Firebase" },
             { test: /\.s?css$/, loader: "style!css!sass" },
             {   test: /\.jsx?$/, 
-                loaders: ["react-hot", "babel?optional=runtime"], 
+                loaders: ["react-hot", "babel-loader"], 
                 exclude: /node_modules/ ,
                 presets: ["env"],
                 plugins: [

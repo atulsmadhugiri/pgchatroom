@@ -24,7 +24,7 @@ class MessagesStore {
     const baseFb = StudyStore.get('baseFb');
     const roomId = RoomStore.get('roomId');
 
-    this.messagingFb = baseFb.child(`rooms/${roomId}/messages`);
+    this.messagingFb = baseFb.child('rooms/' + roomId + '/messages');
   }
 
   receiveMessage(message) {

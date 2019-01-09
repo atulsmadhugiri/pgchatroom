@@ -22,7 +22,7 @@ class RoomActions {
     const baseFb = StudyStore.get('baseFb');
     const userId = UserStore.get('userId');
 
-    const roomFb = baseFb.child(`rooms/${roomId}`);
+    const roomFb = baseFb.child('rooms/' + roomId);
     roomFb.child('users').update({ [userId]: true });
 
     // Dispatch both roomFb and userId in case we haven't created room yet

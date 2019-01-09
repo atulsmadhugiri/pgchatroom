@@ -28,13 +28,13 @@ class StudyStore {
       databaseURL: ROOT_URL,
     };
     Firebase.initializeApp(fbinit);
-    this.baseFb = Firebase.database().ref(ROOT_URL + '/' + this.study + '/' + this.room);
+    this.baseFb = Firebase.database().ref('/' + this.study + '/' + this.room);
     // this.baseFb = new Firebase(`${ROOT_URL}/${this.study}/${this.room}`);
     // this.configFb = new Firebase(`${ROOT_URL}/constants/${this.study}`);
-    this.configFb = Firebase.database().ref(ROOT_URL + '/constants/' + this.study);
+    this.configFb = Firebase.database().ref('/constants/' + this.study);
     // FIXME - authURL correct?
     // this.userAuthFb = new Firebase(USER_AUTH_URL);
-    this.userAuthFb = Firebase.database.ref('user_auth');
+    this.userAuthFb = Firebase.database().ref('user_auth');
     this.usersFb = this.baseFb.child('users');
     this.roomsFb = this.baseFb.child('rooms');
   }
