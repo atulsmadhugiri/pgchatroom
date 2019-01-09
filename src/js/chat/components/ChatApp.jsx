@@ -1,3 +1,5 @@
+import 'babel-polyfill';
+
 import React from 'react';
 
 import Message from './Message';
@@ -52,7 +54,7 @@ const ChatApp = React.createClass({
     ];
     stores.forEach(store => store.listen(this._onChange));
 
-    this._init();
+    this.init();
   },
 
   componentDidUpdate() {
@@ -118,7 +120,7 @@ const ChatApp = React.createClass({
     this.setState({ message: e.target.value });
   },
 
-  async _init() {
+  async init() {
     try {
       StudyActions.initStudy();
       await StudyActions.loadConfig(StudyStore.get('configFb'));

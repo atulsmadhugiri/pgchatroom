@@ -1,8 +1,11 @@
 var webpack = require("webpack");
 
+require("babel-polyfill");
+
 module.exports = {
     entry: {
-        chat: ["./src/js/chat.js"],
+        polyfill: ["babel-polyfill"],
+        chat: ["babel-polyfill", "./src/js/chat.js"],
         json_to_csv: ["./src/js/json_to_csv.js"],
         admin: ["./src/js/admin.js"],
     },
@@ -25,11 +28,19 @@ module.exports = {
             { test: require.resolve("react"), loader: "expose?React" },
             { test: require.resolve("firebase"), loader: "expose?Firebase" },
             { test: /\.s?css$/, loader: "style!css!sass" },
-            { test: /\.jsx?$/, loaders: ["react-hot", "babel?optional=runtime"], exclude: /node_modules/ }
+            {   test: /\.jsx?$/, 
+                loaders: ["react-hot", "babel?optional=runtime"], 
+                exclude: /node_modules/ ,
+                presets: ["env"],
+                plugins: [
+                    ["transform-regenerator", "transform-runtime"],
+                ]
+            }
         ]
     },
     plugins: [
-      new webpack.NoErrorsPlugin(),
+        new webpack.NoErrorsPlugin(), 
+    //   babel-plugin-transform-runtime"
     ],
     eslint: {
         configFile: ".eslintrc"
