@@ -14,12 +14,12 @@ class RoomStore {
 
   createRoomAndListen(roomFb) {
     this.roomFb = roomFb;
-    this.roomId = roomFb.key();
+    this.roomId = roomFb.key;
   }
 
   addUser({ roomFb, userId }) {
     this.roomFb = roomFb;
-    this.roomId = roomFb.key();
+    this.roomId = roomFb.key;
 
     this.roomFb.on('value', snapshot => {
       this.roomTime = snapshot.val().createdAt;

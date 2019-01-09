@@ -17,11 +17,11 @@ class UserActions {
   getInitialUserId() {
     const userId = getAttributeFromUrlParams(USER_ID_REGEX);
     if (!userId) { throw new Error('Missing user_id in url!'); }
-
     this.dispatch(userId);
   }
 
   loadAndListen({ RoomStore, StudyStore, UserStore, WaitingRoomStore, MessagesStore }) {
+    console.log('loaded and listen');
     assert(StudyStore.get('study') && StudyStore.get('config'),
       'Study not loaded.');
     assert(UserStore.get('userId'), 'User not loaded.');
@@ -86,10 +86,12 @@ class UserActions {
     //     }
     //   });
     // });
+
     return new Promise((resolve, reject) => {
       Firebase.auth().signInAnonymously().then(function(result) {
-        // console.log(result.user.uid);
+        console.log(result.user.uid);
         userAuthFb.child(result.user.uid).set(userId);
+        resolve(result.user);
       }).catch(function(error) {
         throw Error('Login failed:' + error.toString());
       });
@@ -97,7 +99,8 @@ class UserActions {
   }
 
   logout(userAuthFb) {
-    userAuthFb.unauth();
+    Firebase.auth().signOut();
+    // userAuthFb.signOut();
   }
 
   setUsersToRoom({ StudyStore, roomId, matchedUsers }) {

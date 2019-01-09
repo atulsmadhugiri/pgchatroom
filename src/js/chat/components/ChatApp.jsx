@@ -16,8 +16,6 @@ import WaitingRoomStore from '../stores/WaitingRoomStore';
 import { MESSAGE_TYPES } from '../../constants';
 
 function getStateFromStores() {
-  console.log('getting state from store');
-  console.log(StudyStore.get('config'));
   return {
     config: StudyStore.get('config'),
     userId: UserStore.get('userId'),
@@ -176,6 +174,12 @@ const ChatApp = React.createClass({
 
         <div>
           Your user ID is: {this.state.userId}
+        </div>
+
+        <div className="spacer"></div>
+
+        <div>
+          Time remaining: {(this.state.config.roomOpenTime / 1000) - (this.state.timeSinceStart / 1000)} seconds
         </div>
 
         <div className="spacer"></div>

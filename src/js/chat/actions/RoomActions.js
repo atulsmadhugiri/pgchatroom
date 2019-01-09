@@ -11,11 +11,13 @@ class RoomActions {
 
     // TODO(sam): Read createdAt and use that to determine the time left
     // instead of just waiting the roomOpenTime.
-    const createdAt = Firebase.ServerValue.TIMESTAMP;
+    // const createdAt = Firebase.ServerValue.TIMESTAMP;
+    const createdAt = Firebase.database.ServerValue.TIMESTAMP;
     roomFb.set({ createdAt });
 
     this.dispatch(roomFb);
-    return roomFb.key();
+    console.log(roomFb.key);
+    return roomFb.key;
   }
 
   addUser({ StudyStore, UserStore, roomId }) {
