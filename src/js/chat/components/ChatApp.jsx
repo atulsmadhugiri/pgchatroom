@@ -179,7 +179,7 @@ const ChatApp = React.createClass({
         <div className="spacer"></div>
 
         <div>
-          Time remaining: {(this.state.config.roomOpenTime / 1000) - (this.state.timeSinceStart / 1000)} seconds
+          Time remaining: {(((this.state.config.roomOpenTime / 1000) - (this.state.timeSinceStart / 1000)) > 0 ) ? ((this.state.config.roomOpenTime / 1000) - (this.state.timeSinceStart / 1000)) : 0 } seconds
         </div>
 
         <div className="spacer"></div>
