@@ -91256,14 +91256,6 @@
 	      _react2['default'].createElement('div', { className: 'spacer' }),
 	      _react2['default'].createElement(
 	        'div',
-	        null,
-	        'Time remaining: ',
-	        this.state.config.roomOpenTime / 1000 - this.state.timeSinceStart / 1000,
-	        ' seconds'
-	      ),
-	      _react2['default'].createElement('div', { className: 'spacer' }),
-	      _react2['default'].createElement(
-	        'div',
 	        { className: 'messages',
 	          ref: 'messages' },
 	        messages
@@ -91284,6 +91276,10 @@
 
 	exports['default'] = ChatApp;
 	module.exports = exports['default'];
+	/* <div className="spacer"></div>
+	<div>
+	 Time remaining: {(((this.state.config.roomOpenTime / 1000) - (this.state.timeSinceStart / 1000)) > 0 ) ? ((this.state.config.roomOpenTime / 1000) - (this.state.timeSinceStart / 1000)) : 0 } seconds
+	</div> */
 
 	/* REACT HOT LOADER */ }).call(this); } finally { if (false) { (function () { var foundReactClasses = module.hot.data && module.hot.data.foundReactClasses || false; if (module.exports && module.makeHot) { var makeExportsHot = require("/Users/atul/projects/pg-chat-room/node_modules/react-hot-loader/makeExportsHot.js"); if (makeExportsHot(module, require("react"))) { foundReactClasses = true; } var shouldAcceptModule = true && foundReactClasses; if (shouldAcceptModule) { module.hot.accept(function (err) { if (err) { console.error("Cannot apply hot update to " + "ChatApp.jsx" + ": " + err.message); } }); } } module.hot.dispose(function (data) { data.makeHot = module.makeHot; data.foundReactClasses = foundReactClasses; }); })(); } }
 
