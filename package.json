@@ -24,7 +24,7 @@
     "babel-polyfill": "^6.26.0",
     "babyparse": "^0.4.3",
     "css-loader": "^0.18.0",
-    "eslint": "^1.4.3",
+    "eslint": "^4.18.2",
     "eslint-loader": "^1.0.0",
     "eslint-plugin-react": "^3.3.2",
     "firebase": "^5.7.2",
