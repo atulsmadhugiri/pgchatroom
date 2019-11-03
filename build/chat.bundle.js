@@ -91366,7 +91366,7 @@
 	  if (usersPerRoom === 1) {
 		return 'You have been matched to 1 other participant. ' + ('You have ' + (0, _util.convertToMins)(roomOpenTime) + ' minutes to chat.');
 	  }
-	  return 'You have been matched to ' + (usersPerRoom - 1) + ' other participants. ' + ('You have ' + (0, _util.convertToMins)(roomOpenTime) + ' minutes to chat.');
+	  return 'ATUL1You have been matched to ' + (usersPerRoom - 1) + ' other participants. ' + ('You have ' + (0, _util.convertToMins)(roomOpenTime) + ' minutes to chat.');
 	}
 
 	function _finishMessage(password) {
