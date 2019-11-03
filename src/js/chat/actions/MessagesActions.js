@@ -10,6 +10,10 @@ function waitingMessage(maxWaitingTime) {
 }
 
 function startMessage(usersPerRoom, roomOpenTime) {
+  if (usersPerRoom === 1) {
+    return `You have been matched to 1 other participants. ` +
+    `You have ${convertToMins(roomOpenTime)} minutes to chat.`;
+  }
   return `You have been matched to ${usersPerRoom - 1} other participants. ` +
     `You have ${convertToMins(roomOpenTime)} minutes to chat.`;
 }
