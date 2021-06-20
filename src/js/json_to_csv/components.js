@@ -1,26 +1,31 @@
 import _ from 'underscore';
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import BabyParse from 'babyparse';
+import PapaParse from 'papaparse';
 
 import {
-  fetchStudyList, setStudyAndStartFetch, setDisplayOption,
+  fetchStudyList,
+  setStudyAndStartFetch,
+  setDisplayOption,
 } from './actions';
 
-const dataShape = PropTypes.objectOf(PropTypes.shape({
-  rooms: PropTypes.objectOf(PropTypes.shape({
-    createdAt: PropTypes.number.isRequired,
-    messages: PropTypes.objectOf(PropTypes.shape({
-      message: PropTypes.string.isRequired,
-      userId: PropTypes.oneOfType(
-        [PropTypes.string, PropTypes.number]).isRequired,
-    })),
-  })),
-  users: PropTypes.oneOfType([
-    PropTypes.object,
-    PropTypes.array,
-  ]).isRequired,
-}));
+const dataShape = PropTypes.objectOf(
+  PropTypes.shape({
+    rooms: PropTypes.objectOf(
+      PropTypes.shape({
+        createdAt: PropTypes.number.isRequired,
+        messages: PropTypes.objectOf(
+          PropTypes.shape({
+            message: PropTypes.string.isRequired,
+            userId: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+              .isRequired,
+          })
+        ),
+      })
+    ),
+    users: PropTypes.oneOfType([PropTypes.object, PropTypes.array]).isRequired,
+  })
+);
 
 // Extracts Room,Room ID,User ID from data
 function extractUserData(data) {
@@ -35,7 +40,7 @@ function extractUserData(data) {
     });
   });
 
-  return BabyParse.unparse({ fields: USER_CSV_FIELDS, data: csvData });
+  return PapaParse.unparse({ fields: USER_CSV_FIELDS, data: csvData });
 }
 
 // Extracts Room ID,User ID,Message from data
@@ -51,20 +56,20 @@ function extractMessageData(data) {
     });
   });
 
-  return BabyParse.unparse({ fields: MESSAGES_CSV_FIELDS, data: csvData });
+  return PapaParse.unparse({ fields: MESSAGES_CSV_FIELDS, data: csvData });
 }
 
 const DataDisplay = ({ displayOption, data }) => {
   let csv;
   switch (displayOption) {
-  case 'USERS':
-    csv = extractUserData(data);
-    break;
-  case 'MESSAGES':
-    csv = extractMessageData(data);
-    break;
-  default:
-    csv = 'No data available for this study.';
+    case 'USERS':
+      csv = extractUserData(data);
+      break;
+    case 'MESSAGES':
+      csv = extractMessageData(data);
+      break;
+    default:
+      csv = 'No data available for this study.';
   }
 
   return <pre>{csv}</pre>;
@@ -81,49 +86,62 @@ class JSONToCSV extends React.Component {
   }
 
   render() {
-    const {
-      studyList,
-      displayOption,
-      data,
-      dispatch,
-      error,
-    } = this.props;
+    const { studyList, displayOption, data, dispatch, error } = this.props;
 
     let studySelect;
 
-    return (<div>
-      <h1>Get Data from Study</h1>
+    return (
+      <div>
+        <h1>Get Data from Study</h1>
 
-      <form onSubmit={(e) => {
-        e.preventDefault();
-        dispatch(setStudyAndStartFetch(studySelect.value));
-      }}>
-        <select ref={node => studySelect = node}>
-          {_.map(studyList,
-            (s) => <option value={s} key={s}>{s}</option>)}
-        </select>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            dispatch(setStudyAndStartFetch(studySelect.value));
+          }}
+        >
+          <select ref={(node) => (studySelect = node)}>
+            {_.map(studyList, (s) => (
+              <option value={s} key={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+          <br />
+          <button name="submit">Submit</button>
+        </form>
+
         <br />
-        <button name="submit">Submit</button>
-      </form>
+        {error}
 
-      <br />
-      {error}
+        {data && (
+          <form>
+            <input
+              type="radio"
+              value="USERS"
+              id="users"
+              checked={displayOption === 'USERS'}
+              onChange={(e) => dispatch(setDisplayOption(e.target.value))}
+            />
+            <label style={{ display: 'inline' }} htmlFor="users">
+              Users
+            </label>
+            <input
+              type="radio"
+              value="MESSAGES"
+              id="messages"
+              checked={displayOption === 'MESSAGES'}
+              onChange={(e) => dispatch(setDisplayOption(e.target.value))}
+            />
+            <label style={{ display: 'inline' }} htmlFor="messages">
+              Messages
+            </label>
+          </form>
+        )}
 
-      {data && <form>
-        <input type="radio" value="USERS"
-          id="users"
-          checked={displayOption === 'USERS'}
-          onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
-        <label style={{display: 'inline'}} htmlFor="users">Users</label>
-        <input type="radio" value="MESSAGES"
-          id="messages"
-          checked={displayOption === 'MESSAGES'}
-          onChange={(e) => dispatch(setDisplayOption(e.target.value))} />
-        <label style={{display: 'inline'}} htmlFor="messages">Messages</label>
-      </form>}
-
-      {data && <DataDisplay displayOption={displayOption} data={data} />}
-    </div>);
+        {data && <DataDisplay displayOption={displayOption} data={data} />}
+      </div>
+    );
   }
 }
 
