@@ -1,13 +1,13 @@
 .PHONY: build serve test
 
-WEBPACK=node_modules/webpack/bin/webpack.js
-WEBPACK_DEV_SERVER=node_modules/webpack-dev-server/bin/webpack-dev-server.js
+WEBPACK=yarn webpack
+WEBPACK_DEV_SERVER=yarn dev
 KARMA=node_modules/karma-cli/bin/karma
 
 BLUE=\033[0;34m
 NOCOLOR=\033[0m
 
-PORT=8081
+PORT=8080
 
 help:
 	@echo "make serve     # runs the server (port 8080 by default)"
@@ -24,7 +24,7 @@ serve:
 	@echo "${BLUE}Starting server on port ${PORT}.${NOCOLOR}"
 	@echo "${BLUE}Navigate to localhost:${PORT}/webpack-dev-server/ to use hot reloader.${NOCOLOR}"
 	@echo "${BLUE}========${NOCOLOR}"
-	${WEBPACK_DEV_SERVER} --port ${PORT} -d --hot --inline
+	${WEBPACK_DEV_SERVER}
 
 deploy:
 	@echo "${BLUE}Deploying app.${NOCOLOR}"
