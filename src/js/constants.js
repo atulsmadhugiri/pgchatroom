@@ -20,7 +20,7 @@ const MESSAGE_TYPES = {
   confederate: 'Confederate',
 };
 
-export default {
+export {
   ROOT_URL,
   STUDIES_URL,
   CONSTANTS_URL,

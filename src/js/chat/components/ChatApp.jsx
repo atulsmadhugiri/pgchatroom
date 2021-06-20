@@ -28,7 +28,7 @@ function getStateFromStores() {
   };
 }
 
-const ChatApp = React.createClass({
+class ChatApp extends React.Component {
   getInitialState() {
     return {
       ...getStateFromStores(),
@@ -38,7 +38,7 @@ const ChatApp = React.createClass({
       message: '',
       error: null,
     };
-  },
+  }
 
   componentWillMount() {
     const stores = [
@@ -48,10 +48,10 @@ const ChatApp = React.createClass({
       WaitingRoomStore,
       RoomStore,
     ];
-    stores.forEach(store => store.listen(this._onChange));
+    stores.forEach((store) => store.listen(this._onChange));
 
     this._init();
-  },
+  }
 
   componentDidUpdate() {
     if (this.state.messagingEnabled) {
@@ -65,12 +65,13 @@ const ChatApp = React.createClass({
         this.setConfederateInterval();
       }
     }
-  },
+  }
 
   setTime() {
-    const timeSinceStart = parseInt((Date.now() - this.state.roomTime) / 1000, 10) * 1000;
+    const timeSinceStart =
+      parseInt((Date.now() - this.state.roomTime) / 1000, 10) * 1000;
     this.setState({ timeSinceStart: timeSinceStart, timeSet: true });
-  },
+  }
 
   setConfederateInterval() {
     this.setState({ startedConfederate: true });
@@ -99,22 +100,24 @@ const ChatApp = React.createClass({
       }
       this.setState({ timeSinceStart: timeSinceStart + 1000 });
     }, 1000);
-  },
+  }
 
   _shouldStartConfederate() {
-    return this.state.roomTime &&
+    return (
+      this.state.roomTime &&
       this.state.config &&
       this.state.config.messages &&
-      !this.state.startedConfederate;
-  },
+      !this.state.startedConfederate
+    );
+  }
 
   _onChange() {
     this.setState(getStateFromStores());
-  },
+  }
 
   _onInputChange(e) {
     this.setState({ message: e.target.value });
-  },
+  }
 
   async _init() {
     try {
@@ -123,14 +126,20 @@ const ChatApp = React.createClass({
 
       UserActions.getInitialUserId();
       await UserActions.authUser(
-        UserStore.get('userId'), StudyStore.get('userAuthFb')
+        UserStore.get('userId'),
+        StudyStore.get('userAuthFb')
       );
-      UserActions.loadAndListen({ StudyStore, UserStore,
-        MessagesStore, WaitingRoomStore, RoomStore });
+      UserActions.loadAndListen({
+        StudyStore,
+        UserStore,
+        MessagesStore,
+        WaitingRoomStore,
+        RoomStore,
+      });
     } catch (error) {
       this.setState({ error });
     }
-  },
+  }
 
   _sendMessage(e) {
     e.preventDefault();
@@ -147,9 +156,10 @@ const ChatApp = React.createClass({
       generated: false,
     });
     this.setState({ message: '' });
-  },
+  }
 
   render() {
+    console.log('ATUL WAS HERE');
     // console.log(this.state);
     if (this.state.error) {
       return <div>Error: {this.state.error.message}</div>;
@@ -161,9 +171,7 @@ const ChatApp = React.createClass({
 
     const messages = this.state.messages.map((message, i) => {
       return (
-        <Message userId={message.userId}
-          message={message.message}
-          key={i} />
+        <Message userId={message.userId} message={message.message} key={i} />
       );
     });
 
@@ -171,29 +179,28 @@ const ChatApp = React.createClass({
       <div>
         <h1>Chat Room</h1>
 
-        <div>
-          Your user ID is: {this.state.userId}
-        </div>
+        <div>Your user ID is: {this.state.userId}</div>
 
         <div className="spacer"></div>
 
-        <div className="messages"
-             ref="messages">
+        <div className="messages" ref="messages">
           {messages}
         </div>
 
         <div className="spacer"></div>
 
         <form onSubmit={this._sendMessage}>
-          <input type="text"
+          <input
+            type="text"
             placeholder="Type a message"
             onChange={this._onInputChange}
             value={this.state.message}
-            disabled={!this.state.messagingEnabled} />
+            disabled={!this.state.messagingEnabled}
+          />
         </form>
       </div>
     );
-  },
-});
+  }
+}
 
 export default ChatApp;

@@ -22,8 +22,8 @@ function convertToMins(ms) {
 // pred: (v, k) => bool
 function filterObject(obj, pred) {
   const keys = _.pairs(obj)
-    .filter(pair => pred(pair[1], pair[0]))
-    .map(pair => pair[0]);
+    .filter((pair) => pred(pair[1], pair[0]))
+    .map((pair) => pair[0]);
   return _.pick(obj, keys);
 }
 
@@ -31,7 +31,7 @@ function findLowestUserId(userIds) {
   return Math.min(...userIds);
 }
 
-export default {
+export {
   assert,
   getAttributeFromUrlParams,
   convertToMs,
