@@ -1,6 +1,8 @@
 PG Chat Room
 =====
 
+**Temporary detached fork of https://github.com/SamLau95/pg-chat-room.**
+
 [ ![Codeship Status for SamLau95/pg-chat-room](https://codeship.com/projects/e7376e90-59af-0133-ef4a-0e6f49d10408/status?branch=master)](https://codeship.com/projects/110132)
 
 Uses Firebase to implement a chat room for the research studies of the
