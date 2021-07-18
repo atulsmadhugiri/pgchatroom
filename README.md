@@ -1,5 +1,4 @@
-PG Chat Room
-=====
+# PG Chat Room
 
 **Temporary detached fork of https://github.com/SamLau95/pg-chat-room.**
 
@@ -18,7 +17,7 @@ Clone the repository:
 
 Run:
 
-    npm install
+    yarn install
 
 To start the server:
 
