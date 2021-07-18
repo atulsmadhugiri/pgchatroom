@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import { convertToMs, convertToMins } from '../../chat/util';
@@ -10,8 +11,8 @@ import { DEFAULT_ROOM_VALUES, MESSAGE_TYPES } from '../../constants';
  */
 const ConfigSetter = React.createClass({
   propTypes: {
-    firebase: React.PropTypes.object.isRequired,
-    study: React.PropTypes.string.isRequired,
+    firebase: PropTypes.object.isRequired,
+    study: PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -50,7 +51,7 @@ const ConfigSetter = React.createClass({
   },
 
   _loadConfig(props) {
-    props.firebase.on('value', snapshot => {
+    props.firebase.on('value', (snapshot) => {
       if (!snapshot.val()) {
         props.firebase.set(DEFAULT_ROOM_VALUES, (err) => {
           console.log(err);
@@ -83,15 +84,21 @@ const ConfigSetter = React.createClass({
     });
   },
 
-  _formGeneralInput(attr, label, convertData = _.identity,
-      convertInput = _.identity) {
+  _formGeneralInput(
+    attr,
+    label,
+    convertData = _.identity,
+    convertInput = _.identity
+  ) {
     return (
       <div>
         <label htmlFor={attr}>{label}</label>
-        <input type="text"
+        <input
+          type="text"
           id={attr}
           value={convertData(this.state.config[attr])}
-          onChange={_.partial(this._handleChange, attr, convertInput)} />
+          onChange={_.partial(this._handleChange, attr, convertInput)}
+        />
         <div className="spacer"></div>
       </div>
     );
@@ -106,7 +113,8 @@ const ConfigSetter = React.createClass({
         config.messages = {};
       }
 
-      config.messages[convertToMs(parseFloat(this.state.messageTime))] = this.state.messageObject;
+      config.messages[convertToMs(parseFloat(this.state.messageTime))] =
+        this.state.messageObject;
 
       this.props.firebase.set(config, (err) => {
         this.setState({
@@ -135,12 +143,12 @@ const ConfigSetter = React.createClass({
     }
 
     if (_.isNaN(parseFloat(this.state.messageTime))) {
-      this.setState({ messageTimeError: 'Invalid Time'});
+      this.setState({ messageTimeError: 'Invalid Time' });
       valid = false;
     }
 
     if (_.isNaN(parseFloat(this.state.messageObject.id))) {
-      this.setState({ messageIDError: 'Invalid ID'});
+      this.setState({ messageIDError: 'Invalid ID' });
       valid = false;
     }
 
@@ -212,7 +220,7 @@ const ConfigSetter = React.createClass({
   },
 
   _renderMessages() {
-    return _.keys(this.state.config.messages).map(key => {
+    return _.keys(this.state.config.messages).map((key) => {
       return (
         <tr key={key} id={key}>
           <td>{convertToMins(key)}</td>
@@ -226,11 +234,9 @@ const ConfigSetter = React.createClass({
   },
 
   _renderMessageTypes() {
-    return _.keys(MESSAGE_TYPES).map(key => {
+    return _.keys(MESSAGE_TYPES).map((key) => {
       return (
-        <option
-          key={key}
-          value={MESSAGE_TYPES[key]}>
+        <option key={key} value={MESSAGE_TYPES[key]}>
           {MESSAGE_TYPES[key]}
         </option>
       );
@@ -242,10 +248,12 @@ const ConfigSetter = React.createClass({
       <form onSubmit={this._handleMessageSubmit}>
         <div>
           <label htmlFor="message">Message</label>
-          <input type="text"
+          <input
+            type="text"
             id="message"
             value={this.state.messageObject.message}
-            onChange={this._handleMessageChange} />
+            onChange={this._handleMessageChange}
+          />
           <h3>{this.state.messageError}</h3>
         </div>
 
@@ -254,30 +262,35 @@ const ConfigSetter = React.createClass({
           <select
             id="messageType"
             value={this.state.messageObject.type}
-            onChange={this._handleMessageTypeChange}>
+            onChange={this._handleMessageTypeChange}
+          >
             {this._renderMessageTypes()}
           </select>
         </div>
 
-        {
-          this.state.messageObject.type === MESSAGE_TYPES.system ? '' :
+        {this.state.messageObject.type === MESSAGE_TYPES.system ? (
+          ''
+        ) : (
           <div>
             <label htmlFor="messageID">ID to show</label>
-            <input type="text"
+            <input
+              type="text"
               id="messageID"
               value={this.state.messageObject.id}
-              onChange={this._handleMessageIDChange} />
+              onChange={this._handleMessageIDChange}
+            />
             <h3>{this.state.messageIDError}</h3>
           </div>
-        }
-
+        )}
 
         <div>
           <label htmlFor="messageTime">Minutes from start of study</label>
-          <input type="text"
+          <input
+            type="text"
             id="messageTime"
             value={this.state.messageTime}
-            onChange={this._handleMessageTimeChange} />
+            onChange={this._handleMessageTimeChange}
+          />
           <h3>{this.state.messageTimeError}</h3>
         </div>
 
@@ -301,26 +314,36 @@ const ConfigSetter = React.createClass({
 
         <h3>Change the settings for study {this.props.study}.</h3>
 
-        {!this.state.loaded ? 'Loading...' :
+        {!this.state.loaded ? (
+          'Loading...'
+        ) : (
           <form onSubmit={this._handleConfigSubmit}>
-
-            {this._formGeneralInput('usersPerRoom',
-              'Users per chat room')}
-            {this._formGeneralInput('maxWaitingTime',
+            {this._formGeneralInput('usersPerRoom', 'Users per chat room')}
+            {this._formGeneralInput(
+              'maxWaitingTime',
               'Max waiting time (in minutes)',
-              convertToMins, convertToMs)}
-            {this._formGeneralInput('roomOpenTime',
+              convertToMins,
+              convertToMs
+            )}
+            {this._formGeneralInput(
+              'roomOpenTime',
               'Time participants have to chat (in minutes)',
-              convertToMins, convertToMs)}
-            {this._formGeneralInput('password',
-              'Password to continue with study after chat')}
-            {this._formGeneralInput('altPassword',
-              'Password to continue if not placed in chat room')}
+              convertToMins,
+              convertToMs
+            )}
+            {this._formGeneralInput(
+              'password',
+              'Password to continue with study after chat'
+            )}
+            {this._formGeneralInput(
+              'altPassword',
+              'Password to continue if not placed in chat room'
+            )}
 
             <div>{this.state.saved && 'Saved!'}</div>
             <button name="submit">Save</button>
           </form>
-        }
+        )}
       </div>
     );
   },

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import { BASE_CHAT_ROOM_URL } from '../../constants';
@@ -10,7 +11,7 @@ const USER_ID_FIELD = 'user_id=${e://Field/CHATROOM%20ID}';
  */
 const RoomGenerator = React.createClass({
   propTypes: {
-    selectedStudy: React.PropTypes.string.isRequired,
+    selectedStudy: PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -30,10 +31,13 @@ const RoomGenerator = React.createClass({
       return '';
     }
 
-    return BASE_CHAT_ROOM_URL + '/' +
+    return (
+      BASE_CHAT_ROOM_URL +
+      '/' +
       `?study=${this.props.selectedStudy}` +
       `&room=${this.state.room}` +
-      `&${USER_ID_FIELD}`;
+      `&${USER_ID_FIELD}`
+    );
   },
 
   render() {
@@ -48,7 +52,8 @@ const RoomGenerator = React.createClass({
               ref="roomInput"
               type="text"
               id="roomInput"
-              placeholder="Room name" />
+              placeholder="Room name"
+            />
           </div>
 
           <button name="submit">Generate</button>

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import AdminActions from '../actions/AdminActions';
@@ -10,7 +11,7 @@ const ERROR_MESSAGE = 'This study already exists.';
  */
 const CreateStudy = React.createClass({
   propTypes: {
-    studies: React.PropTypes.array.isRequired,
+    studies: PropTypes.array.isRequired,
   },
 
   getInitialState() {
@@ -39,8 +40,11 @@ const CreateStudy = React.createClass({
   },
 
   _isInvalid() {
-    return !this.state.study || this.state.study.indexOf(' ') >= 0 ||
-      this._studyExists();
+    return (
+      !this.state.study ||
+      this.state.study.indexOf(' ') >= 0 ||
+      this._studyExists()
+    );
   },
 
   _studyExists() {
@@ -52,17 +56,21 @@ const CreateStudy = React.createClass({
       <form onSubmit={this._handleSubmit}>
         <div>
           <label htmlFor="createStudy">Create a new study</label>
-          <input ref="studyInput"
+          <input
+            ref="studyInput"
             type="text"
             id="createStudy"
             placeholder="Study name"
             value={this.state.study}
-            onChange={this._handleChange} />
+            onChange={this._handleChange}
+          />
         </div>
 
         {this._studyExists() && <h3>{ERROR_MESSAGE}</h3>}
 
-        <button name="submit" disabled={this._isInvalid()}>Create</button>
+        <button name="submit" disabled={this._isInvalid()}>
+          Create
+        </button>
       </form>
     );
   },

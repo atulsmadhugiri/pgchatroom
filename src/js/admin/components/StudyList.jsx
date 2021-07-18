@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
 
 import AdminActions from '../actions/AdminActions';
@@ -10,7 +11,7 @@ import Spacer from './Spacer';
  */
 const StudyList = React.createClass({
   propTypes: {
-    studies: React.PropTypes.array,
+    studies: PropTypes.array,
   },
 
   componentWillMount() {
@@ -26,13 +27,15 @@ const StudyList = React.createClass({
       return 'No studies yet.';
     }
 
-    return this.props.studies.map(study => (
-      <div key={study}
-           className="button"
-           onClick={_.partial(this._handleSelectStudy, study)}>
+    return this.props.studies.map((study) => (
+      <div
+        key={study}
+        className="button"
+        onClick={_.partial(this._handleSelectStudy, study)}
+      >
         {study}
-      </div>)
-    );
+      </div>
+    ));
   },
 
   _handleSelectStudy(study) {
@@ -47,7 +50,9 @@ const StudyList = React.createClass({
 
     return (
       <div>
-        <h3>List of Studies <br/> Click on one to modify its settings</h3>
+        <h3>
+          List of Studies <br /> Click on one to modify its settings
+        </h3>
         {this._renderStudies()}
 
         <Spacer />

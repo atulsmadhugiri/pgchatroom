@@ -1,6 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'underscore';
-// import $ from 'jquery';
+
 import { ROOT_URL } from '../../constants';
 
 function deleteMessage(object) {
@@ -9,9 +10,8 @@ function deleteMessage(object) {
 
 const RoomsList = React.createClass({
   propTypes: {
-    // roomsUrl: React.PropTypes.string,
-    roomsUrl: React.PropTypes.object,
-    study: React.PropTypes.string.isRequired,
+    roomsUrl: PropTypes.object,
+    study: PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -31,7 +31,7 @@ const RoomsList = React.createClass({
 
   _loadRooms(props) {
     if (!_.isUndefined(props.roomsUrl)) {
-      props.roomsUrl.on('value', snapshot => {
+      props.roomsUrl.on('value', (snapshot) => {
         if (snapshot.val()) {
           this.setState({ rooms: snapshot.val() });
         }
@@ -87,11 +87,13 @@ const RoomsList = React.createClass({
       cursor: 'pointer',
     };
 
-    return _.keys(this.state.rooms).map(key => {
+    return _.keys(this.state.rooms).map((key) => {
       return (
         <tr key={key} id={key}>
           <td>{key}</td>
-          <td style={xStyle} onClick={this._removeRoom}>&times;</td>
+          <td style={xStyle} onClick={this._removeRoom}>
+            &times;
+          </td>
         </tr>
       );
     });

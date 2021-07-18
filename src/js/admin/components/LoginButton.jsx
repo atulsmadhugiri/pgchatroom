@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import AdminActions from '../actions/AdminActions';
 
@@ -8,9 +9,9 @@ import AdminActions from '../actions/AdminActions';
  */
 const LoginButton = React.createClass({
   propTypes: {
-    fb: React.PropTypes.object.isRequired,
-    auth: React.PropTypes.object,
-    authError: React.PropTypes.string,
+    fb: PropTypes.object.isRequired,
+    auth: PropTypes.object,
+    authError: PropTypes.string,
   },
 
   componentWillMount() {
@@ -33,19 +34,21 @@ const LoginButton = React.createClass({
   },
 
   render() {
-    return (<div>
-      {this.props.auth ?
-        <div className="button" onClick={this._logout}>
-          Log out
-        </div>
-        :
-        <div className="button" onClick={this._loginPopup}>
-          Log in through Google.
-        </div>
-      }
+    return (
+      <div>
+        {this.props.auth ? (
+          <div className="button" onClick={this._logout}>
+            Log out
+          </div>
+        ) : (
+          <div className="button" onClick={this._loginPopup}>
+            Log in through Google.
+          </div>
+        )}
 
-      <p>{this.props.authError}</p>
-    </div>);
+        <p>{this.props.authError}</p>
+      </div>
+    );
   },
 });
 

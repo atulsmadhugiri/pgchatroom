@@ -16,11 +16,6 @@ import RoomsList from './admin/components/RoomsList';
 import AdminActions from './admin/actions/AdminActions';
 import AdminStore from './admin/stores/AdminStore';
 
-// Don't swallow errors in promises
-process.on('unhandledRejection', (error, promise) => {
-  console.error('UNHANDLED REJECTION', error.stack);
-});
-
 function getStateFromStores() {
   return {
     fb: AdminStore.get('fb'),
@@ -37,39 +32,43 @@ function getStateFromStores() {
 /**
  * Stateful wrapper component for the admin page.
  */
-const AdminApp = React.createClass({
+class AdminApp extends React.Component {
   getInitialState() {
     return getStateFromStores();
-  },
+  }
 
   componentWillMount() {
     AdminStore.listen(this._onChange);
-  },
+  }
 
   _onChange() {
     this.setState(getStateFromStores());
-  },
+  }
 
   _toggleJsonState() {
     AdminActions.selectJsonToCsv(!this.state.jsonToCsvSelected);
-  },
+  }
 
   _renderStudySettings() {
     if (!this.state.selectedStudy) {
       return 'No Study Selected';
     }
 
-    return (<div>
-      <hr />
-      <RoomsList
-        roomsUrl={this.state.roomsUrl}
-        study={this.state.selectedStudy}
-      />
-      <RoomGenerator selectedStudy={this.state.selectedStudy} />
-      <ConfigSetter firebase={this.state.constantsFb}
-        study={this.state.selectedStudy} />
-    </div>);
-  },
+    return (
+      <div>
+        <hr />
+        <RoomsList
+          roomsUrl={this.state.roomsUrl}
+          study={this.state.selectedStudy}
+        />
+        <RoomGenerator selectedStudy={this.state.selectedStudy} />
+        <ConfigSetter
+          firebase={this.state.constantsFb}
+          study={this.state.selectedStudy}
+        />
+      </div>
+    );
+  }
 
   render() {
     return (
@@ -82,36 +81,37 @@ const AdminApp = React.createClass({
           authError={this.state.authError}
         />
 
-        {this.state.auth && this.state.jsonToCsvSelected && <div>
-          <div className="button" onClick={this._toggleJsonState}>
-            Access admin panel
+        {this.state.auth && this.state.jsonToCsvSelected && (
+          <div>
+            <div className="button" onClick={this._toggleJsonState}>
+              Access admin panel
+            </div>
+            <JSONToCSVApp />
           </div>
-          <JSONToCSVApp />
-        </div>}
+        )}
 
-        {this.state.auth && !this.state.jsonToCsvSelected && <div>
-          <div className="button" onClick={this._toggleJsonState}>
-            Access chat data
+        {this.state.auth && !this.state.jsonToCsvSelected && (
+          <div>
+            <div className="button" onClick={this._toggleJsonState}>
+              Access chat data
+            </div>
+
+            <StudyList studies={this.state.studies} />
+
+            <Spacer />
+
+            {this._renderStudySettings()}
           </div>
-
-          <StudyList studies={this.state.studies} />
-
-          <Spacer />
-
-          {this._renderStudySettings()}
-        </div>}
+        )}
 
         <Spacer />
       </div>
     );
-  },
-});
+  }
+}
 
 $(() => {
-  ReactDOM.render(
-    <AdminApp />,
-    document.getElementById('admin-app')
-  );
+  ReactDOM.render(<AdminApp />, document.getElementById('admin-app'));
 });
 
 export default AdminApp;
