@@ -17,12 +17,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.jsx?$/,
-        use: 'eslint',
-        exclude: /node_modules/,
-        enforce: 'pre',
-      },
       { test: /\.s?css$/, use: ['style-loader', 'css-loader', 'sass-loader'] },
       {
         test: /\.jsx?$/,
