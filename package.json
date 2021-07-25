@@ -6,7 +6,7 @@
   "scripts": {
     "test": "make test_once",
     "clean": "rm -rf node_modules/",
-    "dev": "yarn webpack serve --hot --inline --config webpack.config.js"
+    "dev": "yarn webpack serve --mode development --hot --inline --config webpack.config.js"
   },
   "repository": {
     "type": "git",
