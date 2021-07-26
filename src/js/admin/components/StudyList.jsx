@@ -1,66 +1,52 @@
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+/* eslint-disable jsx-a11y/click-events-have-key-events */
+/* eslint-disable comma-dangle */
 import React from 'react';
-import PropTypes from 'prop-types';
-import _ from 'underscore';
 
 import AdminActions from '../actions/AdminActions';
 import CreateStudy from './CreateStudy';
 import Spacer from './Spacer';
 
-/**
- * Renders a list of studies to choose from and edit.
- */
-const StudyList = React.createClass({
-  propTypes: {
-    studies: PropTypes.array,
-  },
-
-  componentWillMount() {
+function StudyList(props) {
+  React.useEffect(() => {
     AdminActions.listenForStudies();
-  },
+    return () => AdminActions.unlistenForStudies();
+  }, []);
 
-  componentWillUnmount() {
-    AdminActions.unlistenForStudies();
-  },
+  const { studies } = props;
 
-  _renderStudies() {
-    if (this.props.studies.length === 0) {
-      return 'No studies yet.';
-    }
+  if (!studies) {
+    return <div>Loading studies...</div>;
+  }
 
-    return this.props.studies.map((study) => (
-      <div
-        key={study}
-        className="button"
-        onClick={_.partial(this._handleSelectStudy, study)}
-      >
+  let studyLinks;
+
+  const handleSelectStudy = React.useCallback(
+    (study) => {
+      AdminActions.setSelectedStudy(study);
+    },
+    [studies]
+  );
+
+  if (studies.length === 0) {
+    studyLinks = <div>No studies yet.</div>;
+  } else {
+    studyLinks = studies.map((study) => (
+      <div key={study} className="button" onClick={handleSelectStudy(study)}>
         {study}
       </div>
     ));
-  },
+  }
 
-  _handleSelectStudy(study) {
-    console.log(study);
-    AdminActions.setSelectedStudy(study);
-  },
-
-  render() {
-    if (!this.props.studies) {
-      return <div>Loading...</div>;
-    }
-
-    return (
-      <div>
-        <h3>
-          List of Studies <br /> Click on one to modify its settings
-        </h3>
-        {this._renderStudies()}
-
-        <Spacer />
-
-        <CreateStudy studies={this.props.studies} />
-      </div>
-    );
-  },
-});
+  return (
+    <div>
+      <h3>List of Studies</h3>
+      <h3>Click on one to modify its settings</h3>
+      {studyLinks}
+      <Spacer />
+      <CreateStudy studies={studies} />
+    </div>
+  );
+}
 
 export default StudyList;
